@@ -3,6 +3,8 @@ import { join } from "path";
 import { Parser } from "xml2js";
 import { SfdxProject } from "@salesforce/core";
 import XmlFormatter from "./xmlFormatter";
+import { PROFILE_ITEMS } from "./constants";
+
 const csvparser = require("csvtojson");
 
 const SKIPPED_FOLDERS = ["node_modules", ".git", ".github"];
@@ -88,7 +90,7 @@ export async function readCsvToJsonArray(csvFilePath: string) {
 
 	// filter null values
 	jsonArray = JSON.parse(JSON.stringify(jsonArray), (key, value) => value === null || value === '' ? undefined : value);
-	if (!Array.isArray(jsonArray)) jsonArray = [jsonArray] 
+	if (!Array.isArray(jsonArray)) jsonArray = [jsonArray]
 
 	return jsonArray;
 }
@@ -119,4 +121,25 @@ export function sortByKey(myArray: [{}], key: string) {
 	}
 
 	return myArray.sort(compare);
+}
+export function generateTagId(myArray: [{}], sectionName: string) {
+	var key = PROFILE_ITEMS[sectionName].key;
+	console.log('key')
+	console.log(key)
+
+	if (Array.isArray(key)) {
+
+		for (var i in myArray) {
+			var tagids = [];
+			for(var k of key){
+				if(myArray[i][k] != undefined) tagids.push(myArray[i][k])
+			}
+
+			myArray[i] = { _tagid: tagids.join('/'), ...myArray[i] }
+		}
+	} else {
+		for (var i in myArray) {
+			myArray[i] = { _tagid: myArray[i][key], ...myArray[i] }
+		}
+	}
 }

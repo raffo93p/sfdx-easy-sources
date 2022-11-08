@@ -1,5 +1,5 @@
 export const PROFILE_APP_ROOT = 'applicationVisibilities';
-export const PROFILE_APP_HEADER = ['application', 'default', 'visible'];
+export const PROFILE_APP_HEADER = ['_tagid','application', 'default', 'visible'];
 export const PROFILE_APP_KEY = 'application';
 
 export const PROFILE_CLASS_ROOT = 'classAccesses';
@@ -12,7 +12,7 @@ export const PROFILE_FIELD_KEY = 'field';
 
 export const PROFILE_LAYOUT_ROOT = 'layoutAssignments';
 export const PROFILE_LAYOUT_HEADER = ['layout', 'recordType'];
-export const PROFILE_LAYOUT_KEY = 'layout';
+export const PROFILE_LAYOUT_KEY = PROFILE_LAYOUT_HEADER;
 
 export const PROFILE_OBJECT_ROOT = 'objectPermissions';
 export const PROFILE_OBJECT_HEADER = ['allowCreate', 'allowDelete', 'allowEdit', 'allowRead', 'modifyAllRecords', 'object', 'viewAllRecords'];

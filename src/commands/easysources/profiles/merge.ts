@@ -10,6 +10,7 @@ import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 const fs = require('fs-extra');
 import { join } from "path";
+import Performance from '../../../utils/performance';
 
 import {
     PROFILES_ROOT_TAG,
@@ -21,18 +22,12 @@ import {
 import { writeXmlToFile, readCsvToJsonArray } from "../../../utils/filesUtils"
 
 
-
-
-
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = Messages.loadMessages('sfdx-easy-sources', 'profiles_split');
-
-var startTime;
-var endTime;
+const messages = Messages.loadMessages('sfdx-easy-sources', 'profiles_merge');
 
 export default class Merge extends SfdxCommand {
     public static description = messages.getMessage('commandDescription');
@@ -43,19 +38,18 @@ export default class Merge extends SfdxCommand {
 
     protected static flagsConfig = {
         // flag with a value (-n, --name=VALUE)
-        name: flags.string({
-            char: 'n',
-            description: messages.getMessage('nameFlagDescription'),
+        input: flags.string({
+            char: 'i',
+            description: messages.getMessage('inputFlagDescription'),
         }),
-        force: flags.boolean({
-            char: 'f',
-            description: messages.getMessage('forceFlagDescription'),
-        }),
+        output: flags.string({
+            char: 'o',
+            description: messages.getMessage('outputFlagDescription'),
+        })
     };
 
-
     public async run(): Promise<AnyJson> {
-        start();
+        Performance.getInstance().start();
 
         const mergedXml = {
             [PROFILES_ROOT_TAG]: {
@@ -65,49 +59,48 @@ export default class Merge extends SfdxCommand {
             },
         };
 
-        const basePath = './assets';
-        var dirList = fs.readdirSync(basePath, { withFileTypes: true })
+
+        const baseInputDir = (this.flags.input || './force-app/src/default/profiles') as string;
+        const baseOutputDir = (this.flags.output || baseInputDir) as string;
+
+        var dirList = fs.readdirSync(baseInputDir, { withFileTypes: true })
             .filter(item => item.isDirectory())
             .map(item => item.name)
 
+        if (!fs.existsSync(baseOutputDir)) {
+            fs.mkdirSync(baseOutputDir);
+        }
+
+        // dir is the profile name without the extension
         for (const dir of dirList) {
             console.log('Merging: ' + dir);
 
+            // key is each profile section (applicationVisibilities, classAccess ecc)
             for (const key in PROFILE_ITEMS) {
-                const csvFilePath = join(basePath, dir, key) + '.csv';
+                const csvFilePath = join(baseInputDir, dir, key) + '.csv';
                 if (fs.existsSync(csvFilePath)) {
                     var jsonArray = await readCsvToJsonArray(csvFilePath)
+                    console.log(jsonArray)
+                    for(var i in jsonArray){
+                        console.log(jsonArray[i])
+                        delete jsonArray[i]['_tagid']
+                    }
                     mergedXml[PROFILES_ROOT_TAG][key] = jsonArray;
                 }
-
             }
 
-            const outputFile = join(basePath, dir, dir) + PROFILES_EXTENSION;
+            const outputFile = join(baseOutputDir, dir + PROFILES_EXTENSION);
 
             writeXmlToFile(
                 outputFile,
                 mergedXml
             );
 
-
         }
 
-
-
-        end()
+        Performance.getInstance().end();
 
         var outputString = 'OK'
         return { outputString };
     }
-}
-
-function start() {
-    startTime = performance.now();
-};
-
-function end() {
-    endTime = performance.now();
-    var timeDiff = endTime - startTime; //in ms 
-
-    console.log('Elaboration completed in ' + timeDiff + " ms");
 }

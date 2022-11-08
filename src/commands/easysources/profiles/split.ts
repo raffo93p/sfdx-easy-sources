@@ -8,11 +8,10 @@ import * as os from 'os';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
-// import SplitProfile from '../../../utils/split-profile';
-import { readXmlFromFile } from '../../../utils/filesUtils'
+import { readXmlFromFile, generateTagId } from '../../../utils/filesUtils'
 const { Parser, transforms: { unwind } } = require('json2csv');
 import { PROFILE_ITEMS, PROFILES_EXTENSION } from '../../../utils/constants';
-import Performance from '../../../utils/performance';
+import Performance from '../../../utils/performance';
 import { basename, join } from "path";
 const fs = require('fs-extra');
 
@@ -59,6 +58,13 @@ export default class Split extends SfdxCommand {
             for (const key in PROFILE_ITEMS) {
                 const myjson = profileProperties[key];
                 if (myjson == undefined) continue;
+
+                // generate tagid
+                if (key !== 'layoutAssignments') continue
+
+                // generate _tagId column
+                generateTagId(myjson, key)
+
 
                 const headers = PROFILE_ITEMS[key];
                 const transforms = [unwind({ paths: headers })];
