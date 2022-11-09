@@ -94,22 +94,23 @@ export async function readCsvToJsonArray(csvFilePath: string) {
 
 	return jsonArray;
 }
-export function jsonArrayToMap(jsonArray: [{}], key: string) {
+export function jsonArrayToMap(jsonArray: [{}]) {
 	if (!Array.isArray(jsonArray)) jsonArray = [jsonArray]
 
 	var aMap = jsonArray.reduce(function (map, obj) {
-		map[obj[key]] = obj;
+		map[obj['_tagid']] = obj;
 		return map;
 	}, {});
 	return aMap;
 }
 
-export async function readCsvToJsonMap(csvFilePath: string, key: string) {
+export async function readCsvToJsonMap(csvFilePath: string) {
 	var jsonArray = await readCsvToJsonArray(csvFilePath);
-	return jsonArrayToMap(jsonArray, key);
+	return jsonArrayToMap(jsonArray);
 }
 
-export function sortByKey(myArray: [{}], key: string) {
+export function sortByKey(myArray: [{}]) {
+	var key = '_tagid';
 	function compare(a, b) {
 		if (a[key] < b[key]) {
 			return -1;
@@ -124,8 +125,6 @@ export function sortByKey(myArray: [{}], key: string) {
 }
 export function generateTagId(myArray: [{}], sectionName: string) {
 	var key = PROFILE_ITEMS[sectionName].key;
-	console.log('key')
-	console.log(key)
 
 	if (Array.isArray(key)) {
 

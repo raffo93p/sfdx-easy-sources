@@ -8,10 +8,10 @@ import * as os from 'os';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
-import { readXmlFromFile, readCsvToJsonMap, jsonArrayToMap, sortByKey } from '../../../utils/filesUtils'
+import { readXmlFromFile, readCsvToJsonMap, jsonArrayToMap, sortByKey, generateTagId } from '../../../utils/filesUtils'
 const { Parser, transforms: { unwind } } = require('json2csv');
 import { PROFILE_ITEMS, PROFILES_EXTENSION } from '../../../utils/constants';
-import Performance from '../../../utils/performance';
+import Performance from '../../../utils/performance';
 
 
 import { basename, join } from "path";
@@ -67,6 +67,8 @@ export default class Upsert extends SfdxCommand {
 
                 if (jsonArrayNew == undefined) continue;
 
+                generateTagId(jsonArrayNew, item)
+
                 const headers = PROFILE_ITEMS[item].headers;
                 const transforms = [unwind({ paths: headers })];
                 const parser = new Parser({ headers, transforms });
@@ -78,12 +80,12 @@ export default class Upsert extends SfdxCommand {
                 if (!fs.existsSync(outputDir)) {
                     fs.mkdirSync(outputDir);
                 }
-
+                console.log('outputFile: ' + outputFile)
                 if (fs.existsSync(outputFile)) {
-                    const csvFilePath = './assets/Admin/' + item + '.csv';
+                    const csvFilePath = join(baseOutputDir, profileName, item + '.csv');
 
-                    var jsonMapOld = await readCsvToJsonMap(csvFilePath, PROFILE_ITEMS[item]['key']);
-                    var jsonMapNew = jsonArrayToMap(jsonArrayNew, PROFILE_ITEMS[item]['key'])
+                    var jsonMapOld = await readCsvToJsonMap(csvFilePath);
+                    var jsonMapNew = jsonArrayToMap(jsonArrayNew)
 
                     for (var k in jsonMapNew) {
                         jsonMapOld[k] = jsonMapNew[k];
@@ -93,7 +95,7 @@ export default class Upsert extends SfdxCommand {
                 }
 
                 try {
-                    jsonArrayNew = sortByKey(jsonArrayNew, PROFILE_ITEMS[item]['key']);
+                    jsonArrayNew = sortByKey(jsonArrayNew);
                     const csv = parser.parse(jsonArrayNew);
                     fs.writeFileSync(outputFile, csv, { flag: 'w+' });
                     // file written successfully

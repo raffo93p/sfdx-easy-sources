@@ -59,9 +59,6 @@ export default class Split extends SfdxCommand {
                 const myjson = profileProperties[key];
                 if (myjson == undefined) continue;
 
-                // generate tagid
-                if (key !== 'layoutAssignments') continue
-
                 // generate _tagId column
                 generateTagId(myjson, key)
 
