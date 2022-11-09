@@ -8,9 +8,10 @@ import * as os from 'os';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
-import { readXmlFromFile, readCsvToJsonMap, jsonArrayToMap, sortByKey } from '../../../utils/filesUtils'
+import { readXmlFromFile, readCsvToJsonMap, jsonArrayToMap, sortByKey, generateTagId } from '../../../utils/filesUtils'
 const { Parser, transforms: { unwind } } = require('json2csv');
 import { PROFILE_ITEMS, PROFILES_EXTENSION } from '../../../utils/constants';
+import Performance from '../../../utils/performance';
 
 
 import { basename, join } from "path";
@@ -21,10 +22,7 @@ Messages.importMessagesDirectory(__dirname);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = Messages.loadMessages('sfdx-easy-sources', 'profiles_split');
-
-var startTime;
-var endTime;
+const messages = Messages.loadMessages('sfdx-easy-sources', 'profiles_upsert');
 
 export default class Upsert extends SfdxCommand {
     public static description = messages.getMessage('commandDescription');
@@ -35,30 +33,31 @@ export default class Upsert extends SfdxCommand {
 
     protected static flagsConfig = {
         // flag with a value (-n, --name=VALUE)
-        name: flags.string({
-            char: 'n',
-            description: messages.getMessage('nameFlagDescription'),
+        input: flags.string({
+            char: 'i',
+            description: messages.getMessage('inputFlagDescription'),
         }),
-        force: flags.boolean({
-            char: 'f',
-            description: messages.getMessage('forceFlagDescription'),
-        }),
+        output: flags.string({
+            char: 'o',
+            description: messages.getMessage('outputFlagDescription'),
+        })
     };
 
 
     public async run(): Promise<AnyJson> {
-        start();
+        Performance.getInstance().start();
 
+        const baseInputDir = (this.flags.input || './force-app/src/default/profiles') as string;
+        const baseOutputDir = (this.flags.output || baseInputDir) as string;
 
-        const basePath = './assets';
-        var fileList = fs.readdirSync(basePath, { withFileTypes: true })
+        var fileList = fs.readdirSync(baseInputDir, { withFileTypes: true })
             .filter(item => !item.isDirectory() && item.name.endsWith(PROFILES_EXTENSION))
             .map(item => item.name)
 
         for (const filename of fileList) {
             console.log('Upserting: ' + filename);
 
-            const inputFile = join(basePath, filename);
+            const inputFile = join(baseInputDir, filename);
 
             const profileProperties = (await readXmlFromFile(inputFile)).Profile ?? {};
 
@@ -68,11 +67,12 @@ export default class Upsert extends SfdxCommand {
 
                 if (jsonArrayNew == undefined) continue;
 
+                generateTagId(jsonArrayNew, item)
+
                 const headers = PROFILE_ITEMS[item].headers;
                 const transforms = [unwind({ paths: headers })];
                 const parser = new Parser({ headers, transforms });
 
-                const baseOutputDir = getBaseDir(inputFile);
                 const profileName = getProfileName(inputFile);
                 const outputDir = join(baseOutputDir, profileName);
                 const outputFile = join(outputDir, item) + '.csv';
@@ -80,12 +80,12 @@ export default class Upsert extends SfdxCommand {
                 if (!fs.existsSync(outputDir)) {
                     fs.mkdirSync(outputDir);
                 }
-
+                console.log('outputFile: ' + outputFile)
                 if (fs.existsSync(outputFile)) {
-                    const csvFilePath = './assets/Admin/' + item + '.csv';
+                    const csvFilePath = join(baseOutputDir, profileName, item + '.csv');
 
-                    var jsonMapOld = await readCsvToJsonMap(csvFilePath, PROFILE_ITEMS[item]['key']);
-                    var jsonMapNew = jsonArrayToMap(jsonArrayNew, PROFILE_ITEMS[item]['key'])
+                    var jsonMapOld = await readCsvToJsonMap(csvFilePath);
+                    var jsonMapNew = jsonArrayToMap(jsonArrayNew)
 
                     for (var k in jsonMapNew) {
                         jsonMapOld[k] = jsonMapNew[k];
@@ -95,7 +95,7 @@ export default class Upsert extends SfdxCommand {
                 }
 
                 try {
-                    jsonArrayNew = sortByKey(jsonArrayNew, PROFILE_ITEMS[item]['key']);
+                    jsonArrayNew = sortByKey(jsonArrayNew);
                     const csv = parser.parse(jsonArrayNew);
                     fs.writeFileSync(outputFile, csv, { flag: 'w+' });
                     // file written successfully
@@ -106,22 +106,11 @@ export default class Upsert extends SfdxCommand {
             }
         }
 
-        end();
+        Performance.getInstance().end();
 
         var outputString = 'OK'
         return { outputString };
     }
-}
-
-function start() {
-    startTime = performance.now();
-};
-
-function end() {
-    endTime = performance.now();
-    var timeDiff = endTime - startTime; //in ms 
-
-    console.log('Elaboration completed in ' + timeDiff + " ms");
 }
 
 function getProfileName(inputFile: string) {
@@ -135,8 +124,4 @@ function getProfileName(inputFile: string) {
             return fileName.substring(0, i);
         }
     }
-}
-
-function getBaseDir(path: string) {
-    return path.substring(0, path.lastIndexOf('/'));
 }

@@ -8,3 +8,5 @@ csv parse esempio from file: https://www.digitalocean.com/community/tutorials/ho
 csv to json: https://www.npmjs.com/package/csvtojson
 xml json e vicev: https://www.npmjs.com/package/xml-js
 xml2js (copiato da https://github.com/Ziemniakoss/sfdx-metadata-splitter)
+
+csv merger git: https://github.com/sctweedie/csvdiff3
