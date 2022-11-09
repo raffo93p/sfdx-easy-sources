@@ -123,6 +123,7 @@ export function sortByKey(myArray: [{}]) {
 
 	return myArray.sort(compare);
 }
+
 export function generateTagId(myArray: [{}], sectionName: string) {
 	var key = PROFILE_ITEMS[sectionName].key;
 
@@ -130,15 +131,24 @@ export function generateTagId(myArray: [{}], sectionName: string) {
 
 		for (var i in myArray) {
 			var tagids = [];
-			for(var k of key){
-				if(myArray[i][k] != undefined) tagids.push(myArray[i][k])
+			for (var k of key) {
+				if (myArray[i][k] != undefined) tagids.push(myArray[i][k])
 			}
-
-			myArray[i] = { _tagid: tagids.join('/'), ...myArray[i] }
+			myArray[i] = upsertTagId(myArray[i], tagids.join('/'));
+			
 		}
 	} else {
 		for (var i in myArray) {
-			myArray[i] = { _tagid: myArray[i][key], ...myArray[i] }
+			myArray[i] = upsertTagId(myArray[i], myArray[i][key]);
 		}
 	}
+}
+
+function upsertTagId(item: {}, value: string) : {} {
+	if (item['_tagid'] === undefined) {
+		item = { _tagid: value, ...item };
+	} else {
+		item['_tagid'] = value;
+	}
+	return item;
 }
