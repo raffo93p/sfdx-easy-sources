@@ -8,7 +8,9 @@ import * as os from 'os';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
-import { generateTagId, readCsvToJsonArray, sortByKey } from '../../../utils/filesUtils'
+import { readCsvToJsonArray, sortByKey } from '../../../utils/filesUtils'
+import { generateTagId } from '../../../utils/utils'
+
 const { Parser, transforms: { unwind } } = require('json2csv');
 import { PROFILE_ITEMS } from '../../../utils/constants';
 import Performance from '../../../utils/performance';
@@ -49,7 +51,7 @@ export default class UpdateKey extends SfdxCommand {
         for (const dir of dirList) {
 
             console.log('UpdateKey: ' + dir);
-            
+
             // key is each profile section (applicationVisibilities, classAccess ecc)
             for (const key in PROFILE_ITEMS) {
 
@@ -58,7 +60,7 @@ export default class UpdateKey extends SfdxCommand {
                     var jsonArray = await readCsvToJsonArray(csvFilePath)
                     generateTagId(jsonArray, key);
                     sortByKey(jsonArray);
-                    
+
                     const headers = PROFILE_ITEMS[key];
                     const transforms = [unwind({ paths: headers })];
                     const parser = new Parser({ headers, transforms });
