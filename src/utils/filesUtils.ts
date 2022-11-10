@@ -124,8 +124,8 @@ export function sortByKey(myArray: [{}]) {
 	return myArray.sort(compare);
 }
 
-export function generateTagId(myArray: [{}], sectionName: string) {
-	var key = PROFILE_ITEMS[sectionName].key;
+export function generateTagId(myArray: [{}], type: string) {
+	var key = PROFILE_ITEMS[type].key;
 
 	if (Array.isArray(key)) {
 
@@ -134,21 +134,29 @@ export function generateTagId(myArray: [{}], sectionName: string) {
 			for (var k of key) {
 				if (myArray[i][k] != undefined) tagids.push(myArray[i][k])
 			}
-			myArray[i] = upsertTagId(myArray[i], tagids.join('/'));
+			myArray[i] = upsertTagId(myArray[i], type, tagids.join('/'));
 			
 		}
 	} else {
 		for (var i in myArray) {
-			myArray[i] = upsertTagId(myArray[i], myArray[i][key]);
+			myArray[i] = upsertTagId(myArray[i], type, myArray[i][key]);
 		}
 	}
 }
 
-function upsertTagId(item: {}, value: string) : {} {
+function upsertTagId(item: {}, type, value: string) : {} {
 	if (item['_tagid'] === undefined) {
-		item = { _tagid: value, ...item };
+		item = {...emptyItem(type), ...item , _tagid: value};
 	} else {
 		item['_tagid'] = value;
+	}
+	return item;
+}
+
+function emptyItem(type: string){
+	var item = {};
+	for(var tag of PROFILE_ITEMS[type].headers){
+		item[tag] = null;
 	}
 	return item;
 }

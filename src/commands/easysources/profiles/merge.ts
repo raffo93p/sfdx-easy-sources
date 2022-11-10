@@ -19,7 +19,7 @@ import {
     PROFILES_EXTENSION
 } from "../../../utils/constants";
 
-import { writeXmlToFile, readCsvToJsonArray } from "../../../utils/filesUtils"
+import { writeXmlToFile, readCsvToJsonArray, sortByKey } from "../../../utils/filesUtils"
 
 
 // Initialize Messages with the current plugin directory
@@ -84,7 +84,7 @@ export default class Merge extends SfdxCommand {
                     for(var i in jsonArray){
                         delete jsonArray[i]['_tagid']
                     }
-                    mergedXml[PROFILES_ROOT_TAG][key] = jsonArray;
+                    mergedXml[PROFILES_ROOT_TAG][key] = sortByKey(jsonArray);
                 }
             }
 

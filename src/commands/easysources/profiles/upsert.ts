@@ -80,7 +80,7 @@ export default class Upsert extends SfdxCommand {
                 if (!fs.existsSync(outputDir)) {
                     fs.mkdirSync(outputDir);
                 }
-                console.log('outputFile: ' + outputFile)
+
                 if (fs.existsSync(outputFile)) {
                     const csvFilePath = join(baseOutputDir, profileName, item + '.csv');
 

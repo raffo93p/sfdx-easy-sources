@@ -56,16 +56,17 @@ export default class Split extends SfdxCommand {
             const profileProperties = (await readXmlFromFile(inputFile)).Profile ?? {};
 
             for (const key in PROFILE_ITEMS) {
+
                 const myjson = profileProperties[key];
                 if (myjson == undefined) continue;
 
                 // generate _tagId column
                 generateTagId(myjson, key)
-
-
-                const headers = PROFILE_ITEMS[key];
+                
+                const headers = PROFILE_ITEMS[key].headers;
                 const transforms = [unwind({ paths: headers })];
-                const parser = new Parser({ headers, transforms });
+
+                const parser = new Parser({ transforms });
                 const csv = parser.parse(myjson);
 
                 const profileName = getProfileName(inputFile);

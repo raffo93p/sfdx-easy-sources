@@ -17,7 +17,7 @@ import {
     PROFILE_ITEMS
 } from "../../../utils/constants";
 
-import { readCsvToJsonMap } from "../../../utils/filesUtils"
+import { readCsvToJsonMap, sortByKey } from "../../../utils/filesUtils"
 
 
 // Initialize Messages with the current plugin directory
@@ -67,7 +67,6 @@ export default class Delete extends SfdxCommand {
 
         // dir is the profile name without the extension
         for (const dir of dirList) {
-            if(dir !== 'Admin') continue
             console.log('Deleting on: ' + dir);
 
             // type is a profile section (applicationVisibilities, classAccess ecc)
@@ -76,13 +75,13 @@ export default class Delete extends SfdxCommand {
                 var jsonMap = await readCsvToJsonMap(csvFilePath)
                
                 delete jsonMap[tagid];
-                var jsonArray = Object.values(jsonMap);
+                var jsonArray = Object.values(jsonMap) as [{}];
 
                 
                 const headers = PROFILE_ITEMS[type];
                 const transforms = [unwind({ paths: headers })];
                 const parser = new Parser({ headers, transforms });
-                // jsonArray = sortByKey(jsonArray);
+                jsonArray = sortByKey(jsonArray);
                 const csv = parser.parse(jsonArray);
                 try {
                     
