@@ -8,7 +8,8 @@ import * as os from 'os';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
-import { readXmlFromFile, readCsvToJsonMap, jsonArrayToMap, sortByKey, generateTagId } from '../../../utils/filesUtils'
+import { readXmlFromFile, readCsvToJsonMap, jsonArrayToMap, sortByKey } from '../../../utils/filesUtils'
+import { generateTagId } from '../../../utils/utils'
 const { Parser, transforms: { unwind } } = require('json2csv');
 import { PROFILE_ITEMS, PROFILES_EXTENSION } from '../../../utils/constants';
 import Performance from '../../../utils/performance';
@@ -80,7 +81,7 @@ export default class Upsert extends SfdxCommand {
                 if (!fs.existsSync(outputDir)) {
                     fs.mkdirSync(outputDir);
                 }
-                console.log('outputFile: ' + outputFile)
+
                 if (fs.existsSync(outputFile)) {
                     const csvFilePath = join(baseOutputDir, profileName, item + '.csv');
 

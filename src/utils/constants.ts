@@ -1,5 +1,5 @@
 export const PROFILE_APP_ROOT = 'applicationVisibilities';
-export const PROFILE_APP_HEADER = ['_tagid','application', 'default', 'visible'];
+export const PROFILE_APP_HEADER = ['application', 'default', 'visible'];
 export const PROFILE_APP_KEY = 'application';
 
 export const PROFILE_CLASS_ROOT = 'classAccesses';

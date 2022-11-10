@@ -123,22 +123,3 @@ export function sortByKey(myArray: [{}]) {
 
 	return myArray.sort(compare);
 }
-export function generateTagId(myArray: [{}], sectionName: string) {
-	var key = PROFILE_ITEMS[sectionName].key;
-
-	if (Array.isArray(key)) {
-
-		for (var i in myArray) {
-			var tagids = [];
-			for(var k of key){
-				if(myArray[i][k] != undefined) tagids.push(myArray[i][k])
-			}
-
-			myArray[i] = { _tagid: tagids.join('/'), ...myArray[i] }
-		}
-	} else {
-		for (var i in myArray) {
-			myArray[i] = { _tagid: myArray[i][key], ...myArray[i] }
-		}
-	}
-}

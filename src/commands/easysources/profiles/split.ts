@@ -8,7 +8,8 @@ import * as os from 'os';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
-import { readXmlFromFile, generateTagId } from '../../../utils/filesUtils'
+import { readXmlFromFile  } from '../../../utils/filesUtils'
+import { generateTagId } from '../../../utils/utils'
 const { Parser, transforms: { unwind } } = require('json2csv');
 import { PROFILE_ITEMS, PROFILES_EXTENSION } from '../../../utils/constants';
 import Performance from '../../../utils/performance';
@@ -56,16 +57,17 @@ export default class Split extends SfdxCommand {
             const profileProperties = (await readXmlFromFile(inputFile)).Profile ?? {};
 
             for (const key in PROFILE_ITEMS) {
+
                 const myjson = profileProperties[key];
                 if (myjson == undefined) continue;
 
                 // generate _tagId column
                 generateTagId(myjson, key)
-
-
-                const headers = PROFILE_ITEMS[key];
+                
+                const headers = PROFILE_ITEMS[key].headers;
                 const transforms = [unwind({ paths: headers })];
-                const parser = new Parser({ headers, transforms });
+
+                const parser = new Parser({ transforms });
                 const csv = parser.parse(myjson);
 
                 const profileName = getProfileName(inputFile);
