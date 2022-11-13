@@ -13,12 +13,12 @@ import { join } from "path";
 import Performance from '../../../utils/performance';
 const { Parser, transforms: { unwind } } = require('json2csv');
 
-import {
-    CSV_EXTENSION,
-    PROFILE_ITEMS
-} from "../../../utils/constants";
+import { CSV_EXTENSION } from "../../../utils/constants";
 
-import { readCsvToJsonMap, sortByKey } from "../../../utils/filesUtils"
+import { readCsvToJsonMap } from "../../../utils/filesUtils"
+import { sortByKey } from "../../../utils/utils"
+
+import { RECORDTYPES_DEFAULT_PATH, RECORDTYPES_PICKVAL_ROOT, RECORDTYPE_ITEMS } from '../../../utils/constants_recordtypes';
 
 
 // Initialize Messages with the current plugin directory
@@ -26,7 +26,7 @@ Messages.importMessagesDirectory(__dirname);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = Messages.loadMessages('sfdx-easy-sources', 'profiles_delete');
+const messages = Messages.loadMessages('sfdx-easy-sources', 'recordtypes_delete');
 
 export default class Delete extends SfdxCommand {
     public static description = messages.getMessage('commandDescription');
@@ -37,64 +37,101 @@ export default class Delete extends SfdxCommand {
 
     protected static flagsConfig = {
         // flag with a value (-n, --name=VALUE)
-        input: flags.string({
+        dir: flags.string({
+            char: 'd',
+            description: messages.getMessage('dirFlagDescription', [RECORDTYPES_DEFAULT_PATH]),
+        }),
+        object: flags.string({
             char: 'i',
-            description: messages.getMessage('inputFlagDescription'),
+            description: messages.getMessage('objectFlagDescription'),
         }),
-        type: flags.string({
-            char: 't',
-            description: messages.getMessage('typeFlagDescription'),
+        recordtype: flags.string({
+            char: 'r',
+            description: messages.getMessage('recordtypeFlagDescription'),
         }),
-        tagid: flags.string({
+        picklist: flags.string({
+            char: 'p',
+            description: messages.getMessage('picklistFlagDescription'),
+        }),
+        apiname: flags.string({
             char: 'k',
-            description: messages.getMessage('tagidFlagDescription'),
+            description: messages.getMessage('apinameFlagDescription'),
         })
     };
 
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        const type = this.flags.type;
-        const tagid = this.flags.tagid;
-        if (!type) throw new SfError(messages.getMessage('errorNoTypeFlag'));
-        if (!tagid) throw new SfError(messages.getMessage('errorNoTagIdFlag'));
-        if (!Object.keys(PROFILE_ITEMS).includes(type)) throw new SfError(messages.getMessage('errorNoValidTypeFlag'));
+        const picklist = this.flags.picklist;
+        const apiname = (this.flags.apiname) as string;
+        if (!picklist) throw new SfError(messages.getMessage('errorNoPicklistFlag'));
 
-        const baseInputDir = (this.flags.input || './force-app/src/default/profiles') as string;
+        const baseInputDir = (this.flags.dir || RECORDTYPES_DEFAULT_PATH) as string;
+        const inputObject = (this.flags.object) as string;
+        const inputRecordType = (this.flags.recordtype) as string;
 
-        var dirList = fs.readdirSync(baseInputDir, { withFileTypes: true })
-            .filter(item => item.isDirectory())
-            .map(item => item.name)
 
-        // dir is the profile name without the extension
-        for (const dir of dirList) {
-            console.log('Deleting on: ' + dir);
+        var objectList = [];
+        if (inputObject) {
+            objectList = inputObject.split(',');
+        } else {
+            objectList = fs.readdirSync(baseInputDir, { withFileTypes: true })
+                .filter(item => item.isDirectory())
+                .map(item => item.name)
+        }
 
-            // type is a profile section (applicationVisibilities, classAccess ecc)
-            const csvFilePath = join(baseInputDir, dir, type) + CSV_EXTENSION;
-            if (fs.existsSync(csvFilePath)) {
-                var jsonMap = await readCsvToJsonMap(csvFilePath)
-               
-                delete jsonMap[tagid];
-                var jsonArray = Object.values(jsonMap) as [{}];
+        for (const obj of objectList) {
+            var recordTypeList = [];
 
-                
-                const headers = PROFILE_ITEMS[type];
-                const transforms = [unwind({ paths: headers })];
-                const parser = new Parser({ headers, transforms });
-                jsonArray = sortByKey(jsonArray);
-                const csv = parser.parse(jsonArray);
-                try {
-                    
-                    fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
-                    // file written successfully
-                } catch (err) {
-                    console.error(err);
-                }
+            if (inputRecordType) {
+                recordTypeList = inputRecordType.split(',');
+            } else {
+                recordTypeList = fs.readdirSync(join(baseInputDir, obj, 'recordTypes'), { withFileTypes: true })
+                    .filter(item => item.isDirectory())
+                    .map(item => item.name)
             }
 
 
+            // dir is the recordtype name without the extension
+            for (const dir of recordTypeList) {
+                console.log('Deleting on: ' + join(obj, dir));
 
+                const csvFilePath = join(baseInputDir, obj, 'recordTypes', dir, RECORDTYPES_PICKVAL_ROOT) + CSV_EXTENSION;
+                if (fs.existsSync(csvFilePath)) {
+                    var jsonMap = await readCsvToJsonMap(csvFilePath)
+
+                    if (apiname) {
+                        delete jsonMap[join(picklist, apiname)];
+                    } else {
+
+                        for (var key of Object.keys(jsonMap)) {
+                            
+                            if (jsonMap[key].picklist === picklist) {
+                                console.log(key)
+                                delete jsonMap[key];
+                            }
+                        }
+                    }
+
+                    var jsonArray = Object.values(jsonMap) as [{}];
+
+
+                    const headers = RECORDTYPE_ITEMS[RECORDTYPES_PICKVAL_ROOT];
+                    const transforms = [unwind({ paths: headers })];
+                    const parser = new Parser({ headers, transforms });
+                    jsonArray = sortByKey(jsonArray);
+                    const csv = parser.parse(jsonArray);
+                    try {
+
+                        fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
+                        // file written successfully
+                    } catch (err) {
+                        console.error(err);
+                    }
+                }
+
+
+            }
         }
 
         Performance.getInstance().end();

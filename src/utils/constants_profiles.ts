@@ -1,3 +1,5 @@
+import { DEFAULT_PATH } from "./constants";
+
 export const PROFILE_APP_ROOT = 'applicationVisibilities';
 export const PROFILE_APP_HEADER = ['application', 'default', 'visible'];
 export const PROFILE_APP_KEY = 'application';
@@ -59,3 +61,5 @@ export const PROFILE_ITEMS = {
 
 export const PROFILES_EXTENSION = ".profile-meta.xml";
 export const PROFILES_ROOT_TAG = "Profile";
+
+export const PROFILES_DEFAULT_PATH = DEFAULT_PATH + '/profiles';

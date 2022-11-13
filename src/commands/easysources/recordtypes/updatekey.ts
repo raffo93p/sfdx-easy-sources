@@ -8,14 +8,15 @@ import * as os from 'os';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
-import { readCsvToJsonArray, sortByKey } from '../../../utils/filesUtils'
-import { generateTagId } from '../../../utils/utils'
+import { readCsvToJsonArray } from '../../../utils/filesUtils'
+
+import { generateTagId, sortByKey } from '../../../utils/utils'
 
 const { Parser, transforms: { unwind } } = require('json2csv');
-import { CSV_EXTENSION, PROFILE_ITEMS } from '../../../utils/constants';
+import { CSV_EXTENSION } from '../../../utils/constants';
 import Performance from '../../../utils/performance';
 import { join } from "path";
-import { RECORDTYPE_ITEMS } from '../../../utils/constants_recordtypes';
+import { RECORDTYPES_DEFAULT_PATH, RECORDTYPE_ITEMS } from '../../../utils/constants_recordtypes';
 const fs = require('fs-extra');
 
 // Initialize Messages with the current plugin directory
@@ -23,7 +24,7 @@ Messages.importMessagesDirectory(__dirname);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = Messages.loadMessages('sfdx-easy-sources', 'profiles_updatekey');
+const messages = Messages.loadMessages('sfdx-easy-sources', 'recordtypes_updatekey');
 
 export default class UpdateKey extends SfdxCommand {
     public static description = messages.getMessage('commandDescription');
@@ -32,52 +33,78 @@ export default class UpdateKey extends SfdxCommand {
 
     protected static flagsConfig = {
         // flag with a value (-n, --name=VALUE)
-        input: flags.string({
+        dir: flags.string({
+            char: 'd',
+            description: messages.getMessage('dirFlagDescription', [RECORDTYPES_DEFAULT_PATH]),
+        }),
+        object: flags.string({
             char: 'i',
-            description: messages.getMessage('inputFlagDescription'),
+            description: messages.getMessage('objectFlagDescription'),
+        }),
+        recordtype: flags.string({
+            char: 'r',
+            description: messages.getMessage('recordtypeFlagDescription'),
         })
     };
 
 
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
-        const baseInputDir = (this.flags.input || './force-app/src/default/objects') as string;
-
-        var dirList = fs.readdirSync(baseInputDir, { withFileTypes: true })
-            .filter(item => item.isDirectory())
-            .map(item => item.name)
+        const baseInputDir = (this.flags.dir || RECORDTYPES_DEFAULT_PATH) as string;
+        const inputObject = (this.flags.object) as string;
+        const inputRecordType = (this.flags.recordtype) as string;
 
 
-        // dir is the record type name without the extension
-        for (const dir of dirList) {
 
-            console.log('UpdateKey: ' + dir);
-
-            // key is each profile section (applicationVisibilities, classAccess ecc)
-            for (const tag_section in RECORDTYPE_ITEMS) {
-
-                const csvFilePath = join(baseInputDir, dir, tag_section) + CSV_EXTENSION;
-                if (fs.existsSync(csvFilePath)) {
-                    var jsonArray = await readCsvToJsonArray(csvFilePath)
-                    generateTagId(jsonArray, RECORDTYPE_ITEMS[tag_section].key, RECORDTYPE_ITEMS[tag_section].headers);
-                    sortByKey(jsonArray);
-
-                    const headers = RECORDTYPE_ITEMS[tag_section];
-                    const transforms = [unwind({ paths: headers })];
-                    const parser = new Parser({ headers, transforms });
-                    const csv = parser.parse(jsonArray);
-
-                    try {
-                        fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
-                        // file written successfully
-                    } catch (err) {
-                        console.error(err);
-                    }
-                }
-            }
-
+        var objectList = [];
+        if (inputObject) {
+            objectList = inputObject.split(',');
+        } else {
+            objectList = fs.readdirSync(baseInputDir, { withFileTypes: true })
+                .filter(item => item.isDirectory())
+                .map(item => item.name)
         }
 
+        for (const obj of objectList) {
+            var recordTypeList = [];
+
+            if (inputRecordType) {
+                recordTypeList = inputRecordType.split(',');
+            } else {
+                recordTypeList = fs.readdirSync(join(baseInputDir, obj, 'recordTypes'), { withFileTypes: true })
+                    .filter(item => item.isDirectory())
+                    .map(item => item.name)
+            }
+            // dir is the record type name without the extension
+            for (const dir of recordTypeList) {
+
+                console.log('UpdateKey: ' + dir);
+
+                // key is each profile section (applicationVisibilities, classAccess ecc)
+                for (const tag_section in RECORDTYPE_ITEMS) {
+
+                    const csvFilePath = join(baseInputDir, dir, tag_section) + CSV_EXTENSION;
+                    if (fs.existsSync(csvFilePath)) {
+                        var jsonArray = await readCsvToJsonArray(csvFilePath)
+                        generateTagId(jsonArray, RECORDTYPE_ITEMS[tag_section].key, RECORDTYPE_ITEMS[tag_section].headers);
+                        sortByKey(jsonArray);
+
+                        const headers = RECORDTYPE_ITEMS[tag_section];
+                        const transforms = [unwind({ paths: headers })];
+                        const parser = new Parser({ headers, transforms });
+                        const csv = parser.parse(jsonArray);
+
+                        try {
+                            fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
+                            // file written successfully
+                        } catch (err) {
+                            console.error(err);
+                        }
+                    }
+                }
+
+            }
+        }
 
         Performance.getInstance().end();
 

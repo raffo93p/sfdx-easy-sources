@@ -1,11 +1,15 @@
 {
   "commandDescription": "Splits profiles into various csv files",
-  "inputFlagDescription": "Specify a custom dir for input profiles. Default: ./force-app/src/default/profiles",
-  "outputFlagDescription": "Specify a custom dir for output profiles. Default the same as input",
+  "dirFlagDescription" : "Specify a custom dir for input profiles. Default: '%s'",
+  "inputFlagDescription": "Specify a profile file in input. Example: Admin.profile-meta.xml",
+  "outputFlagDescription": "Specify a custom dir for output profiles. Default: '%s'",
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
     "sfdx easysources:profiles:split",
-    "sfdx easysources:profiles:split -i './force-app/src/default/profiles' -o './force-app/src/default/profiles'"
+    "sfdx easysources:profiles:split -d './force-app/src/default/profiles'",
+    "sfdx easysources:profiles:split -d './force-app/src/default/profiles' -i 'Admin.profile-meta.xml'",
+    "sfdx easysources:profiles:split -d './force-app/src/default/profiles' -o './force-app/src/default/profiles'",
+    "sfdx easysources:profiles:split -d './force-app/src/default/profiles' -i 'Admin.profile-meta.xml' -o './force-app/src/default/profiles'"
   ]
 }

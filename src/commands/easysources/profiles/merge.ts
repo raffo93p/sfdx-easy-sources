@@ -19,6 +19,7 @@ import {
 } from "../../../utils/constants_profiles";
 
 import { CSV_EXTENSION, XML_PART_EXTENSION } from "../../../utils/constants"
+import {PROFILES_DEFAULT_PATH} from "../../../utils/constants_profiles"
 
 import { writeXmlToFile, readCsvToJsonArray, readXmlFromFile } from "../../../utils/filesUtils"
 import { sortByKey } from "../../../utils/utils"
@@ -41,26 +42,35 @@ export default class Merge extends SfdxCommand {
 
     protected static flagsConfig = {
         // flag with a value (-n, --name=VALUE)
+        dir: flags.string({
+            char: 'd',
+            description: messages.getMessage('dirFlagDescription', [PROFILES_DEFAULT_PATH]),
+        }),
         input: flags.string({
             char: 'i',
             description: messages.getMessage('inputFlagDescription'),
         }),
         output: flags.string({
             char: 'o',
-            description: messages.getMessage('outputFlagDescription'),
+            description: messages.getMessage('outputFlagDescription', [PROFILES_DEFAULT_PATH]),
         })
     };
 
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        const baseInputDir = (this.flags.input || './force-app/src/default/profiles') as string;
+        const baseInputDir = (this.flags.dir || [PROFILES_DEFAULT_PATH]) as string;
         const baseOutputDir = (this.flags.output || baseInputDir) as string;
+        const inputProfile = (this.flags.input) as string;
 
-        var dirList = fs.readdirSync(baseInputDir, { withFileTypes: true })
-            .filter(item => item.isDirectory())
-            .map(item => item.name)
-
+        var dirList = [];
+        if (inputProfile) {
+            dirList = inputProfile.split(',');
+        } else {
+            dirList = fs.readdirSync(baseInputDir, { withFileTypes: true })
+                .filter(item => item.isDirectory())
+                .map(item => item.name)
+        }
         if (!fs.existsSync(baseOutputDir)) {
             fs.mkdirSync(baseOutputDir);
         }

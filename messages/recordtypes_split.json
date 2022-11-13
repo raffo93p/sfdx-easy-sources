@@ -1,11 +1,16 @@
 {
-  "commandDescription": "Splits profiles into various csv files",
-  "inputFlagDescription": "Specify a custom dir for input profiles. Default: ./force-app/src/default/profiles",
-  "outputFlagDescription": "Specify a custom dir for output profiles. Default the same as input",
+  "commandDescription": "Splits recordTypes into various csv files",
+  "dirFlagDescription" : "Specify a custom dir for input recordTypes. Default: '%s'",
+  "objectFlagDescription" : "Specify an object for input recordTypes. Example: 'Account'",
+  "recordtypeFlagDescription": "Specify a recordType. Example: 'MyRecordType.recordType-meta.xml",
+  "outputFlagDescription": "Specify a custom dir for output recordTypes. Default: '%s'",
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:profiles:split",
-    "sfdx easysources:profiles:split -i './force-app/src/default/profiles' -o './force-app/src/default/profiles'"
+    "sfdx easysources:recordtypes:split",
+    "sfdx easysources:recordtypes:split -d './force-app/src/default/objects'",
+    "sfdx easysources:recordtypes:split -d './force-app/src/default/objects' -i 'Account'",
+    "sfdx easysources:recordtypes:split -d './force-app/src/default/objects' -o './force-app/src/default/objects'",
+    "sfdx easysources:recordtypes:split -d './force-app/src/default/objects' -i 'Account' -r 'MyRecordType.recordType-meta.xml'"
   ]
 }

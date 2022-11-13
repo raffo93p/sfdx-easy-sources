@@ -1,5 +1,5 @@
 import { promises, lstatSync } from "fs";
-import { basename, join } from "path";
+import { join } from "path";
 import { Parser } from "xml2js";
 import { SfdxProject } from "@salesforce/core";
 import XmlFormatter from "./xmlFormatter";
@@ -109,7 +109,8 @@ export async function readCsvToJsonMap(csvFilePath: string) {
 }
 
 export function removeExtension(inputFile: string) {
-	const fileName = basename(inputFile);
+	if(inputFile == null || inputFile == undefined) return inputFile;
+	const fileName = inputFile; //basename(inputFile);
 	let dotsCount = 0;
 	for (let i = fileName.length - 1; i > 0; i--) {
 		if (fileName[i] === ".") {
