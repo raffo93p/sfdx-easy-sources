@@ -8,13 +8,16 @@ import * as os from 'os';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
-import { readCsvToJsonArray, sortByKey } from '../../../utils/filesUtils'
+import { readCsvToJsonArray } from '../../../utils/filesUtils'
+import { sortByKey } from "../../../utils/utils"
+
 import { generateTagId } from '../../../utils/utils'
 
 const { Parser, transforms: { unwind } } = require('json2csv');
-import { PROFILE_ITEMS } from '../../../utils/constants';
+import { PROFILE_ITEMS } from '../../../utils/constants_profiles';
 import Performance from '../../../utils/performance';
 import { join } from "path";
+import { CSV_EXTENSION } from '../../../utils/constants';
 const fs = require('fs-extra');
 
 // Initialize Messages with the current plugin directory
@@ -52,16 +55,16 @@ export default class UpdateKey extends SfdxCommand {
 
             console.log('UpdateKey: ' + dir);
 
-            // key is each profile section (applicationVisibilities, classAccess ecc)
-            for (const key in PROFILE_ITEMS) {
+            // tag_Section is each profile section (applicationVisibilities, classAccess ecc)
+            for (const tag_section in PROFILE_ITEMS) {
 
-                const csvFilePath = join(baseInputDir, dir, key) + '.csv';
+                const csvFilePath = join(baseInputDir, dir, tag_section) + CSV_EXTENSION;
                 if (fs.existsSync(csvFilePath)) {
                     var jsonArray = await readCsvToJsonArray(csvFilePath)
-                    generateTagId(jsonArray, key);
+                    generateTagId(jsonArray, PROFILE_ITEMS[tag_section].key, PROFILE_ITEMS[tag_section].headers);
                     sortByKey(jsonArray);
 
-                    const headers = PROFILE_ITEMS[key];
+                    const headers = PROFILE_ITEMS[tag_section];
                     const transforms = [unwind({ paths: headers })];
                     const parser = new Parser({ headers, transforms });
                     const csv = parser.parse(jsonArray);

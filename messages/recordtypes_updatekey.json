@@ -1,0 +1,10 @@
+{
+  "commandDescription": "Update _tagid on csv files, based on the other fields",
+  "inputFlagDescription": "Specify a custom dir for input csv profiles. Default: ./force-app/src/default/profiles",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:profiles:updatekey",
+    "sfdx easysources:profiles:updatekey -i './force-app/src/default/profiles'"
+  ]
+}

@@ -9,15 +9,15 @@ import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import { readXmlFromFile, removeExtension, writeXmlToFile } from '../../../utils/filesUtils'
-import { generateTagId } from '../../../utils/utils'
-const { Parser, transforms: { unwind } } = require('json2csv');
-import { PROFILE_ITEMS, PROFILES_EXTENSION, PROFILES_ROOT_TAG } from '../../../utils/constants_profiles';
+// import { generateTagId } from '../../../utils/utils'
+const { Parser } = require('json2csv');
+import { RECORDTYPES_EXTENSION, RECORDTYPES_PICKVAL_ROOT, RECORDTYPES_ROOT_TAG, RECORDTYPE_ITEMS } from '../../../utils/constants_recordtypes';
 import Performance from '../../../utils/performance';
 import { join } from "path";
-const fs = require('fs-extra');
-import { sortByKey } from "../../../utils/utils"
+import { generateTagId, sortByKey } from '../../../utils/utils';
 import { CSV_EXTENSION, XML_PART_EXTENSION } from '../../../utils/constants';
-
+import { transformXMLtoCSV } from '../../../utils/utils_recordtypes';
+const fs = require('fs-extra');
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);
@@ -46,38 +46,38 @@ export default class Split extends SfdxCommand {
 
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
-        const baseInputDir = (this.flags.input || './force-app/src/default/profiles') as string;
+        const baseInputDir = (this.flags.input || './force-app/src/default/objects') as string;
         const baseOutputDir = (this.flags.output || baseInputDir) as string;
 
         var fileList = fs.readdirSync(baseInputDir, { withFileTypes: true })
-            .filter(item => !item.isDirectory() && item.name.endsWith(PROFILES_EXTENSION))
+            .filter(item => !item.isDirectory() && item.name.endsWith(RECORDTYPES_EXTENSION))
             .map(item => item.name)
 
+        // TODO per objects non mi va bene questo scorrimento. devo andare in ogni oggetto
         for (const filename of fileList) {
             console.log('Splitting: ' + filename);
 
+
             const inputFile = join(baseInputDir, filename);
             const xmlFileContent = (await readXmlFromFile(inputFile)) ?? {};
-            const profileProperties = xmlFileContent[PROFILES_ROOT_TAG] ?? {};
+            const recordtypeProperties = xmlFileContent[RECORDTYPES_ROOT_TAG] ?? {};
 
-            const profileName = removeExtension(inputFile);
-            const outputDir = join(baseOutputDir, profileName);
+            const recordTypeName = removeExtension(inputFile);
+            const outputDir = join(baseOutputDir, recordTypeName);
 
-            for (const tag_section in PROFILE_ITEMS) {
-
-                var myjson = profileProperties[tag_section];
+            for (const tag_section in RECORDTYPE_ITEMS) {
+                const myjson = recordtypeProperties[RECORDTYPES_PICKVAL_ROOT];
                 if (myjson == undefined) continue;
 
+                var jsforcsv = transformXMLtoCSV(myjson);
+
+
                 // generate _tagId column
-                generateTagId(myjson, PROFILE_ITEMS[tag_section].key, PROFILE_ITEMS[tag_section].headers);
-                myjson = sortByKey(myjson);
+                generateTagId(jsforcsv, RECORDTYPE_ITEMS[tag_section].key, RECORDTYPE_ITEMS[tag_section].headers);
+                jsforcsv = sortByKey(jsforcsv);
 
-                const headers = PROFILE_ITEMS[tag_section].headers;
-                const transforms = [unwind({ paths: headers })];
-
-                const parser = new Parser({ transforms });
-                const csv = parser.parse(myjson);
-
+                const parser = new Parser();
+                const csv = parser.parse(jsforcsv);
 
                 const outputFileCSV = join(outputDir, tag_section) + CSV_EXTENSION;
 
@@ -92,11 +92,10 @@ export default class Split extends SfdxCommand {
                     console.error(err);
                 }
 
-                xmlFileContent[PROFILES_ROOT_TAG][tag_section] = null;
+                xmlFileContent[RECORDTYPES_ROOT_TAG][tag_section] = null;
 
             }
-
-            const outputFileXML = join(outputDir, profileName + XML_PART_EXTENSION);
+            const outputFileXML = join(outputDir, recordTypeName + XML_PART_EXTENSION);
             writeXmlToFile(outputFileXML, xmlFileContent);
         }
 
@@ -106,3 +105,4 @@ export default class Split extends SfdxCommand {
         return { outputString };
     }
 }
+

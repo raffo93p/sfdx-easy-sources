@@ -13,16 +13,19 @@ import { join } from "path";
 import Performance from '../../../utils/performance';
 
 import {
-    PROFILES_ROOT_TAG,
-    PROFILE_ITEMS,
-    PROFILES_EXTENSION
-} from "../../../utils/constants_profiles";
+    CSV_EXTENSION,
+    XML_PART_EXTENSION
+} from "../../../utils/constants";
 
-import { CSV_EXTENSION, XML_PART_EXTENSION } from "../../../utils/constants"
+import {
+    RECORDTYPES_EXTENSION,
+    RECORDTYPES_PICKVAL_ROOT,
+    RECORDTYPES_ROOT_TAG,
+    RECORDTYPE_ITEMS
+} from "../../../utils/constants_recordtypes";
 
 import { writeXmlToFile, readCsvToJsonArray, readXmlFromFile } from "../../../utils/filesUtils"
 import { sortByKey } from "../../../utils/utils"
-
 
 
 // Initialize Messages with the current plugin directory
@@ -65,15 +68,14 @@ export default class Merge extends SfdxCommand {
             fs.mkdirSync(baseOutputDir);
         }
 
-        // dir is the profile name without the extension
+        // dir is the record type name without the extension
         for (const dir of dirList) {
             console.log('Merging: ' + dir);
+
             const inputXML = join(baseInputDir, dir, dir) + XML_PART_EXTENSION;
             const mergedXml = (await readXmlFromFile(inputXML)) ?? {};
 
-
-            // tag_section is each profile section (applicationVisibilities, classAccess ecc)
-            for (const tag_section in PROFILE_ITEMS) {
+            for (const tag_section in RECORDTYPE_ITEMS) {
                 const csvFilePath = join(baseInputDir, dir, tag_section) + CSV_EXTENSION;
                 if (fs.existsSync(csvFilePath)) {
                     var jsonArray = await readCsvToJsonArray(csvFilePath)
@@ -83,14 +85,17 @@ export default class Merge extends SfdxCommand {
                     for (var i in jsonArray) {
                         delete jsonArray[i]['_tagid']
                     }
-                    mergedXml[PROFILES_ROOT_TAG][tag_section] = sortByKey(jsonArray);
-                }
-            }
 
-            const outputFile = join(baseOutputDir, dir + PROFILES_EXTENSION);
+                    var jsonArrayForXML = transformCSVtoXML(jsonArray);
+
+
+                    mergedXml[RECORDTYPES_ROOT_TAG][RECORDTYPES_PICKVAL_ROOT] = jsonArrayForXML;
+                }
+
+            }
+            const outputFile = join(baseOutputDir, dir + RECORDTYPES_EXTENSION);
 
             writeXmlToFile(outputFile, mergedXml);
-
 
         }
 
@@ -99,4 +104,22 @@ export default class Merge extends SfdxCommand {
         var outputString = 'OK'
         return { outputString };
     }
+}
+
+function transformCSVtoXML(jsonArray) {
+    var jsonArrayForXML = []
+    var obj = {}
+    var prevPicklist: string;
+    for (var entry of jsonArray) {
+        console.log(prevPicklist)
+        if (entry.picklist !== prevPicklist) {
+            if (prevPicklist != undefined) jsonArrayForXML.push(obj);
+            obj = { picklist: entry.picklist, values: [{ fullName: entry.values_fullName, default: entry.values_default }] };
+            prevPicklist = entry.picklist
+        } else {
+            obj['values'].push({ fullName: entry.values_fullName, default: entry.values_default })
+        }
+    }
+    jsonArrayForXML.push(obj);
+    return jsonArrayForXML;
 }

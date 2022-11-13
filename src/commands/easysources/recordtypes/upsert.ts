@@ -9,15 +9,15 @@ import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import { readXmlFromFile, readCsvToJsonMap, jsonArrayToMap, removeExtension, writeXmlToFile } from '../../../utils/filesUtils'
-import { sortByKey, generateTagId } from "../../../utils/utils"
-
+import { generateTagId, sortByKey } from '../../../utils/utils'
 const { Parser, transforms: { unwind } } = require('json2csv');
-import { PROFILE_ITEMS, PROFILES_EXTENSION, PROFILES_ROOT_TAG } from '../../../utils/constants_profiles';
+import { CSV_EXTENSION, XML_PART_EXTENSION } from '../../../utils/constants';
 import Performance from '../../../utils/performance';
 
 
 import { join } from "path";
-import { CSV_EXTENSION, XML_PART_EXTENSION } from '../../../utils/constants';
+import { RECORDTYPES_EXTENSION, RECORDTYPES_ROOT_TAG, RECORDTYPE_ITEMS } from '../../../utils/constants_recordtypes';
+import { transformXMLtoCSV } from '../../../utils/utils_recordtypes';
 const fs = require('fs-extra');
 
 // Initialize Messages with the current plugin directory
@@ -50,11 +50,11 @@ export default class Upsert extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        const baseInputDir = (this.flags.input || './force-app/src/default/profiles') as string;
+        const baseInputDir = (this.flags.input || './force-app/src/default/objects') as string;
         const baseOutputDir = (this.flags.output || baseInputDir) as string;
 
         var fileList = fs.readdirSync(baseInputDir, { withFileTypes: true })
-            .filter(item => !item.isDirectory() && item.name.endsWith(PROFILES_EXTENSION))
+            .filter(item => !item.isDirectory() && item.name.endsWith(RECORDTYPES_EXTENSION))
             .map(item => item.name)
 
         for (const filename of fileList) {
@@ -63,19 +63,23 @@ export default class Upsert extends SfdxCommand {
             const inputFile = join(baseInputDir, filename);
 
             const xmlFileContent = (await readXmlFromFile(inputFile)) ?? {};
-            const profileProperties = xmlFileContent[PROFILES_ROOT_TAG] ?? {};
+            const recordtypeProperties = xmlFileContent[RECORDTYPES_ROOT_TAG] ?? {};
 
-            const profileName = removeExtension(inputFile);
-            const outputDir = join(baseOutputDir, profileName);
+            const recordtypeName = removeExtension(inputFile);
+            const outputDir = join(baseOutputDir, recordtypeName);
 
-            for (const tag_section in PROFILE_ITEMS) {
+            for (const tag_section in RECORDTYPE_ITEMS) {
 
-                var jsonArrayNew = profileProperties[tag_section];
-                if (jsonArrayNew == undefined) continue;
+                var jsonArray = recordtypeProperties[tag_section];
+                if (jsonArray == undefined) continue;
 
-                generateTagId(jsonArrayNew, PROFILE_ITEMS[tag_section].key, PROFILE_ITEMS[tag_section].headers)
+                var jsonArrayNew = transformXMLtoCSV(jsonArray);
 
-                const headers = PROFILE_ITEMS[tag_section].headers;
+
+                generateTagId(jsonArrayNew, RECORDTYPE_ITEMS[tag_section].key, RECORDTYPE_ITEMS[tag_section].headers)
+
+
+                const headers = RECORDTYPE_ITEMS[tag_section].headers;
                 const transforms = [unwind({ paths: headers })];
                 const parser = new Parser({ headers, transforms });
 
@@ -87,7 +91,7 @@ export default class Upsert extends SfdxCommand {
                 }
 
                 if (fs.existsSync(outputFile)) {
-                    const csvFilePath = join(baseOutputDir, profileName, tag_section + CSV_EXTENSION);
+                    const csvFilePath = join(baseOutputDir, recordtypeName, tag_section + CSV_EXTENSION);
 
                     var jsonMapOld = await readCsvToJsonMap(csvFilePath);
                     var jsonMapNew = jsonArrayToMap(jsonArrayNew)
@@ -107,21 +111,19 @@ export default class Upsert extends SfdxCommand {
                 } catch (err) {
                     console.error(err);
                 }
-                xmlFileContent[PROFILES_ROOT_TAG][tag_section] = null;
-
+                xmlFileContent[RECORDTYPES_ROOT_TAG][tag_section] = null;
 
             }
-
-            const inputFilePart = join(baseInputDir, profileName, profileName + XML_PART_EXTENSION);
+            const inputFilePart = join(baseInputDir, recordtypeName, recordtypeName + XML_PART_EXTENSION);
             const xmlFileContentPart = (await readXmlFromFile(inputFilePart)) ?? {};
-            const profilePropertiesPart = xmlFileContentPart[PROFILES_ROOT_TAG] ?? {};
-
-            for (var k in profileProperties) {
+            const recordtypePropertiesPart = xmlFileContentPart[RECORDTYPES_ROOT_TAG] ?? {};
+            
+            for(var k in recordtypeProperties){
                 console.log(k)
-                profilePropertiesPart[k] = profileProperties[k];
+                recordtypePropertiesPart[k] = recordtypeProperties[k];
             }
 
-            writeXmlToFile(inputFilePart, profilePropertiesPart);
+            writeXmlToFile(inputFilePart, recordtypePropertiesPart); 
         }
 
         Performance.getInstance().end();

@@ -8,91 +8,76 @@ import * as os from 'os';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
-const fs = require('fs-extra');
-import { join } from "path";
+import { readCsvToJsonArray, sortByKey } from '../../../utils/filesUtils'
+import { generateTagId } from '../../../utils/utils'
+
+const { Parser, transforms: { unwind } } = require('json2csv');
+import { CSV_EXTENSION, PROFILE_ITEMS } from '../../../utils/constants';
 import Performance from '../../../utils/performance';
-
-import {
-    PROFILES_ROOT_TAG,
-    PROFILE_ITEMS,
-    PROFILES_EXTENSION
-} from "../../../utils/constants_profiles";
-
-import { CSV_EXTENSION, XML_PART_EXTENSION } from "../../../utils/constants"
-
-import { writeXmlToFile, readCsvToJsonArray, readXmlFromFile } from "../../../utils/filesUtils"
-import { sortByKey } from "../../../utils/utils"
-
-
+import { join } from "path";
+import { RECORDTYPE_ITEMS } from '../../../utils/constants_recordtypes';
+const fs = require('fs-extra');
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = Messages.loadMessages('sfdx-easy-sources', 'profiles_merge');
+const messages = Messages.loadMessages('sfdx-easy-sources', 'profiles_updatekey');
 
-export default class Merge extends SfdxCommand {
+export default class UpdateKey extends SfdxCommand {
     public static description = messages.getMessage('commandDescription');
 
     public static examples = messages.getMessage('examples').split(os.EOL);
-
-    public static args = [{ name: 'file' }];
 
     protected static flagsConfig = {
         // flag with a value (-n, --name=VALUE)
         input: flags.string({
             char: 'i',
             description: messages.getMessage('inputFlagDescription'),
-        }),
-        output: flags.string({
-            char: 'o',
-            description: messages.getMessage('outputFlagDescription'),
         })
     };
 
+
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
-
-        const baseInputDir = (this.flags.input || './force-app/src/default/profiles') as string;
-        const baseOutputDir = (this.flags.output || baseInputDir) as string;
+        const baseInputDir = (this.flags.input || './force-app/src/default/objects') as string;
 
         var dirList = fs.readdirSync(baseInputDir, { withFileTypes: true })
             .filter(item => item.isDirectory())
             .map(item => item.name)
 
-        if (!fs.existsSync(baseOutputDir)) {
-            fs.mkdirSync(baseOutputDir);
-        }
 
-        // dir is the profile name without the extension
+        // dir is the record type name without the extension
         for (const dir of dirList) {
-            console.log('Merging: ' + dir);
-            const inputXML = join(baseInputDir, dir, dir) + XML_PART_EXTENSION;
-            const mergedXml = (await readXmlFromFile(inputXML)) ?? {};
 
+            console.log('UpdateKey: ' + dir);
 
-            // tag_section is each profile section (applicationVisibilities, classAccess ecc)
-            for (const tag_section in PROFILE_ITEMS) {
+            // key is each profile section (applicationVisibilities, classAccess ecc)
+            for (const tag_section in RECORDTYPE_ITEMS) {
+
                 const csvFilePath = join(baseInputDir, dir, tag_section) + CSV_EXTENSION;
                 if (fs.existsSync(csvFilePath)) {
                     var jsonArray = await readCsvToJsonArray(csvFilePath)
+                    generateTagId(jsonArray, RECORDTYPE_ITEMS[tag_section].key, RECORDTYPE_ITEMS[tag_section].headers);
+                    sortByKey(jsonArray);
 
-                    jsonArray = sortByKey(jsonArray);
+                    const headers = RECORDTYPE_ITEMS[tag_section];
+                    const transforms = [unwind({ paths: headers })];
+                    const parser = new Parser({ headers, transforms });
+                    const csv = parser.parse(jsonArray);
 
-                    for (var i in jsonArray) {
-                        delete jsonArray[i]['_tagid']
+                    try {
+                        fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
+                        // file written successfully
+                    } catch (err) {
+                        console.error(err);
                     }
-                    mergedXml[PROFILES_ROOT_TAG][tag_section] = sortByKey(jsonArray);
                 }
             }
 
-            const outputFile = join(baseOutputDir, dir + PROFILES_EXTENSION);
-
-            writeXmlToFile(outputFile, mergedXml);
-
-
         }
+
 
         Performance.getInstance().end();
 

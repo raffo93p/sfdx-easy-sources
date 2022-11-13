@@ -1,0 +1,11 @@
+{
+  "commandDescription": "Upsert csv files based on profiles",
+  "inputFlagDescription": "Specify a custom dir for input profiles. Default: ./force-app/src/default/profiles",
+  "outputFlagDescription": "Specify a custom dir for output profiles. Default the same as input",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:profiles:upsert",
+    "sfdx easysources:profiles:upsert -i './force-app/src/default/profiles' -o './force-app/src/default/profiles'"
+  ]
+}

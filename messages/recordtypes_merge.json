@@ -1,0 +1,11 @@
+{
+  "commandDescription": "Merge back csv files into profiles",
+  "inputFlagDescription": "Specify a custom dir for input csv files. Default: ./force-app/src/default/profiles",
+  "outputFlagDescription": "Specify a custom dir for output profiles. Default the same as input",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:profiles:merge",
+    "sfdx easysources:profiles:merge -i './force-app/src/default/profiles' -o './force-app/src/default/profiles'"
+  ]
+}

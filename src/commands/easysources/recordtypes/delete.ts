@@ -14,12 +14,11 @@ import Performance from '../../../utils/performance';
 const { Parser, transforms: { unwind } } = require('json2csv');
 
 import {
+    CSV_EXTENSION,
     PROFILE_ITEMS
-} from "../../../utils/constants_profiles";
+} from "../../../utils/constants";
 
-import { readCsvToJsonMap } from "../../../utils/filesUtils"
-import { sortByKey } from "../../../utils/utils"
-import { CSV_EXTENSION } from '../../../utils/constants';
+import { readCsvToJsonMap, sortByKey } from "../../../utils/filesUtils"
 
 
 // Initialize Messages with the current plugin directory
@@ -75,18 +74,18 @@ export default class Delete extends SfdxCommand {
             const csvFilePath = join(baseInputDir, dir, type) + CSV_EXTENSION;
             if (fs.existsSync(csvFilePath)) {
                 var jsonMap = await readCsvToJsonMap(csvFilePath)
-
+               
                 delete jsonMap[tagid];
-                var jsonArray = Object.values(jsonMap) as [];
+                var jsonArray = Object.values(jsonMap) as [{}];
 
-
+                
                 const headers = PROFILE_ITEMS[type];
                 const transforms = [unwind({ paths: headers })];
                 const parser = new Parser({ headers, transforms });
                 jsonArray = sortByKey(jsonArray);
                 const csv = parser.parse(jsonArray);
                 try {
-
+                    
                     fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
                     // file written successfully
                 } catch (err) {
