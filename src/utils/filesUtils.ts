@@ -3,7 +3,6 @@ import { join } from "path";
 import { Parser } from "xml2js";
 import { SfdxProject } from "@salesforce/core";
 import XmlFormatter from "./xmlFormatter";
-import { PROFILE_ITEMS } from "./constants";
 
 const csvparser = require("csvtojson");
 
@@ -94,7 +93,7 @@ export async function readCsvToJsonArray(csvFilePath: string) {
 
 	return jsonArray;
 }
-export function jsonArrayToMap(jsonArray: [{}]) {
+export function jsonArrayToMap(jsonArray) {
 	if (!Array.isArray(jsonArray)) jsonArray = [jsonArray]
 
 	var aMap = jsonArray.reduce(function (map, obj) {
@@ -109,17 +108,16 @@ export async function readCsvToJsonMap(csvFilePath: string) {
 	return jsonArrayToMap(jsonArray);
 }
 
-export function sortByKey(myArray: [{}]) {
-	var key = '_tagid';
-	function compare(a, b) {
-		if (a[key] < b[key]) {
-			return -1;
+export function removeExtension(inputFile: string) {
+	if(inputFile == null || inputFile == undefined) return inputFile;
+	const fileName = inputFile; //basename(inputFile);
+	let dotsCount = 0;
+	for (let i = fileName.length - 1; i > 0; i--) {
+		if (fileName[i] === ".") {
+			dotsCount++;
 		}
-		if (a[key] > b[key]) {
-			return 1;
+		if (dotsCount == 2) {
+			return fileName.substring(0, i);
 		}
-		return 0;
 	}
-
-	return myArray.sort(compare);
 }

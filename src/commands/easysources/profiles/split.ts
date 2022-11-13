@@ -8,13 +8,17 @@ import * as os from 'os';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
-import { readXmlFromFile  } from '../../../utils/filesUtils'
+import { readXmlFromFile, removeExtension, writeXmlToFile } from '../../../utils/filesUtils'
 import { generateTagId } from '../../../utils/utils'
 const { Parser, transforms: { unwind } } = require('json2csv');
-import { PROFILE_ITEMS, PROFILES_EXTENSION } from '../../../utils/constants';
+import { PROFILE_ITEMS, PROFILES_EXTENSION, PROFILES_ROOT_TAG } from '../../../utils/constants_profiles';
 import Performance from '../../../utils/performance';
 import { basename, join } from "path";
 const fs = require('fs-extra');
+import { sortByKey } from "../../../utils/utils"
+import { CSV_EXTENSION, XML_PART_EXTENSION } from '../../../utils/constants';
+import {PROFILES_DEFAULT_PATH} from "../../../utils/constants_profiles";
+
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);
@@ -28,83 +32,91 @@ export default class Split extends SfdxCommand {
 
     public static examples = messages.getMessage('examples').split(os.EOL);
 
+
     protected static flagsConfig = {
         // flag with a value (-n, --name=VALUE)
+        dir: flags.string({
+            char: 'd',
+            description: messages.getMessage('dirFlagDescription', [PROFILES_DEFAULT_PATH]),
+        }),
         input: flags.string({
             char: 'i',
             description: messages.getMessage('inputFlagDescription'),
         }),
         output: flags.string({
             char: 'o',
-            description: messages.getMessage('outputFlagDescription'),
-        })
+            description: messages.getMessage('outputFlagDescription', [PROFILES_DEFAULT_PATH]),
+        }),
     };
 
 
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
-        const baseInputDir = (this.flags.input || './force-app/src/default/profiles') as string;
-        const baseOutputDir = (this.flags.output || baseInputDir) as string;
 
-        var fileList = fs.readdirSync(baseInputDir, { withFileTypes: true })
-            .filter(item => !item.isDirectory() && item.name.endsWith(PROFILES_EXTENSION))
-            .map(item => item.name)
+        const baseInputDir = (this.flags.dir || PROFILES_DEFAULT_PATH) as string;
+        const baseOutputDir = (this.flags.output || baseInputDir) as string;
+        const inputProfile = (this.flags.input) as string;
+
+        var fileList = [];
+
+        if (inputProfile) {
+            fileList = inputProfile.split(',');
+        } else {
+            fileList = fs.readdirSync(baseInputDir, { withFileTypes: true })
+                .filter(item => !item.isDirectory() && item.name.endsWith(PROFILES_EXTENSION))
+                .map(item => item.name)
+        }
 
         for (const filename of fileList) {
             console.log('Splitting: ' + filename);
 
             const inputFile = join(baseInputDir, filename);
-            const profileProperties = (await readXmlFromFile(inputFile)).Profile ?? {};
+            const xmlFileContent = (await readXmlFromFile(inputFile)) ?? {};
+            const profileProperties = xmlFileContent[PROFILES_ROOT_TAG] ?? {};
 
-            for (const key in PROFILE_ITEMS) {
+            const profileName = removeExtension(basename(inputFile));
+            const outputDir = join(baseOutputDir, profileName);
 
-                const myjson = profileProperties[key];
+            for (const tag_section in PROFILE_ITEMS) {
+
+                var myjson = profileProperties[tag_section];
                 if (myjson == undefined) continue;
 
                 // generate _tagId column
-                generateTagId(myjson, key)
-                
-                const headers = PROFILE_ITEMS[key].headers;
+                generateTagId(myjson, PROFILE_ITEMS[tag_section].key, PROFILE_ITEMS[tag_section].headers);
+                myjson = sortByKey(myjson);
+
+                const headers = PROFILE_ITEMS[tag_section].headers;
                 const transforms = [unwind({ paths: headers })];
 
                 const parser = new Parser({ transforms });
                 const csv = parser.parse(myjson);
 
-                const profileName = getProfileName(inputFile);
-                const outputDir = join(baseOutputDir, profileName);
-                const outputFile = join(outputDir, key) + '.csv';
+
+                const outputFileCSV = join(outputDir, tag_section) + CSV_EXTENSION;
 
                 if (!fs.existsSync(outputDir)) {
-                    fs.mkdirSync(outputDir);
+                    fs.mkdirSync(outputDir, { recursive: true });
                 }
 
                 try {
-                    fs.writeFileSync(outputFile, csv, { flag: 'w+' });
+                    fs.writeFileSync(outputFileCSV, csv, { flag: 'w+' });
                     // file written successfully
                 } catch (err) {
                     console.error(err);
                 }
+
+                xmlFileContent[PROFILES_ROOT_TAG][tag_section] = null;
+
             }
+
+            const outputFileXML = join(outputDir, profileName + XML_PART_EXTENSION);
+            writeXmlToFile(outputFileXML, xmlFileContent);
         }
 
         Performance.getInstance().end();
 
         var outputString = 'OK'
         return { outputString };
-    }
-}
-
-
-
-function getProfileName(inputFile: string) {
-    const fileName = basename(inputFile);
-    let dotsCount = 0;
-    for (let i = fileName.length - 1; i > 0; i--) {
-        if (fileName[i] === ".") {
-            dotsCount++;
-        }
-        if (dotsCount == 2) {
-            return fileName.substring(0, i);
-        }
     }
 }

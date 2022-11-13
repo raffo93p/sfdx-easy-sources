@@ -1,7 +1,6 @@
-import { PROFILE_ITEMS } from "./constants";
 
-export function generateTagId(myArray: [{}], type: string) {
-	var key = PROFILE_ITEMS[type].key;
+export function generateTagId(myArray, key, headers) {
+	
 
 	if (Array.isArray(key)) {
 
@@ -10,29 +9,46 @@ export function generateTagId(myArray: [{}], type: string) {
 			for (var k of key) {
 				if (myArray[i][k] != undefined) tagids.push(myArray[i][k])
 			}
-			myArray[i] = upsertTagId(myArray[i], type, tagids.join('/'));
+			myArray[i] = upsertTagId(myArray[i], headers, tagids.join('/'));
 			
 		}
 	} else {
 		for (var i in myArray) {
-			myArray[i] = upsertTagId(myArray[i], type, myArray[i][key]);
+			myArray[i] = upsertTagId(myArray[i], headers, myArray[i][key]);
 		}
 	}
 }
 
-function upsertTagId(item: {}, type, value: string) : {} {
+function upsertTagId(item: {}, headers, value: string) : {} {
 	if (item['_tagid'] === undefined) {
-		item = {...emptyItem(type), ...item , _tagid: value};
+		item = {...emptyItem(headers), ...item , _tagid: value};
 	} else {
 		item['_tagid'] = value;
 	}
 	return item;
 }
 
-function emptyItem(type: string){
+function emptyItem(headers: [string]){
 	var item = {};
-	for(var tag of PROFILE_ITEMS[type].headers){
+	for(var tag of headers){
 		item[tag] = null;
 	}
 	return item;
+}
+
+export function sortByKey(myArray) {
+	if(myArray == null || myArray == undefined || !Array.isArray(myArray)) return myArray;
+	
+	var key = '_tagid';
+	function compare(a, b) {
+		if (a[key] < b[key]) {
+			return -1;
+		}
+		if (a[key] > b[key]) {
+			return 1;
+		}
+		return 0;
+	}
+
+	return myArray.sort(compare);
 }

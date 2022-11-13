@@ -14,12 +14,16 @@ import Performance from '../../../utils/performance';
 
 import {
     PROFILES_ROOT_TAG,
-    XML_NAMESPACE,
     PROFILE_ITEMS,
     PROFILES_EXTENSION
-} from "../../../utils/constants";
+} from "../../../utils/constants_profiles";
 
-import { writeXmlToFile, readCsvToJsonArray, sortByKey } from "../../../utils/filesUtils"
+import { CSV_EXTENSION, XML_PART_EXTENSION } from "../../../utils/constants"
+import {PROFILES_DEFAULT_PATH} from "../../../utils/constants_profiles"
+
+import { writeXmlToFile, readCsvToJsonArray, readXmlFromFile } from "../../../utils/filesUtils"
+import { sortByKey } from "../../../utils/utils"
+
 
 
 // Initialize Messages with the current plugin directory
@@ -38,35 +42,35 @@ export default class Merge extends SfdxCommand {
 
     protected static flagsConfig = {
         // flag with a value (-n, --name=VALUE)
+        dir: flags.string({
+            char: 'd',
+            description: messages.getMessage('dirFlagDescription', [PROFILES_DEFAULT_PATH]),
+        }),
         input: flags.string({
             char: 'i',
             description: messages.getMessage('inputFlagDescription'),
         }),
         output: flags.string({
             char: 'o',
-            description: messages.getMessage('outputFlagDescription'),
+            description: messages.getMessage('outputFlagDescription', [PROFILES_DEFAULT_PATH]),
         })
     };
 
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        const mergedXml = {
-            [PROFILES_ROOT_TAG]: {
-                $: {
-                    xmlns: XML_NAMESPACE,
-                },
-            },
-        };
-
-
-        const baseInputDir = (this.flags.input || './force-app/src/default/profiles') as string;
+        const baseInputDir = (this.flags.dir || [PROFILES_DEFAULT_PATH]) as string;
         const baseOutputDir = (this.flags.output || baseInputDir) as string;
+        const inputProfile = (this.flags.input) as string;
 
-        var dirList = fs.readdirSync(baseInputDir, { withFileTypes: true })
-            .filter(item => item.isDirectory())
-            .map(item => item.name)
-
+        var dirList = [];
+        if (inputProfile) {
+            dirList = inputProfile.split(',');
+        } else {
+            dirList = fs.readdirSync(baseInputDir, { withFileTypes: true })
+                .filter(item => item.isDirectory())
+                .map(item => item.name)
+        }
         if (!fs.existsSync(baseOutputDir)) {
             fs.mkdirSync(baseOutputDir);
         }
@@ -74,26 +78,29 @@ export default class Merge extends SfdxCommand {
         // dir is the profile name without the extension
         for (const dir of dirList) {
             console.log('Merging: ' + dir);
+            const inputXML = join(baseInputDir, dir, dir) + XML_PART_EXTENSION;
+            const mergedXml = (await readXmlFromFile(inputXML)) ?? {};
 
-            // key is each profile section (applicationVisibilities, classAccess ecc)
-            for (const key in PROFILE_ITEMS) {
-                const csvFilePath = join(baseInputDir, dir, key) + '.csv';
+
+            // tag_section is each profile section (applicationVisibilities, classAccess ecc)
+            for (const tag_section in PROFILE_ITEMS) {
+                const csvFilePath = join(baseInputDir, dir, tag_section) + CSV_EXTENSION;
                 if (fs.existsSync(csvFilePath)) {
                     var jsonArray = await readCsvToJsonArray(csvFilePath)
 
-                    for(var i in jsonArray){
+                    jsonArray = sortByKey(jsonArray);
+
+                    for (var i in jsonArray) {
                         delete jsonArray[i]['_tagid']
                     }
-                    mergedXml[PROFILES_ROOT_TAG][key] = sortByKey(jsonArray);
+                    mergedXml[PROFILES_ROOT_TAG][tag_section] = sortByKey(jsonArray);
                 }
             }
 
             const outputFile = join(baseOutputDir, dir + PROFILES_EXTENSION);
 
-            writeXmlToFile(
-                outputFile,
-                mergedXml
-            );
+            writeXmlToFile(outputFile, mergedXml);
+
 
         }
 
