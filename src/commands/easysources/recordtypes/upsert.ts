@@ -144,14 +144,19 @@ export default class Upsert extends SfdxCommand {
 
                 }
                 const inputFilePart = join(baseInputDir, obj, 'recordTypes', recordtypeName, recordtypeName + XML_PART_EXTENSION);
-                const xmlFileContentPart = (await readXmlFromFile(inputFilePart)) ?? {};
-                const recordtypePropertiesPart = xmlFileContentPart[RECORDTYPES_ROOT_TAG] ?? {};
-
-                for (var k in recordtypeProperties) {
-                    recordtypePropertiesPart[k] = recordtypeProperties[k];
+               
+                if (fs.existsSync(inputFilePart)) {
+                    const xmlFileContentPart = (await readXmlFromFile(inputFilePart)) ?? {};
+                    const recordtypePropertiesPart = xmlFileContentPart[RECORDTYPES_ROOT_TAG] ?? {};
+    
+                    for (var k in recordtypeProperties) {
+                        recordtypePropertiesPart[k] = recordtypeProperties[k];
+                    }
+    
+                    writeXmlToFile(inputFilePart, recordtypePropertiesPart);
+                } else {
+                    writeXmlToFile(inputFilePart, recordtypeProperties);
                 }
-
-                writeXmlToFile(inputFilePart, recordtypePropertiesPart);
             }
         }
         Performance.getInstance().end();
