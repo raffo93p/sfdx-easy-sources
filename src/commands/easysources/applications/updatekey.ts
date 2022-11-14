@@ -8,17 +8,9 @@ import * as os from 'os';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
-import { readCsvToJsonArray } from '../../../utils/filesUtils'
-import { sortByKey } from "../../../utils/utils"
-
-import { generateTagId } from '../../../utils/utils'
-
-const { Parser, transforms: { unwind } } = require('json2csv');
 import Performance from '../../../utils/performance';
-import { join } from "path";
-import { CSV_EXTENSION } from '../../../utils/constants';
-import { APPLICATIONS_DEFAULT_PATH, APPLICATION_ITEMS } from '../../../utils/constants_applications';
-const fs = require('fs-extra');
+import { APPLICATIONS_DEFAULT_PATH, APPLICATION_ITEMS } from '../../../utils/constants/constants_applications';
+import { updatekey } from '../../../utils/commands/keyupdater';
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);
@@ -48,53 +40,11 @@ export default class UpdateKey extends SfdxCommand {
 
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
-        const baseInputDir = (this.flags.dir || [APPLICATIONS_DEFAULT_PATH]) as string;
-        const inputApplication = (this.flags.input) as string;
 
-        var dirList = [];
-        if (inputApplication) {
-            dirList = inputApplication.split(',');
-        } else {
-            dirList = fs.readdirSync(baseInputDir, { withFileTypes: true })
-                .filter(item => item.isDirectory())
-                .map(item => item.name)
-        }
-
-        // dir is the application  name without the extension
-        for (const dir of dirList) {
-
-            console.log('UpdateKey: ' + dir);
-
-            for (const tag_section in APPLICATION_ITEMS) {
-
-                const csvFilePath = join(baseInputDir, dir, tag_section) + CSV_EXTENSION;
-                console.log(csvFilePath)
-                if (fs.existsSync(csvFilePath)) {
-                    var jsonArray = await readCsvToJsonArray(csvFilePath)
-
-                    generateTagId(jsonArray, APPLICATION_ITEMS[tag_section].key, APPLICATION_ITEMS[tag_section].headers);
-                    sortByKey(jsonArray);
-
-                    const headers = APPLICATION_ITEMS[tag_section];
-                    const transforms = [unwind({ paths: headers })];
-                    const parser = new Parser({ headers, transforms });
-                    const csv = parser.parse(jsonArray);
-
-                    try {
-                        fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
-                        // file written successfully
-                    } catch (err) {
-                        console.error(err);
-                    }
-                }
-            }
-
-        }
-
+        var result = await updatekey(this.flags, APPLICATIONS_DEFAULT_PATH, APPLICATION_ITEMS);
 
         Performance.getInstance().end();
 
-        var outputString = 'OK'
-        return { outputString };
+        return result;
     }
 }

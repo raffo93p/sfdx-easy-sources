@@ -15,12 +15,12 @@ const { Parser, transforms: { unwind } } = require('json2csv');
 
 import {
     PROFILE_ITEMS
-} from "../../../utils/constants_profiles";
+} from "../../../utils/constants/constants_profiles";
 
 import { readCsvToJsonMap } from "../../../utils/filesUtils"
 import { sortByKey } from "../../../utils/utils"
-import { CSV_EXTENSION } from '../../../utils/constants';
-import {PROFILES_DEFAULT_PATH} from '../../../utils/constants_profiles';
+import { CSV_EXTENSION } from '../../../utils/constants/constants';
+import {PROFILES_DEFAULT_PATH} from '../../../utils/constants/constants_profiles';
 
 
 // Initialize Messages with the current plugin directory

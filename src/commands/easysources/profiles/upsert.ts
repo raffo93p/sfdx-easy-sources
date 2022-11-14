@@ -8,18 +8,10 @@ import * as os from 'os';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
-import { readXmlFromFile, readCsvToJsonMap, jsonArrayToMap, removeExtension, writeXmlToFile } from '../../../utils/filesUtils'
-import { sortByKey, generateTagId } from "../../../utils/utils"
-
-const { Parser, transforms: { unwind } } = require('json2csv');
-import { PROFILE_ITEMS, PROFILES_EXTENSION, PROFILES_ROOT_TAG } from '../../../utils/constants_profiles';
+import { PROFILE_ITEMS, PROFILES_EXTENSION, PROFILES_ROOT_TAG } from '../../../utils/constants/constants_profiles';
 import Performance from '../../../utils/performance';
-
-
-import { join } from "path";
-import { CSV_EXTENSION, XML_PART_EXTENSION } from '../../../utils/constants';
-import { PROFILES_DEFAULT_PATH } from '../../../utils/constants_profiles';
-const fs = require('fs-extra');
+import { PROFILES_DEFAULT_PATH } from '../../../utils/constants/constants_profiles';
+import { upsert } from '../../../utils/commands/upserter';
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);
@@ -56,92 +48,9 @@ export default class Upsert extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        const baseInputDir = (this.flags.dir || PROFILES_DEFAULT_PATH) as string;
-        const baseOutputDir = (this.flags.output || baseInputDir) as string;
-        const inputProfile = (this.flags.input) as string;
-
-        var fileList = []
-        if (inputProfile) {
-            fileList = inputProfile.split(',');
-        } else {
-            fileList = fs.readdirSync(baseInputDir, { withFileTypes: true })
-                .filter(item => !item.isDirectory() && item.name.endsWith(PROFILES_EXTENSION))
-                .map(item => item.name)
-        }
-
-        for (const filename of fileList) {
-            console.log('Upserting: ' + filename);
-
-            const inputFile = join(baseInputDir, filename);
-
-            const xmlFileContent = (await readXmlFromFile(inputFile)) ?? {};
-            const profileProperties = xmlFileContent[PROFILES_ROOT_TAG] ?? {};
-
-            const profileName = removeExtension(filename);
-            const outputDir = join(baseOutputDir, profileName);
-
-            for (const tag_section in PROFILE_ITEMS) {
-
-                var jsonArrayNew = profileProperties[tag_section];
-                if (jsonArrayNew == undefined) continue;
-
-                generateTagId(jsonArrayNew, PROFILE_ITEMS[tag_section].key, PROFILE_ITEMS[tag_section].headers)
-
-                const headers = PROFILE_ITEMS[tag_section].headers;
-                const transforms = [unwind({ paths: headers })];
-                const parser = new Parser({ headers, transforms });
-
-
-                const outputFile = join(outputDir, tag_section) + CSV_EXTENSION;
-
-                if (!fs.existsSync(outputDir)) {
-                    fs.mkdirSync(outputDir);
-                }
-
-                if (fs.existsSync(outputFile)) {
-                    const csvFilePath = join(baseOutputDir, profileName, tag_section + CSV_EXTENSION);
-
-                    var jsonMapOld = await readCsvToJsonMap(csvFilePath);
-                    var jsonMapNew = jsonArrayToMap(jsonArrayNew)
-
-                    for (var k in jsonMapNew) {
-                        jsonMapOld[k] = jsonMapNew[k];
-                    }
-                    jsonArrayNew = Object.values(jsonMapOld);
-
-                }
-
-                try {
-                    jsonArrayNew = sortByKey(jsonArrayNew);
-                    const csv = parser.parse(jsonArrayNew);
-                    fs.writeFileSync(outputFile, csv, { flag: 'w+' });
-                    // file written successfully
-                } catch (err) {
-                    console.error(err);
-                }
-                xmlFileContent[PROFILES_ROOT_TAG][tag_section] = null;
-
-
-            }
-
-            const inputFilePart = join(baseInputDir, profileName, profileName + XML_PART_EXTENSION);
-            if (fs.existsSync(inputFilePart)) {
-                const xmlFileContentPart = (await readXmlFromFile(inputFilePart)) ?? {};
-                const profilePropertiesPart = xmlFileContentPart[PROFILES_ROOT_TAG] ?? {};
-
-                for (var k in profileProperties) {
-                    profilePropertiesPart[k] = profileProperties[k];
-                }
-
-                writeXmlToFile(inputFilePart, profilePropertiesPart);
-            } else {
-                writeXmlToFile(inputFilePart, profileProperties);
-            }
-        }
+        var result = await upsert(this.flags, PROFILES_DEFAULT_PATH, PROFILES_EXTENSION, PROFILES_ROOT_TAG, PROFILE_ITEMS);
 
         Performance.getInstance().end();
-
-        var outputString = 'OK'
-        return { outputString };
+        return result;
     }
 }

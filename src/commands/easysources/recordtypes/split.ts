@@ -11,11 +11,11 @@ import { AnyJson } from '@salesforce/ts-types';
 import { readXmlFromFile, removeExtension, writeXmlToFile } from '../../../utils/filesUtils'
 // import { generateTagId } from '../../../utils/utils'
 const { Parser } = require('json2csv');
-import { RECORDTYPES_DEFAULT_PATH, RECORDTYPES_EXTENSION, RECORDTYPES_PICKVAL_ROOT, RECORDTYPES_ROOT_TAG, RECORDTYPE_ITEMS } from '../../../utils/constants_recordtypes';
+import { RECORDTYPES_DEFAULT_PATH, RECORDTYPES_EXTENSION, RECORDTYPES_PICKVAL_ROOT, RECORDTYPES_ROOT_TAG, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
 import Performance from '../../../utils/performance';
 import { join } from "path";
 import { generateTagId, sortByKey } from '../../../utils/utils';
-import { CSV_EXTENSION, XML_PART_EXTENSION } from '../../../utils/constants';
+import { CSV_EXTENSION, XML_PART_EXTENSION } from '../../../utils/constants/constants';
 import { transformXMLtoCSV } from '../../../utils/utils_recordtypes';
 const fs = require('fs-extra');
 
@@ -126,8 +126,6 @@ export default class Split extends SfdxCommand {
                 writeXmlToFile(outputFileXML, xmlFileContent);
             }
         }
-
-
 
         Performance.getInstance().end();
 
