@@ -13,10 +13,10 @@ import { readCsvToJsonArray } from '../../../utils/filesUtils'
 import { generateTagId, sortByKey } from '../../../utils/utils'
 
 const { Parser, transforms: { unwind } } = require('json2csv');
-import { CSV_EXTENSION } from '../../../utils/constants';
+import { CSV_EXTENSION } from '../../../utils/constants/constants';
 import Performance from '../../../utils/performance';
 import { join } from "path";
-import { RECORDTYPES_DEFAULT_PATH, RECORDTYPE_ITEMS } from '../../../utils/constants_recordtypes';
+import { RECORDTYPES_DEFAULT_PATH, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
 const fs = require('fs-extra');
 
 // Initialize Messages with the current plugin directory

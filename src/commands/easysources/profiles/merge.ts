@@ -8,21 +8,17 @@ import * as os from 'os';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
-const fs = require('fs-extra');
-import { join } from "path";
 import Performance from '../../../utils/performance';
 
 import {
     PROFILES_ROOT_TAG,
     PROFILE_ITEMS,
     PROFILES_EXTENSION
-} from "../../../utils/constants_profiles";
+} from "../../../utils/constants/constants_profiles";
 
-import { CSV_EXTENSION, XML_PART_EXTENSION } from "../../../utils/constants"
-import {PROFILES_DEFAULT_PATH} from "../../../utils/constants_profiles"
+import { PROFILES_DEFAULT_PATH } from "../../../utils/constants/constants_profiles"
+import { merge } from '../../../utils/commands/merger';
 
-import { writeXmlToFile, readCsvToJsonArray, readXmlFromFile } from "../../../utils/filesUtils"
-import { sortByKey } from "../../../utils/utils"
 
 
 
@@ -59,54 +55,10 @@ export default class Merge extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        const baseInputDir = (this.flags.dir || [PROFILES_DEFAULT_PATH]) as string;
-        const baseOutputDir = (this.flags.output || baseInputDir) as string;
-        const inputProfile = (this.flags.input) as string;
-
-        var dirList = [];
-        if (inputProfile) {
-            dirList = inputProfile.split(',');
-        } else {
-            dirList = fs.readdirSync(baseInputDir, { withFileTypes: true })
-                .filter(item => item.isDirectory())
-                .map(item => item.name)
-        }
-        if (!fs.existsSync(baseOutputDir)) {
-            fs.mkdirSync(baseOutputDir);
-        }
-
-        // dir is the profile name without the extension
-        for (const dir of dirList) {
-            console.log('Merging: ' + dir);
-            const inputXML = join(baseInputDir, dir, dir) + XML_PART_EXTENSION;
-            const mergedXml = (await readXmlFromFile(inputXML)) ?? {};
-
-
-            // tag_section is each profile section (applicationVisibilities, classAccess ecc)
-            for (const tag_section in PROFILE_ITEMS) {
-                const csvFilePath = join(baseInputDir, dir, tag_section) + CSV_EXTENSION;
-                if (fs.existsSync(csvFilePath)) {
-                    var jsonArray = await readCsvToJsonArray(csvFilePath)
-
-                    jsonArray = sortByKey(jsonArray);
-
-                    for (var i in jsonArray) {
-                        delete jsonArray[i]['_tagid']
-                    }
-                    mergedXml[PROFILES_ROOT_TAG][tag_section] = sortByKey(jsonArray);
-                }
-            }
-
-            const outputFile = join(baseOutputDir, dir + PROFILES_EXTENSION);
-
-            writeXmlToFile(outputFile, mergedXml);
-
-
-        }
+        var result = await merge(this.flags, PROFILES_DEFAULT_PATH, PROFILES_EXTENSION, PROFILES_ROOT_TAG, PROFILE_ITEMS);
 
         Performance.getInstance().end();
+        return result;
 
-        var outputString = 'OK'
-        return { outputString };
     }
 }

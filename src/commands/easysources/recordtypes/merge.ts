@@ -15,7 +15,7 @@ import Performance from '../../../utils/performance';
 import {
     CSV_EXTENSION,
     XML_PART_EXTENSION
-} from "../../../utils/constants";
+} from "../../../utils/constants/constants";
 
 import {
     RECORDTYPES_DEFAULT_PATH,
@@ -23,7 +23,7 @@ import {
     RECORDTYPES_PICKVAL_ROOT,
     RECORDTYPES_ROOT_TAG,
     RECORDTYPE_ITEMS
-} from "../../../utils/constants_recordtypes";
+} from "../../../utils/constants/constants_recordtypes";
 
 import { writeXmlToFile, readCsvToJsonArray, readXmlFromFile } from "../../../utils/filesUtils"
 import { sortByKey } from "../../../utils/utils"

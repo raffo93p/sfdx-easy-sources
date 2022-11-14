@@ -8,15 +8,9 @@ import * as os from 'os';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
-const fs = require('fs-extra');
-import { join } from "path";
 import Performance from '../../../utils/performance';
-
-import { CSV_EXTENSION, XML_PART_EXTENSION } from "../../../utils/constants"
-
-import { writeXmlToFile, readCsvToJsonArray, readXmlFromFile } from "../../../utils/filesUtils"
-import { sortByKey } from "../../../utils/utils"
-import { APPLICATIONS_DEFAULT_PATH, APPLICATIONS_EXTENSION, APPLICATIONS_ROOT_TAG, APPLICATION_ITEMS } from '../../../utils/constants_applications';
+import { APPLICATIONS_DEFAULT_PATH, APPLICATIONS_EXTENSION, APPLICATIONS_ROOT_TAG, APPLICATION_ITEMS } from '../../../utils/constants/constants_applications';
+import { merge } from '../../../utils/commands/merger';
 
 
 
@@ -53,53 +47,10 @@ export default class Merge extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        const baseInputDir = (this.flags.dir || [APPLICATIONS_DEFAULT_PATH]) as string;
-        const baseOutputDir = (this.flags.output || baseInputDir) as string;
-        const inputApplication = (this.flags.input) as string;
-
-        var dirList = [];
-        if (inputApplication) {
-            dirList = inputApplication.split(',');
-        } else {
-            dirList = fs.readdirSync(baseInputDir, { withFileTypes: true })
-                .filter(item => item.isDirectory())
-                .map(item => item.name)
-        }
-        if (!fs.existsSync(baseOutputDir)) {
-            fs.mkdirSync(baseOutputDir);
-        }
-
-        // dir is the application name without the extension
-        for (const dir of dirList) {
-            console.log('Merging: ' + dir);
-            const inputXML = join(baseInputDir, dir, dir) + XML_PART_EXTENSION;
-            const mergedXml = (await readXmlFromFile(inputXML)) ?? {};
-
-
-            for (const tag_section in APPLICATION_ITEMS) {
-                const csvFilePath = join(baseInputDir, dir, tag_section) + CSV_EXTENSION;
-                if (fs.existsSync(csvFilePath)) {
-                    var jsonArray = await readCsvToJsonArray(csvFilePath)
-
-                    jsonArray = sortByKey(jsonArray);
-
-                    for (var i in jsonArray) {
-                        delete jsonArray[i]['_tagid']
-                    }
-                    mergedXml[APPLICATIONS_ROOT_TAG][tag_section] = sortByKey(jsonArray);
-                }
-            }
-
-            const outputFile = join(baseOutputDir, dir + APPLICATIONS_EXTENSION);
-
-            writeXmlToFile(outputFile, mergedXml);
-
-
-        }
+        var result = await merge(this.flags, APPLICATIONS_DEFAULT_PATH, APPLICATIONS_EXTENSION, APPLICATIONS_ROOT_TAG, APPLICATION_ITEMS);
 
         Performance.getInstance().end();
 
-        var outputString = 'OK'
-        return { outputString };
+        return result;
     }
 }

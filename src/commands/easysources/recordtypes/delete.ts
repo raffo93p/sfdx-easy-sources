@@ -13,12 +13,12 @@ import { join } from "path";
 import Performance from '../../../utils/performance';
 const { Parser, transforms: { unwind } } = require('json2csv');
 
-import { CSV_EXTENSION } from "../../../utils/constants";
+import { CSV_EXTENSION } from "../../../utils/constants/constants";
 
 import { readCsvToJsonMap } from "../../../utils/filesUtils"
 import { sortByKey } from "../../../utils/utils"
 
-import { RECORDTYPES_DEFAULT_PATH, RECORDTYPES_PICKVAL_ROOT, RECORDTYPE_ITEMS } from '../../../utils/constants_recordtypes';
+import { RECORDTYPES_DEFAULT_PATH, RECORDTYPES_PICKVAL_ROOT, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
 
 
 // Initialize Messages with the current plugin directory

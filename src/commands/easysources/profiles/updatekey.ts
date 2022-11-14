@@ -8,18 +8,10 @@ import * as os from 'os';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
-import { readCsvToJsonArray } from '../../../utils/filesUtils'
-import { sortByKey } from "../../../utils/utils"
-
-import { generateTagId } from '../../../utils/utils'
-
-const { Parser, transforms: { unwind } } = require('json2csv');
-import { PROFILE_ITEMS } from '../../../utils/constants_profiles';
+import { PROFILE_ITEMS } from '../../../utils/constants/constants_profiles';
 import Performance from '../../../utils/performance';
-import { join } from "path";
-import { CSV_EXTENSION } from '../../../utils/constants';
-import {PROFILES_DEFAULT_PATH} from '../../../utils/constants_profiles';
-const fs = require('fs-extra');
+import { PROFILES_DEFAULT_PATH } from '../../../utils/constants/constants_profiles';
+import { updatekey } from "../../../utils/commands/keyupdater";
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);
@@ -49,54 +41,10 @@ export default class UpdateKey extends SfdxCommand {
 
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
-        const baseInputDir = (this.flags.dir || [PROFILES_DEFAULT_PATH]) as string;
-        const inputProfile = (this.flags.input) as string;
 
-        var dirList = [];
-        if (inputProfile) {
-            dirList = inputProfile.split(',');
-        } else {
-            dirList = fs.readdirSync(baseInputDir, { withFileTypes: true })
-                .filter(item => item.isDirectory())
-                .map(item => item.name)
-        }
-
-        // dir is the profile name without the extension
-        for (const dir of dirList) {
-
-            console.log('UpdateKey: ' + dir);
-
-            // tag_Section is each profile section (applicationVisibilities, classAccess ecc)
-            for (const tag_section in PROFILE_ITEMS) {
-
-                const csvFilePath = join(baseInputDir, dir, tag_section) + CSV_EXTENSION;
-                console.log(csvFilePath)
-                if (fs.existsSync(csvFilePath)) {
-                    var jsonArray = await readCsvToJsonArray(csvFilePath)
-                    if(tag_section === 'classAccesses') console.log(jsonArray[0])
-                    generateTagId(jsonArray, PROFILE_ITEMS[tag_section].key, PROFILE_ITEMS[tag_section].headers);
-                    sortByKey(jsonArray);
-
-                    const headers = PROFILE_ITEMS[tag_section];
-                    const transforms = [unwind({ paths: headers })];
-                    const parser = new Parser({ headers, transforms });
-                    const csv = parser.parse(jsonArray);
-
-                    try {
-                        fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
-                        // file written successfully
-                    } catch (err) {
-                        console.error(err);
-                    }
-                }
-            }
-
-        }
-
+        var result = await updatekey(this.flags, PROFILES_DEFAULT_PATH, PROFILE_ITEMS);
 
         Performance.getInstance().end();
-
-        var outputString = 'OK'
-        return { outputString };
+        return result;
     }
 }
