@@ -1,11 +1,11 @@
 {
   "commandDescription": "Update _tagid on csv files, based on the other fields",
-  "dirFlagDescription": "Specify a custom dir for input profiles. Default: '%s'",
-  "inputFlagDescription": "Specify a profile. Example: Admin",
+  "dirFlagDescription": "Specify a custom dir for input applications. Default: '%s'",
+  "inputFlagDescription": "Specify a application. Example: Sales",
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:profiles:updatekey",
-    "sfdx easysources:profiles:updatekey -i './force-app/src/default/profiles'"
+    "sfdx easysources:applications:updatekey",
+    "sfdx easysources:applications:updatekey -i './force-app/src/default/applications'"
   ]
 }

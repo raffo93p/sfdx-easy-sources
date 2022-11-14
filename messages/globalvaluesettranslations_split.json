@@ -1,0 +1,15 @@
+{
+  "commandDescription": "Splits globalvaluesettranslations into various csv files",
+  "dirFlagDescription" : "Specify a custom dir for input globalvaluesettranslations. Default: '%s'",
+  "inputFlagDescription": "Specify a globalvaluesettranslation file in input. Example: Admin.globalvaluesettranslation-meta.xml",
+  "outputFlagDescription": "Specify a custom dir for output globalvaluesettranslations. Default: '%s'",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:globalvaluesettranslations:split",
+    "sfdx easysources:globalvaluesettranslations:split -d './force-app/src/default/globalvaluesettranslations'",
+    "sfdx easysources:globalvaluesettranslations:split -d './force-app/src/default/globalvaluesettranslations' -i 'MyGlobalValueSet-en_US.globalvaluesettranslation-meta.xml'",
+    "sfdx easysources:globalvaluesettranslations:split -d './force-app/src/default/globalvaluesettranslations' -o './force-app/src/default/globalvaluesettranslations'",
+    "sfdx easysources:globalvaluesettranslations:split -d './force-app/src/default/globalvaluesettranslations' -i 'MyGlobalValueSet-en_US.globalvaluesettranslation-meta.xml' -o './force-app/src/default/globalvaluesettranslations'"
+  ]
+}

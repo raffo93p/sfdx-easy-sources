@@ -1,9 +1,3 @@
-/*
- * Copyright (c) 2020, salesforce.com, inc.
- * All rights reserved.
- * Licensed under the BSD 3-Clause license.
- * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
- */
 import { readXmlFromFile, readCsvToJsonMap, jsonArrayToMap, removeExtension, writeXmlToFile } from '../filesUtils'
 import { sortByKey, generateTagId } from "../utils"
 const { Parser, transforms: { unwind } } = require('json2csv');
