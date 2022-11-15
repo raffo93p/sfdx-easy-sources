@@ -10,12 +10,8 @@ import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import Performance from '../../../utils/performance';
 import { updatekey } from "../../../utils/commands/keyupdater";
-
-import {
-    GVSET_ITEMS
-} from "../../../utils/constants/constants_globalvaluesets";
-
-import { GVSETS_DEFAULT_PATH } from "../../../utils/constants/constants_globalvaluesets"
+import { GVSETS_SUBPATH, GVSET_ITEMS } from "../../../utils/constants/constants_globalvaluesets"
+import { DEFAULT_PATH } from '../../../utils/constants/constants';
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);
@@ -34,7 +30,7 @@ export default class UpdateKey extends SfdxCommand {
         // flag with a value (-n, --name=VALUE)
         dir: flags.string({
             char: 'd',
-            description: messages.getMessage('dirFlagDescription', [GVSETS_DEFAULT_PATH]),
+            description: messages.getMessage('dirFlagDescription', [DEFAULT_PATH]),
         }),
         input: flags.string({
             char: 'i',
@@ -46,7 +42,7 @@ export default class UpdateKey extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        var result = await updatekey(this.flags, GVSETS_DEFAULT_PATH, GVSET_ITEMS);
+        var result = await updatekey(this.flags, GVSETS_SUBPATH, GVSET_ITEMS);
 
         Performance.getInstance().end();
         return result;

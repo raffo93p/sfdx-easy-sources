@@ -1,13 +1,13 @@
 const fs = require('fs-extra');
 import { join } from "path";
-import { CSV_EXTENSION, XML_PART_EXTENSION } from "../constants/constants"
+import { CSV_EXTENSION, XML_PART_EXTENSION, DEFAULT_PATH } from "../constants/constants"
 import { writeXmlToFile, readCsvToJsonArray, readXmlFromFile } from "../filesUtils"
 import { sortByKey } from "../utils"
 
 
 
-export async function merge(flags, default_path, file_extension, file_root_tag, file_items) {
-    const baseInputDir = (flags.dir || [default_path]) as string;
+export async function merge(flags, file_extension, file_root_tag, file_items, file_subpath) {
+    const baseInputDir = join((flags.dir || DEFAULT_PATH), file_subpath) as string;
     const baseOutputDir = (flags.output || baseInputDir) as string;
     const inputProfile = (flags.input) as string;
 

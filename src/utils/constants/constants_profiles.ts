@@ -62,4 +62,5 @@ export const PROFILE_ITEMS = {
 export const PROFILES_EXTENSION = ".profile-meta.xml";
 export const PROFILES_ROOT_TAG = "Profile";
 
-export const PROFILES_DEFAULT_PATH = DEFAULT_PATH + '/profiles';
+export const PROFILES_SUBPATH = 'profiles';
+export const PROFILES_DEFAULT_PATH = DEFAULT_PATH + '/' + PROFILES_SUBPATH;

@@ -10,5 +10,5 @@ export const PAO_KEY = ['recordType', 'content', 'profile','actionName','formFac
 export const APPLICATION_ITEMS = {
     [PAO_ROOT]: { headers: PAO_HEADER, key: PAO_KEY }
 }
-
-export const APPLICATIONS_DEFAULT_PATH = DEFAULT_PATH + '/applications';
+export const APPLICATIONS_SUBPATH = 'applications';
+export const APPLICATIONS_DEFAULT_PATH = DEFAULT_PATH + '/'+ APPLICATIONS_SUBPATH;

@@ -11,4 +11,5 @@ export const GVSET_ITEMS = {
     [GVSET_ROOT]: { headers: GVSET_HEADER, key: GVSET_KEY }
 }
 
-export const GVSETS_DEFAULT_PATH = DEFAULT_PATH + '/globalValueSets';
+export const GVSETS_SUBPATH = 'globalValueSets';
+export const GVSETS_DEFAULT_PATH = DEFAULT_PATH + '/' + GVSETS_SUBPATH;

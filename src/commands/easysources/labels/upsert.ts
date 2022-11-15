@@ -10,14 +10,8 @@ import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import Performance from '../../../utils/performance';
 import { upsert } from '../../../utils/commands/upserter';
-
-import {
-    LABELS_ROOT_TAG,
-    LABEL_ITEMS,
-    LABELS_EXTENSION
-} from "../../../utils/constants/constants_labels";
-
-import { LABELS_DEFAULT_PATH } from "../../../utils/constants/constants_labels"
+import { LABELS_ROOT_TAG, LABEL_ITEMS, LABELS_EXTENSION, LABELS_SUBPATH } from "../../../utils/constants/constants_labels";
+import { DEFAULT_PATH } from '../../../utils/constants/constants';
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);
@@ -38,7 +32,7 @@ export default class Upsert extends SfdxCommand {
         // flag with a value (-n, --name=VALUE)
         dir: flags.string({
             char: 'd',
-            description: messages.getMessage('dirFlagDescription', [LABELS_DEFAULT_PATH]),
+            description: messages.getMessage('dirFlagDescription', [DEFAULT_PATH]),
         }),
         input: flags.string({
             char: 'i',
@@ -46,7 +40,7 @@ export default class Upsert extends SfdxCommand {
         }),
         output: flags.string({
             char: 'o',
-            description: messages.getMessage('outputFlagDescription', [LABELS_DEFAULT_PATH]),
+            description: messages.getMessage('outputFlagDescription', [DEFAULT_PATH]),
         })
     };
 
@@ -54,7 +48,7 @@ export default class Upsert extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        var result = await upsert(this.flags, LABELS_DEFAULT_PATH, LABELS_EXTENSION, LABELS_ROOT_TAG, LABEL_ITEMS);
+        var result = await upsert(this.flags, LABELS_SUBPATH, LABELS_EXTENSION, LABELS_ROOT_TAG, LABEL_ITEMS);
 
         Performance.getInstance().end();
         return result;

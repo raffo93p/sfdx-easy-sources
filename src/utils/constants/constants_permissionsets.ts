@@ -62,4 +62,5 @@ export const PERMSET_ITEMS = {
 export const PERMSETS_EXTENSION = ".permissionset-meta.xml";
 export const PERMSETS_ROOT_TAG = "PermissionSet";
 
-export const PERMSETS_DEFAULT_PATH = DEFAULT_PATH + '/permissionsets';
+export const PERMSETS_SUBPATH = 'permissionsets';
+export const PERMSETS_DEFAULT_PATH = DEFAULT_PATH + '/' + PERMSETS_SUBPATH;

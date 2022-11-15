@@ -11,11 +11,11 @@ import { AnyJson } from '@salesforce/ts-types';
 import { readXmlFromFile, removeExtension, writeXmlToFile } from '../../../utils/filesUtils'
 // import { generateTagId } from '../../../utils/utils'
 const { Parser } = require('json2csv');
-import { RECORDTYPES_DEFAULT_PATH, RECORDTYPES_EXTENSION, RECORDTYPES_PICKVAL_ROOT, RECORDTYPES_ROOT_TAG, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
+import { RECORDTYPES_EXTENSION, RECORDTYPES_PICKVAL_ROOT, RECORDTYPES_ROOT_TAG, RECORDTYPES_SUBPATH, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
 import Performance from '../../../utils/performance';
 import { join } from "path";
 import { generateTagId, sortByKey } from '../../../utils/utils';
-import { CSV_EXTENSION, XML_PART_EXTENSION } from '../../../utils/constants/constants';
+import { CSV_EXTENSION, DEFAULT_PATH, XML_PART_EXTENSION } from '../../../utils/constants/constants';
 import { transformXMLtoCSV } from '../../../utils/utils_recordtypes';
 const fs = require('fs-extra');
 
@@ -35,7 +35,7 @@ export default class Split extends SfdxCommand {
         // flag with a value (-n, --name=VALUE)
         dir: flags.string({
             char: 'd',
-            description: messages.getMessage('dirFlagDescription', [RECORDTYPES_DEFAULT_PATH]),
+            description: messages.getMessage('dirFlagDescription', [DEFAULT_PATH]),
         }),
         object: flags.string({
             char: 'i',
@@ -47,7 +47,7 @@ export default class Split extends SfdxCommand {
         }),
         output: flags.string({
             char: 'o',
-            description: messages.getMessage('outputFlagDescription', [RECORDTYPES_DEFAULT_PATH]),
+            description: messages.getMessage('outputFlagDescription', [DEFAULT_PATH]),
         }),
     };
 
@@ -55,7 +55,7 @@ export default class Split extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        const baseInputDir = (this.flags.dir || RECORDTYPES_DEFAULT_PATH) as string;
+        const baseInputDir = join((this.flags.dir || DEFAULT_PATH), RECORDTYPES_SUBPATH) as string;
         const baseOutputDir = (this.flags.output || baseInputDir) as string;
         const inputObject = (this.flags.object) as string;
         const inputRecordType = (this.flags.recordtype) as string;

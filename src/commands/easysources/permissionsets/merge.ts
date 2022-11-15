@@ -9,15 +9,9 @@ import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import Performance from '../../../utils/performance';
-
-import {
-    PERMSETS_ROOT_TAG,
-    PERMSET_ITEMS,
-    PERMSETS_EXTENSION
-} from "../../../utils/constants/constants_permissionsets";
-
-import { PERMSETS_DEFAULT_PATH } from "../../../utils/constants/constants_permissionsets"
+import { PERMSETS_ROOT_TAG, PERMSET_ITEMS, PERMSETS_EXTENSION, PERMSETS_SUBPATH } from "../../../utils/constants/constants_permissionsets";
 import { merge } from '../../../utils/commands/merger';
+import { DEFAULT_PATH } from '../../../utils/constants/constants';
 
 
 
@@ -27,7 +21,7 @@ Messages.importMessagesDirectory(__dirname);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = Messages.loadMessages('sfdx-easy-sources', 'profiles_merge');
+const messages = Messages.loadMessages('sfdx-easy-sources', 'permissionsets_merge');
 
 export default class Merge extends SfdxCommand {
     public static description = messages.getMessage('commandDescription');
@@ -40,7 +34,7 @@ export default class Merge extends SfdxCommand {
         // flag with a value (-n, --name=VALUE)
         dir: flags.string({
             char: 'd',
-            description: messages.getMessage('dirFlagDescription', [PERMSETS_DEFAULT_PATH]),
+            description: messages.getMessage('dirFlagDescription', [DEFAULT_PATH]),
         }),
         input: flags.string({
             char: 'i',
@@ -48,14 +42,14 @@ export default class Merge extends SfdxCommand {
         }),
         output: flags.string({
             char: 'o',
-            description: messages.getMessage('outputFlagDescription', [PERMSETS_DEFAULT_PATH]),
+            description: messages.getMessage('outputFlagDescription', [DEFAULT_PATH]),
         })
     };
 
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        var result = await merge(this.flags, PERMSETS_DEFAULT_PATH, PERMSETS_EXTENSION, PERMSETS_ROOT_TAG, PERMSET_ITEMS);
+        var result = await merge(this.flags, PERMSETS_SUBPATH, PERMSETS_EXTENSION, PERMSETS_ROOT_TAG, PERMSET_ITEMS);
 
         Performance.getInstance().end();
         return result;

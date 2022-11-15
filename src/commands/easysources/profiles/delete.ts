@@ -12,15 +12,10 @@ const fs = require('fs-extra');
 import { join } from "path";
 import Performance from '../../../utils/performance';
 const { Parser, transforms: { unwind } } = require('json2csv');
-
-import {
-    PROFILE_ITEMS
-} from "../../../utils/constants/constants_profiles";
-
+import { PROFILES_SUBPATH, PROFILE_ITEMS } from "../../../utils/constants/constants_profiles";
 import { readCsvToJsonMap } from "../../../utils/filesUtils"
 import { sortByKey } from "../../../utils/utils"
-import { CSV_EXTENSION } from '../../../utils/constants/constants';
-import {PROFILES_DEFAULT_PATH} from '../../../utils/constants/constants_profiles';
+import { CSV_EXTENSION, DEFAULT_PATH } from '../../../utils/constants/constants';
 
 
 // Initialize Messages with the current plugin directory
@@ -41,7 +36,7 @@ export default class Delete extends SfdxCommand {
         // flag with a value (-n, --name=VALUE)
         dir: flags.string({
             char: 'd',
-            description: messages.getMessage('dirFlagDescription', [PROFILES_DEFAULT_PATH]),
+            description: messages.getMessage('dirFlagDescription', [DEFAULT_PATH]),
         }),
         input: flags.string({
             char: 'i',
@@ -65,8 +60,7 @@ export default class Delete extends SfdxCommand {
         if (!type) throw new SfError(messages.getMessage('errorNoTypeFlag'));
         if (!tagid) throw new SfError(messages.getMessage('errorNoTagIdFlag'));
         if (!Object.keys(PROFILE_ITEMS).includes(type)) throw new SfError(messages.getMessage('errorNoValidTypeFlag'));
-
-        const baseInputDir = (this.flags.dir || PROFILES_DEFAULT_PATH) as string;
+        const baseInputDir = join((this.flags.dir || DEFAULT_PATH), PROFILES_SUBPATH) as string;
         const inputProfile = (this.flags.input) as string;
 
         var dirList = [];

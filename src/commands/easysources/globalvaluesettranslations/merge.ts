@@ -10,14 +10,8 @@ import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import Performance from '../../../utils/performance';
 import { merge } from '../../../utils/commands/merger';
-
-import {
-    GVSETTRANS_ROOT_TAG,
-    GVSETTRAN_ITEMS,
-    GVSETTRANS_EXTENSION
-} from "../../../utils/constants/constants_globalvaluesettranslations";
-
-import { GVSETTRANS_DEFAULT_PATH } from "../../../utils/constants/constants_globalvaluesettranslations"
+import { GVSETTRANS_ROOT_TAG, GVSETTRAN_ITEMS, GVSETTRANS_EXTENSION, GVSETTRANS_SUBPATH } from "../../../utils/constants/constants_globalvaluesettranslations";
+import { DEFAULT_PATH } from '../../../utils/constants/constants';
 
 
 
@@ -40,7 +34,7 @@ export default class Merge extends SfdxCommand {
         // flag with a value (-n, --name=VALUE)
         dir: flags.string({
             char: 'd',
-            description: messages.getMessage('dirFlagDescription', [GVSETTRANS_DEFAULT_PATH]),
+            description: messages.getMessage('dirFlagDescription', [DEFAULT_PATH]),
         }),
         input: flags.string({
             char: 'i',
@@ -48,14 +42,14 @@ export default class Merge extends SfdxCommand {
         }),
         output: flags.string({
             char: 'o',
-            description: messages.getMessage('outputFlagDescription', [GVSETTRANS_DEFAULT_PATH]),
+            description: messages.getMessage('outputFlagDescription', [DEFAULT_PATH]),
         })
     };
 
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        var result = await merge(this.flags, GVSETTRANS_DEFAULT_PATH, GVSETTRANS_EXTENSION, GVSETTRANS_ROOT_TAG, GVSETTRAN_ITEMS);
+        var result = await merge(this.flags, GVSETTRANS_SUBPATH, GVSETTRANS_EXTENSION, GVSETTRANS_ROOT_TAG, GVSETTRAN_ITEMS);
 
         Performance.getInstance().end();
         return result;

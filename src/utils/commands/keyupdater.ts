@@ -3,11 +3,11 @@ import { sortByKey } from "../utils"
 import { generateTagId } from '../utils'
 const { Parser, transforms: { unwind } } = require('json2csv');
 import { join } from "path";
-import { CSV_EXTENSION } from '../constants/constants';
+import { CSV_EXTENSION, DEFAULT_PATH } from '../constants/constants';
 const fs = require('fs-extra');
 
-export async function updatekey(flags, default_path, file_items) {
-    const baseInputDir = (flags.dir || [default_path]) as string;
+export async function updatekey(flags, file_subpath, file_items) {
+    const baseInputDir = join((flags.dir || DEFAULT_PATH), file_subpath) as string;
     const inputFiles = (flags.input) as string;
 
     var dirList = [];
