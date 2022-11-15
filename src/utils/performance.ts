@@ -23,6 +23,6 @@ export default class Performance {
         this.endTime = performance.now();
         var timeDiff = this.endTime - this.startTime; //in ms 
 
-        console.log('Elaboration completed in ' + timeDiff + " ms");
+        console.log('Elaboration completed in ' + Math.round(timeDiff) + " ms");
     }
 }

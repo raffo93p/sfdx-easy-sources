@@ -8,10 +8,10 @@ import * as os from 'os';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
-import { PROFILE_ITEMS, PROFILES_EXTENSION, PROFILES_ROOT_TAG, PROFILES_SUBPATH } from '../../../utils/constants/constants_profiles';
 import Performance from '../../../utils/performance';
-import { split } from '../../../utils/commands/splitter';
 import { DEFAULT_PATH } from '../../../utils/constants/constants';
+import { bulkExecuteCommands } from '../../../utils/utils';
+
 
 
 // Initialize Messages with the current plugin directory
@@ -19,13 +19,14 @@ Messages.importMessagesDirectory(__dirname);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = Messages.loadMessages('sfdx-easy-sources', 'profiles_split');
+const messages = Messages.loadMessages('sfdx-easy-sources', 'applications_merge');
 
-export default class Split extends SfdxCommand {
+export default class Merge extends SfdxCommand {
     public static description = messages.getMessage('commandDescription');
 
     public static examples = messages.getMessage('examples').split(os.EOL);
 
+    public static args = [{ name: 'file' }];
 
     protected static flagsConfig = {
         // flag with a value (-n, --name=VALUE)
@@ -40,16 +41,16 @@ export default class Split extends SfdxCommand {
         output: flags.string({
             char: 'o',
             description: messages.getMessage('outputFlagDescription', [DEFAULT_PATH]),
-        }),
+        })
     };
-
 
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        var result = await split(this.flags, PROFILES_SUBPATH, PROFILES_EXTENSION, PROFILES_ROOT_TAG, PROFILE_ITEMS);
-
+        await bulkExecuteCommands(this.flags, 'merge');
+        
         Performance.getInstance().end();
-        return result;
+
+        return 'OK';
     }
 }

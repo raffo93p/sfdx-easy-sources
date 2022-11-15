@@ -14,14 +14,12 @@ import { GVSETTRANS_ROOT_TAG, GVSETTRAN_ITEMS, GVSETTRANS_EXTENSION, GVSETTRANS_
 import { DEFAULT_PATH } from '../../../utils/constants/constants';
 
 
-
-
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = Messages.loadMessages('sfdx-easy-sources', 'gvsets_merge');
+const messages = Messages.loadMessages('sfdx-easy-sources', 'globalvaluesettranslations_merge');
 
 export default class Merge extends SfdxCommand {
     public static description = messages.getMessage('commandDescription');

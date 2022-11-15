@@ -28,10 +28,10 @@ export async function updatekey(flags, file_subpath, file_items) {
         for (const tag_section in file_items) {
 
             const csvFilePath = join(baseInputDir, dir, tag_section) + CSV_EXTENSION;
-            console.log(csvFilePath)
+
             if (fs.existsSync(csvFilePath)) {
                 var jsonArray = await readCsvToJsonArray(csvFilePath)
-                if (tag_section === 'classAccesses') console.log(jsonArray[0])
+
                 generateTagId(jsonArray, file_items[tag_section].key, file_items[tag_section].headers);
                 sortByKey(jsonArray);
 
