@@ -1,64 +1,10 @@
-import { promises, lstatSync } from "fs";
+import { promises } from "fs";
 import { join } from "path";
 import { Parser } from "xml2js";
 import { SfdxProject } from "@salesforce/core";
 import XmlFormatter from "./xmlFormatter";
 
 const csvparser = require("csvtojson");
-
-const SKIPPED_FOLDERS = ["node_modules", ".git", ".github"];
-
-export async function findAllFilesWithExtension(
-	basePath: string,
-	fileExtension: string
-): Promise<string[]> {
-	const allFiles = await findAllFiles(basePath);
-	const filesWithExtension = [];
-	for (const file of allFiles) {
-		if (file.endsWith(fileExtension)) {
-			filesWithExtension.push(file);
-		}
-	}
-	return filesWithExtension;
-}
-
-export async function findAllFiles(basePath: string) {
-	const dirs = [];
-	const files = [];
-	for (const fileOrDir of await promises.readdir(basePath)) {
-		const fullFileOrDirPath = join(basePath, fileOrDir);
-		const fileOrDirStats = lstatSync(fullFileOrDirPath);
-		if (fileOrDirStats.isFile()) {
-			files.push(fullFileOrDirPath);
-		} else if (
-			fileOrDirStats.isDirectory() &&
-			!SKIPPED_FOLDERS.includes(fileOrDir)
-		) {
-			dirs.push(fullFileOrDirPath);
-		}
-	}
-	const filesInSubFolders = await Promise.all(
-		dirs.map((dir) => findAllFiles(dir))
-	).then((results) => results.flat());
-
-	for (const fileInSubFolder of filesInSubFolders) {
-		files.push(fileInSubFolder);
-	}
-
-	return files;
-}
-
-export async function getAllDirs(path: string): Promise<string[]> {
-	const dirs = [];
-	for (const fileOrDir of await promises.readdir(path)) {
-		const fullPath = join(path, fileOrDir);
-		const fileOrDirStats = lstatSync(fullPath);
-		if (fileOrDirStats.isDirectory()) {
-			dirs.push(fullPath);
-		}
-	}
-	return dirs;
-}
 
 export async function readXmlFromFile(file: string): Promise<any> {
 	return promises
@@ -109,7 +55,7 @@ export async function readCsvToJsonMap(csvFilePath: string) {
 }
 
 export function removeExtension(inputFile: string) {
-	if(inputFile == null || inputFile == undefined) return inputFile;
+	if (inputFile == null || inputFile == undefined) return inputFile;
 	const fileName = inputFile; //basename(inputFile);
 	let dotsCount = 0;
 	for (let i = fileName.length - 1; i > 0; i--) {

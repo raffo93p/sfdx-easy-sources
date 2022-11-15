@@ -9,14 +9,12 @@ import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import { readCsvToJsonArray } from '../../../utils/filesUtils'
-
 import { generateTagId, sortByKey } from '../../../utils/utils'
-
 const { Parser, transforms: { unwind } } = require('json2csv');
-import { CSV_EXTENSION } from '../../../utils/constants/constants';
+import { CSV_EXTENSION, DEFAULT_PATH } from '../../../utils/constants/constants';
 import Performance from '../../../utils/performance';
 import { join } from "path";
-import { RECORDTYPES_DEFAULT_PATH, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
+import { RECORDTYPES_SUBPATH, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
 const fs = require('fs-extra');
 
 // Initialize Messages with the current plugin directory
@@ -35,7 +33,7 @@ export default class UpdateKey extends SfdxCommand {
         // flag with a value (-n, --name=VALUE)
         dir: flags.string({
             char: 'd',
-            description: messages.getMessage('dirFlagDescription', [RECORDTYPES_DEFAULT_PATH]),
+            description: messages.getMessage('dirFlagDescription', [DEFAULT_PATH]),
         }),
         object: flags.string({
             char: 'i',
@@ -50,7 +48,7 @@ export default class UpdateKey extends SfdxCommand {
 
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
-        const baseInputDir = (this.flags.dir || RECORDTYPES_DEFAULT_PATH) as string;
+        const baseInputDir = join((this.flags.dir || DEFAULT_PATH), RECORDTYPES_SUBPATH) as string;
         const inputObject = (this.flags.object) as string;
         const inputRecordType = (this.flags.recordtype) as string;
 

@@ -14,19 +14,21 @@ import Performance from '../../../utils/performance';
 
 import {
     CSV_EXTENSION,
+    DEFAULT_PATH,
     XML_PART_EXTENSION
 } from "../../../utils/constants/constants";
 
 import {
-    RECORDTYPES_DEFAULT_PATH,
     RECORDTYPES_EXTENSION,
     RECORDTYPES_PICKVAL_ROOT,
     RECORDTYPES_ROOT_TAG,
+    RECORDTYPES_SUBPATH,
     RECORDTYPE_ITEMS
 } from "../../../utils/constants/constants_recordtypes";
 
 import { writeXmlToFile, readCsvToJsonArray, readXmlFromFile } from "../../../utils/filesUtils"
 import { sortByKey } from "../../../utils/utils"
+import { transformCSVtoXML } from '../../../utils/utils_recordtypes';
 
 
 // Initialize Messages with the current plugin directory
@@ -47,7 +49,7 @@ export default class Merge extends SfdxCommand {
         // flag with a value (-n, --name=VALUE)
         dir: flags.string({
             char: 'd',
-            description: messages.getMessage('dirFlagDescription', [RECORDTYPES_DEFAULT_PATH]),
+            description: messages.getMessage('dirFlagDescription', [DEFAULT_PATH]),
         }),
         object: flags.string({
             char: 'i',
@@ -59,15 +61,15 @@ export default class Merge extends SfdxCommand {
         }),
         output: flags.string({
             char: 'o',
-            description: messages.getMessage('outputFlagDescription', [RECORDTYPES_DEFAULT_PATH]),
+            description: messages.getMessage('outputFlagDescription', [DEFAULT_PATH]),
         })
     };
 
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        const baseInputDir = (this.flags.dir || RECORDTYPES_DEFAULT_PATH) as string;
-        const baseOutputDir = (this.flags.output || baseInputDir) as string;
+        const baseInputDir = join((this.flags.dir || DEFAULT_PATH), RECORDTYPES_SUBPATH) as string;
+        const baseOutputDir = join((this.flags.output || baseInputDir), RECORDTYPES_SUBPATH) as string;
         const inputObject = (this.flags.object) as string;
         const inputRecordType = (this.flags.recordtype) as string;
 
@@ -124,7 +126,7 @@ export default class Merge extends SfdxCommand {
 
             }
         }
-        
+
 
         // dir is the record type name without the extension
 
@@ -134,22 +136,4 @@ export default class Merge extends SfdxCommand {
         var outputString = 'OK'
         return { outputString };
     }
-}
-
-function transformCSVtoXML(jsonArray) {
-    var jsonArrayForXML = []
-    var obj = {}
-    var prevPicklist: string;
-    for (var entry of jsonArray) {
-
-        if (entry.picklist !== prevPicklist) {
-            if (prevPicklist != undefined) jsonArrayForXML.push(obj);
-            obj = { picklist: entry.picklist, values: [{ fullName: entry.values_fullName, default: entry.values_default }] };
-            prevPicklist = entry.picklist
-        } else {
-            obj['values'].push({ fullName: entry.values_fullName, default: entry.values_default })
-        }
-    }
-    jsonArrayForXML.push(obj);
-    return jsonArrayForXML;
 }
