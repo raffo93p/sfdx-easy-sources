@@ -20,7 +20,7 @@ Messages.importMessagesDirectory(__dirname);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = Messages.loadMessages('sfdx-easy-sources', 'gvsets_merge');
+const messages = Messages.loadMessages('sfdx-easy-sources', 'globalvaluesets_merge');
 
 export default class Merge extends SfdxCommand {
     public static description = messages.getMessage('commandDescription');

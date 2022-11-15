@@ -7,7 +7,7 @@ const fs = require('fs-extra');
 
 export async function upsert(flags, file_subpath, file_extension, file_root_tag, file_items) {
     const baseInputDir = join((flags.dir || DEFAULT_PATH), file_subpath) as string;
-    const baseOutputDir = (flags.output || baseInputDir) as string;
+    const baseOutputDir = join((flags.output || baseInputDir), file_subpath) as string;
     const inputFiles = (flags.input) as string;
 
     var fileList = []

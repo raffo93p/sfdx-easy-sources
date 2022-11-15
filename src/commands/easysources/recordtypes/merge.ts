@@ -28,6 +28,7 @@ import {
 
 import { writeXmlToFile, readCsvToJsonArray, readXmlFromFile } from "../../../utils/filesUtils"
 import { sortByKey } from "../../../utils/utils"
+import { transformCSVtoXML } from '../../../utils/utils_recordtypes';
 
 
 // Initialize Messages with the current plugin directory
@@ -68,7 +69,7 @@ export default class Merge extends SfdxCommand {
         Performance.getInstance().start();
 
         const baseInputDir = join((this.flags.dir || DEFAULT_PATH), RECORDTYPES_SUBPATH) as string;
-        const baseOutputDir = (this.flags.output || baseInputDir) as string;
+        const baseOutputDir = join((this.flags.output || baseInputDir), RECORDTYPES_SUBPATH) as string;
         const inputObject = (this.flags.object) as string;
         const inputRecordType = (this.flags.recordtype) as string;
 
@@ -135,22 +136,4 @@ export default class Merge extends SfdxCommand {
         var outputString = 'OK'
         return { outputString };
     }
-}
-
-function transformCSVtoXML(jsonArray) {
-    var jsonArrayForXML = []
-    var obj = {}
-    var prevPicklist: string;
-    for (var entry of jsonArray) {
-
-        if (entry.picklist !== prevPicklist) {
-            if (prevPicklist != undefined) jsonArrayForXML.push(obj);
-            obj = { picklist: entry.picklist, values: [{ fullName: entry.values_fullName, default: entry.values_default }] };
-            prevPicklist = entry.picklist
-        } else {
-            obj['values'].push({ fullName: entry.values_fullName, default: entry.values_default })
-        }
-    }
-    jsonArrayForXML.push(obj);
-    return jsonArrayForXML;
 }

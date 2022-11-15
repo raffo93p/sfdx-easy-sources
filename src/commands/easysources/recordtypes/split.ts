@@ -56,7 +56,7 @@ export default class Split extends SfdxCommand {
         Performance.getInstance().start();
 
         const baseInputDir = join((this.flags.dir || DEFAULT_PATH), RECORDTYPES_SUBPATH) as string;
-        const baseOutputDir = (this.flags.output || baseInputDir) as string;
+        const baseOutputDir = join((this.flags.output || baseInputDir), RECORDTYPES_SUBPATH) as string;
         const inputObject = (this.flags.object) as string;
         const inputRecordType = (this.flags.recordtype) as string;
 
