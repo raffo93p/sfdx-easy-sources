@@ -8,17 +8,17 @@ import * as os from 'os';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
-import { PERMSET_ITEMS, PERMSETS_EXTENSION, PERMSETS_ROOT_TAG } from '../../../utils/constants/constants_permissionsets';
+import { PERMSET_ITEMS, PERMSETS_EXTENSION, PERMSETS_ROOT_TAG, PERMSETS_SUBPATH} from '../../../utils/constants/constants_permissionsets';
 import Performance from '../../../utils/performance';
-import { PERMSETS_DEFAULT_PATH } from '../../../utils/constants/constants_permissionsets';
 import { upsert } from '../../../utils/commands/upserter';
+import { DEFAULT_PATH } from '../../../utils/constants/constants';
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = Messages.loadMessages('sfdx-easy-sources', 'profiles_upsert');
+const messages = Messages.loadMessages('sfdx-easy-sources', 'permissionsets_upsert');
 
 export default class Upsert extends SfdxCommand {
     public static description = messages.getMessage('commandDescription');
@@ -32,7 +32,7 @@ export default class Upsert extends SfdxCommand {
         // flag with a value (-n, --name=VALUE)
         dir: flags.string({
             char: 'd',
-            description: messages.getMessage('dirFlagDescription', [PERMSETS_DEFAULT_PATH]),
+            description: messages.getMessage('dirFlagDescription', [DEFAULT_PATH]),
         }),
         input: flags.string({
             char: 'i',
@@ -40,7 +40,7 @@ export default class Upsert extends SfdxCommand {
         }),
         output: flags.string({
             char: 'o',
-            description: messages.getMessage('outputFlagDescription', [PERMSETS_DEFAULT_PATH]),
+            description: messages.getMessage('outputFlagDescription', [DEFAULT_PATH]),
         })
     };
 
@@ -48,7 +48,7 @@ export default class Upsert extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        var result = await upsert(this.flags, PERMSETS_DEFAULT_PATH, PERMSETS_EXTENSION, PERMSETS_ROOT_TAG, PERMSET_ITEMS);
+        var result = await upsert(this.flags, PERMSETS_SUBPATH, PERMSETS_EXTENSION, PERMSETS_ROOT_TAG, PERMSET_ITEMS);
 
         Performance.getInstance().end();
         return result;

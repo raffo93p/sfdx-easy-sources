@@ -2,11 +2,11 @@ import { readXmlFromFile, readCsvToJsonMap, jsonArrayToMap, removeExtension, wri
 import { sortByKey, generateTagId } from "../utils"
 const { Parser, transforms: { unwind } } = require('json2csv');
 import { join } from "path";
-import { CSV_EXTENSION, XML_PART_EXTENSION } from '../constants/constants';
+import { CSV_EXTENSION, DEFAULT_PATH, XML_PART_EXTENSION } from '../constants/constants';
 const fs = require('fs-extra');
 
-export async function upsert(flags, default_path, file_extension, file_root_tag, file_items) {
-    const baseInputDir = (flags.dir || default_path) as string;
+export async function upsert(flags, file_subpath, file_extension, file_root_tag, file_items) {
+    const baseInputDir = join((flags.dir || DEFAULT_PATH), file_subpath) as string;
     const baseOutputDir = (flags.output || baseInputDir) as string;
     const inputFiles = (flags.input) as string;
 

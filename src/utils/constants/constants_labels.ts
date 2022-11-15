@@ -11,4 +11,5 @@ export const LABEL_ITEMS = {
     [LABEL_ROOT]: { headers: LABEL_HEADER, key: LABEL_KEY }
 }
 
-export const LABELS_DEFAULT_PATH = DEFAULT_PATH + '/labels';
+export const LABELS_SUBPATH = 'labels';
+export const LABELS_DEFAULT_PATH = DEFAULT_PATH + '/' + LABELS_SUBPATH;

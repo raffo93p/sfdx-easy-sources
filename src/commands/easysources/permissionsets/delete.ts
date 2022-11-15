@@ -12,15 +12,10 @@ const fs = require('fs-extra');
 import { join } from "path";
 import Performance from '../../../utils/performance';
 const { Parser, transforms: { unwind } } = require('json2csv');
-
-import {
-    PERMSET_ITEMS
-} from "../../../utils/constants/constants_permissionsets";
-
+import {PERMSETS_SUBPATH, PERMSET_ITEMS} from "../../../utils/constants/constants_permissionsets";
 import { readCsvToJsonMap } from "../../../utils/filesUtils"
 import { sortByKey } from "../../../utils/utils"
-import { CSV_EXTENSION } from '../../../utils/constants/constants';
-import {PERMSETS_DEFAULT_PATH} from '../../../utils/constants/constants_permissionsets';
+import { CSV_EXTENSION, DEFAULT_PATH } from '../../../utils/constants/constants';
 
 
 // Initialize Messages with the current plugin directory
@@ -28,7 +23,7 @@ Messages.importMessagesDirectory(__dirname);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = Messages.loadMessages('sfdx-easy-sources', 'profiles_delete');
+const messages = Messages.loadMessages('sfdx-easy-sources', 'permissionsets_delete');
 
 export default class Delete extends SfdxCommand {
     public static description = messages.getMessage('commandDescription');
@@ -41,7 +36,7 @@ export default class Delete extends SfdxCommand {
         // flag with a value (-n, --name=VALUE)
         dir: flags.string({
             char: 'd',
-            description: messages.getMessage('dirFlagDescription', [PERMSETS_DEFAULT_PATH]),
+            description: messages.getMessage('dirFlagDescription', [DEFAULT_PATH]),
         }),
         input: flags.string({
             char: 'i',
@@ -66,7 +61,7 @@ export default class Delete extends SfdxCommand {
         if (!tagid) throw new SfError(messages.getMessage('errorNoTagIdFlag'));
         if (!Object.keys(PERMSET_ITEMS).includes(type)) throw new SfError(messages.getMessage('errorNoValidTypeFlag'));
 
-        const baseInputDir = (this.flags.dir || PERMSETS_DEFAULT_PATH) as string;
+        const baseInputDir = join((this.flags.dir || DEFAULT_PATH), PERMSETS_SUBPATH) as string;
         const inputProfile = (this.flags.input) as string;
 
         var dirList = [];

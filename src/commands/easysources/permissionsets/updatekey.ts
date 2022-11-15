@@ -8,17 +8,17 @@ import * as os from 'os';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
-import { PERMSET_ITEMS } from '../../../utils/constants/constants_permissionsets';
 import Performance from '../../../utils/performance';
-import { PERMSETS_DEFAULT_PATH } from '../../../utils/constants/constants_permissionsets';
+import { PERMSETS_SUBPATH, PERMSET_ITEMS } from '../../../utils/constants/constants_permissionsets';
 import { updatekey } from "../../../utils/commands/keyupdater";
+import { DEFAULT_PATH } from '../../../utils/constants/constants';
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = Messages.loadMessages('sfdx-easy-sources', 'profiles_updatekey');
+const messages = Messages.loadMessages('sfdx-easy-sources', 'permissionsets_updatekey');
 
 export default class UpdateKey extends SfdxCommand {
     public static description = messages.getMessage('commandDescription');
@@ -30,7 +30,7 @@ export default class UpdateKey extends SfdxCommand {
         // flag with a value (-n, --name=VALUE)
         dir: flags.string({
             char: 'd',
-            description: messages.getMessage('dirFlagDescription', [PERMSETS_DEFAULT_PATH]),
+            description: messages.getMessage('dirFlagDescription', [DEFAULT_PATH]),
         }),
         input: flags.string({
             char: 'i',
@@ -42,7 +42,7 @@ export default class UpdateKey extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        var result = await updatekey(this.flags, PERMSETS_DEFAULT_PATH, PERMSET_ITEMS);
+        var result = await updatekey(this.flags, PERMSETS_SUBPATH, PERMSET_ITEMS);
 
         Performance.getInstance().end();
         return result;

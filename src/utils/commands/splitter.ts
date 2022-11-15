@@ -4,11 +4,11 @@ const { Parser, transforms: { unwind } } = require('json2csv');
 import { basename, join } from "path";
 const fs = require('fs-extra');
 import { sortByKey } from "../utils"
-import { CSV_EXTENSION, XML_PART_EXTENSION } from '../constants/constants';
+import { CSV_EXTENSION, XML_PART_EXTENSION, DEFAULT_PATH} from '../constants/constants';
 
-export async function split(flags, default_path, file_extension, file_root_tag, file_items) {
+export async function split(flags,file_subpath, file_extension, file_root_tag, file_items) {
 
-    const baseInputDir = (flags.dir || default_path) as string;
+    const baseInputDir = join((flags.dir || DEFAULT_PATH), file_subpath) as string;
     const baseOutputDir = (flags.output || baseInputDir) as string;
     const inputFiles = (flags.input) as string;
 

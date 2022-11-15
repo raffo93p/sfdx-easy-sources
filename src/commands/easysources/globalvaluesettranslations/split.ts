@@ -10,14 +10,8 @@ import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import Performance from '../../../utils/performance';
 import { split } from '../../../utils/commands/splitter';
-
-import {
-    GVSETTRANS_ROOT_TAG,
-    GVSETTRAN_ITEMS,
-    GVSETTRANS_EXTENSION
-} from "../../../utils/constants/constants_globalvaluesettranslations";
-
-import { GVSETTRANS_DEFAULT_PATH } from "../../../utils/constants/constants_globalvaluesettranslations"
+import { GVSETTRANS_ROOT_TAG, GVSETTRAN_ITEMS, GVSETTRANS_EXTENSION, GVSETTRANS_SUBPATH } from "../../../utils/constants/constants_globalvaluesettranslations";
+import { DEFAULT_PATH } from '../../../utils/constants/constants';
 
 
 // Initialize Messages with the current plugin directory
@@ -37,7 +31,7 @@ export default class Split extends SfdxCommand {
         // flag with a value (-n, --name=VALUE)
         dir: flags.string({
             char: 'd',
-            description: messages.getMessage('dirFlagDescription', [GVSETTRANS_DEFAULT_PATH]),
+            description: messages.getMessage('dirFlagDescription', [DEFAULT_PATH]),
         }),
         input: flags.string({
             char: 'i',
@@ -45,7 +39,7 @@ export default class Split extends SfdxCommand {
         }),
         output: flags.string({
             char: 'o',
-            description: messages.getMessage('outputFlagDescription', [GVSETTRANS_DEFAULT_PATH]),
+            description: messages.getMessage('outputFlagDescription', [DEFAULT_PATH]),
         }),
     };
 
@@ -53,7 +47,7 @@ export default class Split extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        var result = await split(this.flags, GVSETTRANS_DEFAULT_PATH, GVSETTRANS_EXTENSION, GVSETTRANS_ROOT_TAG, GVSETTRAN_ITEMS);
+        var result = await split(this.flags, GVSETTRANS_SUBPATH, GVSETTRANS_EXTENSION, GVSETTRANS_ROOT_TAG, GVSETTRAN_ITEMS);
 
         Performance.getInstance().end();
         return result;
