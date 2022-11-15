@@ -13,12 +13,12 @@ import { join } from "path";
 import Performance from '../../../utils/performance';
 const { Parser, transforms: { unwind } } = require('json2csv');
 
-import { CSV_EXTENSION } from "../../../utils/constants/constants";
+import { CSV_EXTENSION, DEFAULT_PATH } from "../../../utils/constants/constants";
 
 import { readCsvToJsonMap } from "../../../utils/filesUtils"
 import { sortByKey } from "../../../utils/utils"
 
-import { RECORDTYPES_DEFAULT_PATH, RECORDTYPES_PICKVAL_ROOT, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
+import { RECORDTYPES_DEFAULT_PATH, RECORDTYPES_PICKVAL_ROOT, RECORDTYPES_SUBPATH, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
 
 
 // Initialize Messages with the current plugin directory
@@ -39,7 +39,7 @@ export default class Delete extends SfdxCommand {
         // flag with a value (-n, --name=VALUE)
         dir: flags.string({
             char: 'd',
-            description: messages.getMessage('dirFlagDescription', [RECORDTYPES_DEFAULT_PATH]),
+            description: messages.getMessage('dirFlagDescription', [DEFAULT_PATH]),
         }),
         object: flags.string({
             char: 'i',
@@ -66,7 +66,7 @@ export default class Delete extends SfdxCommand {
         const apiname = (this.flags.apiname) as string;
         if (!picklist) throw new SfError(messages.getMessage('errorNoPicklistFlag'));
 
-        const baseInputDir = (this.flags.dir || RECORDTYPES_DEFAULT_PATH) as string;
+        const baseInputDir = join((this.flags.dir || RECORDTYPES_DEFAULT_PATH), RECORDTYPES_SUBPATH) as string;
         const inputObject = (this.flags.object) as string;
         const inputRecordType = (this.flags.recordtype) as string;
 
@@ -105,7 +105,7 @@ export default class Delete extends SfdxCommand {
                     } else {
 
                         for (var key of Object.keys(jsonMap)) {
-                            
+
                             if (jsonMap[key].picklist === picklist) {
                                 console.log(key)
                                 delete jsonMap[key];

@@ -9,8 +9,9 @@ import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import Performance from '../../../utils/performance';
-import { APPLICATIONS_DEFAULT_PATH, APPLICATIONS_EXTENSION, APPLICATIONS_ROOT_TAG, APPLICATION_ITEMS } from '../../../utils/constants/constants_applications';
+import { APPLICATIONS_EXTENSION, APPLICATIONS_ROOT_TAG, APPLICATIONS_SUBPATH, APPLICATION_ITEMS } from '../../../utils/constants/constants_applications';
 import { merge } from '../../../utils/commands/merger';
+import { DEFAULT_PATH } from '../../../utils/constants/constants';
 
 
 
@@ -32,7 +33,7 @@ export default class Merge extends SfdxCommand {
         // flag with a value (-n, --name=VALUE)
         dir: flags.string({
             char: 'd',
-            description: messages.getMessage('dirFlagDescription', [APPLICATIONS_DEFAULT_PATH]),
+            description: messages.getMessage('dirFlagDescription', [DEFAULT_PATH]),
         }),
         input: flags.string({
             char: 'i',
@@ -40,14 +41,14 @@ export default class Merge extends SfdxCommand {
         }),
         output: flags.string({
             char: 'o',
-            description: messages.getMessage('outputFlagDescription', [APPLICATIONS_DEFAULT_PATH]),
+            description: messages.getMessage('outputFlagDescription', [DEFAULT_PATH]),
         })
     };
 
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        var result = await merge(this.flags, APPLICATIONS_DEFAULT_PATH, APPLICATIONS_EXTENSION, APPLICATIONS_ROOT_TAG, APPLICATION_ITEMS);
+        var result = await merge(this.flags, APPLICATIONS_SUBPATH, APPLICATIONS_EXTENSION, APPLICATIONS_ROOT_TAG, APPLICATION_ITEMS);
 
         Performance.getInstance().end();
 

@@ -1,19 +1,13 @@
-/*
- * Copyright (c) 2020, salesforce.com, inc.
- * All rights reserved.
- * Licensed under the BSD 3-Clause license.
- * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
- */
 import { readXmlFromFile, readCsvToJsonMap, jsonArrayToMap, removeExtension, writeXmlToFile } from '../filesUtils'
 import { sortByKey, generateTagId } from "../utils"
 const { Parser, transforms: { unwind } } = require('json2csv');
 import { join } from "path";
-import { CSV_EXTENSION, XML_PART_EXTENSION } from '../constants/constants';
+import { CSV_EXTENSION, DEFAULT_PATH, XML_PART_EXTENSION } from '../constants/constants';
 const fs = require('fs-extra');
 
-export async function upsert(flags, default_path, file_extension, file_root_tag, file_items) {
-    const baseInputDir = (flags.dir || default_path) as string;
-    const baseOutputDir = (flags.output || baseInputDir) as string;
+export async function upsert(flags, file_subpath, file_extension, file_root_tag, file_items) {
+    const baseInputDir = join((flags.dir || DEFAULT_PATH), file_subpath) as string;
+    const baseOutputDir = join((flags.output || baseInputDir), file_subpath) as string;
     const inputFiles = (flags.input) as string;
 
     var fileList = []
