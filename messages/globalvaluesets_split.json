@@ -7,9 +7,9 @@
   "forceFlagDescription": "WTF",
   "examples": [
     "sfdx easysources:globalvaluesets:split",
-    "sfdx easysources:globalvaluesets:split -d './force-app/src/default/globalvaluesets'",
-    "sfdx easysources:globalvaluesets:split -d './force-app/src/default/globalvaluesets' -i 'MyGlobalValueSet.globalvalueset-meta.xml'",
-    "sfdx easysources:globalvaluesets:split -d './force-app/src/default/globalvaluesets' -o './force-app/src/default/globalvaluesets'",
-    "sfdx easysources:globalvaluesets:split -d './force-app/src/default/globalvaluesets' -i 'MyGlobalValueSet.globalvalueset-meta.xml' -o './force-app/src/default/globalvaluesets'"
+    "sfdx easysources:globalvaluesets:split -d './force-app/src/default'",
+    "sfdx easysources:globalvaluesets:split -d './force-app/src/default' -i 'MyGlobalValueSet.globalvalueset-meta.xml'",
+    "sfdx easysources:globalvaluesets:split -d './force-app/src/default' -o './force-app/src/default'",
+    "sfdx easysources:globalvaluesets:split -d './force-app/src/default' -i 'MyGlobalValueSet.globalvalueset-meta.xml' -o './force-app/src/default'"
   ]
 }

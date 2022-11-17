@@ -1,0 +1,11 @@
+{
+  "commandDescription": "Merge back csv files into metadata files",
+  "dirFlagDescription": "Specify a custom dir for input csv files. Default: '%s'",
+  "outputFlagDescription": "Specify a custom dir for output metadata files. Default: '%s'",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:all:merge",
+    "sfdx easysources:all:merge -d './force-app/src/default' -o './force-app/src/default'"
+  ]
+}
