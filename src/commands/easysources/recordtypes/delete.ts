@@ -42,7 +42,7 @@ export default class Delete extends SfdxCommand {
             description: messages.getMessage('dirFlagDescription', [DEFAULT_PATH]),
         }),
         object: flags.string({
-            char: 'i',
+            char: 's',
             description: messages.getMessage('objectFlagDescription'),
         }),
         recordtype: flags.string({
