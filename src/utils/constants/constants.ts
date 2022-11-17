@@ -5,6 +5,6 @@ export const XML_PART_EXTENSION = '-part.xml';
 
 export const DEFAULT_PATH = './force-app/src/default';
 
-export const SFDX_CMD = 'bin/dev';
+export const SFDX_CMD = 'sfdx';
 
 export const PLUGIN_NAME = "sfdx-easy-sources";
