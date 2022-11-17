@@ -7,6 +7,6 @@
   "forceFlagDescription": "WTF",
   "examples": [
     "sfdx easysources:globalvaluesettranslations:merge",
-    "sfdx easysources:globalvaluesettranslations:merge -d './force-app/src/default/globalvaluesettranslations' -o './force-app/src/default/globalvaluesettranslations'"
+    "sfdx easysources:globalvaluesettranslations:merge -d './force-app/src/default' -o './force-app/src/default'"
   ]
 }
