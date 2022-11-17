@@ -9,7 +9,7 @@
   "examples": [
     "sfdx easysources:recordtypes:upsert",
     "sfdx easysources:recordtypes:upsert -d './force-app/src/default' -o './force-app/src/default'",
-    "sfdx easysources:recordtypes:upsert -d './force-app/src/default' -i 'Account'",
-    "sfdx easysources:recordtypes:upsert -d './force-app/src/default' -i 'Account' -r 'MyRecordType.recordType-meta.xml'"
+    "sfdx easysources:recordtypes:upsert -d './force-app/src/default' -s 'Account'",
+    "sfdx easysources:recordtypes:upsert -d './force-app/src/default' -s 'Account' -r 'MyRecordType.recordType-meta.xml'"
   ]
 }
