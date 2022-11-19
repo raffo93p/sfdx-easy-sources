@@ -8,10 +8,10 @@ import * as os from 'os';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
-import { readXmlFromFile, readCsvToJsonMap, jsonArrayToMap, removeExtension, writeXmlToFile } from '../../../utils/filesUtils'
+import { readXmlFromFile, readCsvToJsonMap, jsonArrayToMap, removeExtension, writeXmlToFile, calcCsvFilename } from '../../../utils/filesUtils'
 import { generateTagId, sortByKey } from '../../../utils/utils'
 const { Parser, transforms: { unwind } } = require('json2csv');
-import { CSV_EXTENSION, DEFAULT_PATH, XML_PART_EXTENSION } from '../../../utils/constants/constants';
+import { DEFAULT_PATH, XML_PART_EXTENSION } from '../../../utils/constants/constants';
 import Performance from '../../../utils/performance';
 import { join } from "path";
 import { RECORDTYPES_EXTENSION, RECORDTYPES_ROOT_TAG, RECORDTYPES_SUBPATH, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
@@ -119,14 +119,14 @@ export default class Upsert extends SfdxCommand {
                     const parser = new Parser({ headers, transforms });
 
 
-                    const outputFile = join(outputDir, tag_section) + CSV_EXTENSION;
+                    const outputFile = join(outputDir, calcCsvFilename(recordtypeName, tag_section));
 
                     if (!fs.existsSync(outputDir)) {
                         fs.mkdirSync(outputDir);
                     }
 
                     if (fs.existsSync(outputFile)) {
-                        const csvFilePath = join(baseOutputDir, obj, 'recordTypes', recordtypeName, tag_section + CSV_EXTENSION);
+                        const csvFilePath = join(baseOutputDir, obj, 'recordTypes', recordtypeName, calcCsvFilename(recordtypeName, tag_section));
 
                         var jsonMapOld = await readCsvToJsonMap(csvFilePath);
                         var jsonMapNew = jsonArrayToMap(jsonArrayNew)

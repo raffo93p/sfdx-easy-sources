@@ -1,7 +1,7 @@
 const fs = require('fs-extra');
 import { join } from "path";
-import { CSV_EXTENSION, XML_PART_EXTENSION, DEFAULT_PATH } from "../constants/constants"
-import { writeXmlToFile, readCsvToJsonArray, readXmlFromFile } from "../filesUtils"
+import { XML_PART_EXTENSION, DEFAULT_PATH } from "../constants/constants"
+import { writeXmlToFile, readCsvToJsonArray, readXmlFromFile, calcCsvFilename } from "../filesUtils"
 import { sortByKey } from "../utils"
 
 
@@ -37,7 +37,7 @@ export async function merge(flags, file_subpath, file_extension, file_root_tag, 
 
         // tag_section is each file section (applicationVisibilities, classAccess ecc)
         for (const tag_section in file_items) {
-            const csvFilePath = join(baseInputDir, dir, tag_section) + CSV_EXTENSION;
+            const csvFilePath = join(baseInputDir, dir, calcCsvFilename(dir, tag_section));
             if (fs.existsSync(csvFilePath)) {
                 var jsonArray = await readCsvToJsonArray(csvFilePath)
 

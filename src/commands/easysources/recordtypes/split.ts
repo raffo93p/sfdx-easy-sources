@@ -8,14 +8,14 @@ import * as os from 'os';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
-import { readXmlFromFile, removeExtension, writeXmlToFile } from '../../../utils/filesUtils'
+import { calcCsvFilename, readXmlFromFile, removeExtension, writeXmlToFile } from '../../../utils/filesUtils'
 // import { generateTagId } from '../../../utils/utils'
 const { Parser } = require('json2csv');
 import { RECORDTYPES_EXTENSION, RECORDTYPES_PICKVAL_ROOT, RECORDTYPES_ROOT_TAG, RECORDTYPES_SUBPATH, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
 import Performance from '../../../utils/performance';
 import { join } from "path";
 import { generateTagId, sortByKey } from '../../../utils/utils';
-import { CSV_EXTENSION, DEFAULT_PATH, XML_PART_EXTENSION } from '../../../utils/constants/constants';
+import { DEFAULT_PATH, XML_PART_EXTENSION } from '../../../utils/constants/constants';
 import { transformXMLtoCSV } from '../../../utils/utils_recordtypes';
 const fs = require('fs-extra');
 
@@ -115,7 +115,7 @@ export default class Split extends SfdxCommand {
                     const parser = new Parser();
                     const csv = parser.parse(jsforcsv);
 
-                    const outputFileCSV = join(outputDir, tag_section) + CSV_EXTENSION;
+                    const outputFileCSV = join(outputDir, calcCsvFilename(filename, tag_section));
 
                     if (!fs.existsSync(outputDir)) {
                         fs.mkdirSync(outputDir, { recursive: true });

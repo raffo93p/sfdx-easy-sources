@@ -1,8 +1,8 @@
-import { readXmlFromFile, readCsvToJsonMap, jsonArrayToMap, removeExtension, writeXmlToFile } from '../filesUtils'
+import { readXmlFromFile, readCsvToJsonMap, jsonArrayToMap, removeExtension, writeXmlToFile, calcCsvFilename } from '../filesUtils'
 import { sortByKey, generateTagId } from "../utils"
 const { Parser, transforms: { unwind } } = require('json2csv');
 import { join } from "path";
-import { CSV_EXTENSION, DEFAULT_PATH, XML_PART_EXTENSION } from '../constants/constants';
+import { DEFAULT_PATH, XML_PART_EXTENSION } from '../constants/constants';
 const fs = require('fs-extra');
 
 export async function upsert(flags, file_subpath, file_extension, file_root_tag, file_items) {
@@ -48,14 +48,14 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
             const parser = new Parser({ headers, transforms });
 
 
-            const outputFile = join(outputDir, tag_section) + CSV_EXTENSION;
+            const outputFile = join(outputDir, calcCsvFilename(fileName, tag_section));
 
             if (!fs.existsSync(outputDir)) {
                 fs.mkdirSync(outputDir);
             }
 
             if (fs.existsSync(outputFile)) {
-                const csvFilePath = join(baseOutputDir, fileName, tag_section + CSV_EXTENSION);
+                const csvFilePath = join(baseOutputDir, fileName, calcCsvFilename(fileName, tag_section));
 
                 var jsonMapOld = await readCsvToJsonMap(csvFilePath);
                 var jsonMapNew = jsonArrayToMap(jsonArrayNew)
