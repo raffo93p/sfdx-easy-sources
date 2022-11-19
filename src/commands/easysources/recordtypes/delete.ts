@@ -13,9 +13,9 @@ import { join } from "path";
 import Performance from '../../../utils/performance';
 const { Parser, transforms: { unwind } } = require('json2csv');
 
-import { CSV_EXTENSION, DEFAULT_PATH } from "../../../utils/constants/constants";
+import { DEFAULT_PATH } from "../../../utils/constants/constants";
 
-import { readCsvToJsonMap } from "../../../utils/filesUtils"
+import { calcCsvFilename, readCsvToJsonMap } from "../../../utils/filesUtils"
 import { sortByKey } from "../../../utils/utils"
 
 import { RECORDTYPES_DEFAULT_PATH, RECORDTYPES_PICKVAL_ROOT, RECORDTYPES_SUBPATH, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
@@ -100,7 +100,7 @@ export default class Delete extends SfdxCommand {
             for (const dir of recordTypeList) {
                 console.log('Deleting on: ' + join(obj, dir));
 
-                const csvFilePath = join(baseInputDir, obj, 'recordTypes', dir, RECORDTYPES_PICKVAL_ROOT) + CSV_EXTENSION;
+                const csvFilePath = join(baseInputDir, obj, 'recordTypes', dir, calcCsvFilename(dir,RECORDTYPES_PICKVAL_ROOT));
                 if (fs.existsSync(csvFilePath)) {
                     var jsonMap = await readCsvToJsonMap(csvFilePath)
 

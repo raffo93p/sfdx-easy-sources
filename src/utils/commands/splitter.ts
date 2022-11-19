@@ -1,10 +1,10 @@
-import { readXmlFromFile, removeExtension, writeXmlToFile } from '../filesUtils'
+import { calcCsvFilename, readXmlFromFile, removeExtension, writeXmlToFile } from '../filesUtils'
 import { generateTagId } from '../utils'
 const { Parser, transforms: { unwind } } = require('json2csv');
-import { basename, join } from "path";
+import { join } from "path";
 const fs = require('fs-extra');
 import { sortByKey } from "../utils"
-import { CSV_EXTENSION, XML_PART_EXTENSION, DEFAULT_PATH } from '../constants/constants';
+import { XML_PART_EXTENSION, DEFAULT_PATH } from '../constants/constants';
 
 export async function split(flags, file_subpath, file_extension, file_root_tag, file_items) {
 
@@ -26,14 +26,14 @@ export async function split(flags, file_subpath, file_extension, file_root_tag, 
             .map(item => item.name)
     }
 
-    for (const filename of fileList) {
-        console.log('Splitting: ' + filename);
+    for (const fullFilename of fileList) {
+        console.log('Splitting: ' + fullFilename);
 
-        const inputFile = join(baseInputDir, filename);
+        const inputFile = join(baseInputDir, fullFilename);
         const xmlFileContent = (await readXmlFromFile(inputFile)) ?? {};
         const fileProperties = xmlFileContent[file_root_tag] ?? {};
 
-        const fileName = removeExtension(basename(inputFile));
+        const fileName = removeExtension(fullFilename);
         const outputDir = join(baseOutputDir, fileName);
 
         for (const tag_section in file_items) {
@@ -58,7 +58,7 @@ export async function split(flags, file_subpath, file_extension, file_root_tag, 
             const csv = parser.parse(myjson);
 
 
-            const outputFileCSV = join(outputDir, tag_section) + CSV_EXTENSION;
+            const outputFileCSV = join(outputDir, calcCsvFilename(fileName, tag_section));
 
             if (!fs.existsSync(outputDir)) {
                 fs.mkdirSync(outputDir, { recursive: true });

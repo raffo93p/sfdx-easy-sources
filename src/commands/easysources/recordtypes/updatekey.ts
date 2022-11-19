@@ -8,10 +8,10 @@ import * as os from 'os';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
-import { readCsvToJsonArray } from '../../../utils/filesUtils'
+import { calcCsvFilename, readCsvToJsonArray } from '../../../utils/filesUtils'
 import { generateTagId, sortByKey } from '../../../utils/utils'
 const { Parser, transforms: { unwind } } = require('json2csv');
-import { CSV_EXTENSION, DEFAULT_PATH } from '../../../utils/constants/constants';
+import { DEFAULT_PATH } from '../../../utils/constants/constants';
 import Performance from '../../../utils/performance';
 import { join } from "path";
 import { RECORDTYPES_SUBPATH, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
@@ -86,7 +86,7 @@ export default class UpdateKey extends SfdxCommand {
                 // key is each profile section (applicationVisibilities, classAccess ecc)
                 for (const tag_section in RECORDTYPE_ITEMS) {
 
-                    const csvFilePath = join(baseInputDir, obj, 'recordTypes', dir, tag_section) + CSV_EXTENSION;
+                    const csvFilePath = join(baseInputDir, obj, 'recordTypes', dir, calcCsvFilename(dir, tag_section));
                     if (fs.existsSync(csvFilePath)) {
                         var jsonArray = await readCsvToJsonArray(csvFilePath)
                         generateTagId(jsonArray, RECORDTYPE_ITEMS[tag_section].key, RECORDTYPE_ITEMS[tag_section].headers);

@@ -1,9 +1,9 @@
-import { readCsvToJsonArray } from '../filesUtils'
+import { calcCsvFilename, readCsvToJsonArray } from '../filesUtils'
 import { sortByKey } from "../utils"
 import { generateTagId } from '../utils'
 const { Parser, transforms: { unwind } } = require('json2csv');
 import { join } from "path";
-import { CSV_EXTENSION, DEFAULT_PATH } from '../constants/constants';
+import { DEFAULT_PATH } from '../constants/constants';
 const fs = require('fs-extra');
 
 export async function updatekey(flags, file_subpath, file_items) {
@@ -32,7 +32,7 @@ export async function updatekey(flags, file_subpath, file_items) {
         // tag_Section is each file section (applicationVisibilities, classAccess ecc)
         for (const tag_section in file_items) {
 
-            const csvFilePath = join(baseInputDir, dir, tag_section) + CSV_EXTENSION;
+            const csvFilePath = join(baseInputDir, dir, calcCsvFilename(dir,tag_section));
 
             if (fs.existsSync(csvFilePath)) {
                 var jsonArray = await readCsvToJsonArray(csvFilePath)

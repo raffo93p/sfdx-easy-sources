@@ -13,9 +13,9 @@ import { join } from "path";
 import Performance from '../../../utils/performance';
 const { Parser, transforms: { unwind } } = require('json2csv');
 import { PROFILES_SUBPATH, PROFILE_ITEMS } from "../../../utils/constants/constants_profiles";
-import { readCsvToJsonMap } from "../../../utils/filesUtils"
+import { calcCsvFilename, readCsvToJsonMap } from "../../../utils/filesUtils"
 import { sortByKey } from "../../../utils/utils"
-import { CSV_EXTENSION, DEFAULT_PATH } from '../../../utils/constants/constants';
+import { DEFAULT_PATH } from '../../../utils/constants/constants';
 
 
 // Initialize Messages with the current plugin directory
@@ -83,7 +83,7 @@ export default class Delete extends SfdxCommand {
             console.log('Deleting on: ' + dir);
 
             // type is a profile section (applicationVisibilities, classAccess ecc)
-            const csvFilePath = join(baseInputDir, dir, type) + CSV_EXTENSION;
+            const csvFilePath = join(baseInputDir, dir, calcCsvFilename(dir, type));
             if (fs.existsSync(csvFilePath)) {
                 var jsonMap = await readCsvToJsonMap(csvFilePath)
 

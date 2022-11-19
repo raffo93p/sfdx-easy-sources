@@ -13,7 +13,6 @@ import { join } from "path";
 import Performance from '../../../utils/performance';
 
 import {
-    CSV_EXTENSION,
     DEFAULT_PATH,
     XML_PART_EXTENSION
 } from "../../../utils/constants/constants";
@@ -26,7 +25,7 @@ import {
     RECORDTYPE_ITEMS
 } from "../../../utils/constants/constants_recordtypes";
 
-import { writeXmlToFile, readCsvToJsonArray, readXmlFromFile } from "../../../utils/filesUtils"
+import { writeXmlToFile, readCsvToJsonArray, readXmlFromFile, calcCsvFilename } from "../../../utils/filesUtils"
 import { sortByKey } from "../../../utils/utils"
 import { transformCSVtoXML } from '../../../utils/utils_recordtypes';
 
@@ -108,7 +107,7 @@ export default class Merge extends SfdxCommand {
                 const outputDir = join(baseOutputDir, obj, 'recordTypes');
 
                 for (const tag_section in RECORDTYPE_ITEMS) {
-                    const csvFilePath = join(baseInputDir, obj, 'recordTypes', dir, tag_section) + CSV_EXTENSION;
+                    const csvFilePath = join(baseInputDir, obj, 'recordTypes', dir, calcCsvFilename(dir, tag_section));
                     if (fs.existsSync(csvFilePath)) {
                         var jsonArray = await readCsvToJsonArray(csvFilePath)
 
