@@ -9,11 +9,15 @@ import { CSV_EXTENSION, XML_PART_EXTENSION, DEFAULT_PATH } from '../constants/co
 export async function split(flags, file_subpath, file_extension, file_root_tag, file_items) {
 
     const baseInputDir = join((flags.dir || DEFAULT_PATH), file_subpath) as string;
-    const baseOutputDir = join((flags.output || baseInputDir), file_subpath) as string;
+    const baseOutputDir = flags.output == null ? baseInputDir : join(flags.output, file_subpath) as string;
     const inputFiles = (flags.input) as string;
 
-    var fileList = [];
+    if (!fs.existsSync(baseInputDir)) {
+        console.log('Input folder ' + baseInputDir + ' does not exist!');
+        return;
+    }
 
+    var fileList = [];
     if (inputFiles) {
         fileList = inputFiles.split(',');
     } else {
@@ -35,10 +39,16 @@ export async function split(flags, file_subpath, file_extension, file_root_tag, 
         for (const tag_section in file_items) {
 
             var myjson = fileProperties[tag_section];
+
+            // skip when tag is not found in the xml
             if (myjson == undefined) continue;
+            // fixes scenarios when the tag is one, since it would be read as object and not array
+            if(!Array.isArray(myjson)) myjson = [myjson];
+
 
             // generate _tagId column
             generateTagId(myjson, file_items[tag_section].key, file_items[tag_section].headers);
+            // sorts array by _tagid. sorting is made as string
             myjson = sortByKey(myjson);
 
             const headers = file_items[tag_section].headers;

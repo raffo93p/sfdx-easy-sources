@@ -7,8 +7,13 @@ const fs = require('fs-extra');
 
 export async function upsert(flags, file_subpath, file_extension, file_root_tag, file_items) {
     const baseInputDir = join((flags.dir || DEFAULT_PATH), file_subpath) as string;
-    const baseOutputDir = join((flags.output || baseInputDir), file_subpath) as string;
+    const baseOutputDir = flags.output == null ? baseInputDir : join(flags.output, file_subpath) as string;
     const inputFiles = (flags.input) as string;
+
+    if(!fs.existsSync(baseInputDir)){
+        console.log('Input folder ' + baseInputDir + ' does not exist!');
+        return;
+    }
 
     var fileList = []
     if (inputFiles) {
@@ -34,6 +39,7 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
 
             var jsonArrayNew = fileProperties[tag_section];
             if (jsonArrayNew == undefined) continue;
+            if(!Array.isArray(jsonArrayNew)) jsonArrayNew = [jsonArrayNew];
 
             generateTagId(jsonArrayNew, file_items[tag_section].key, file_items[tag_section].headers)
 

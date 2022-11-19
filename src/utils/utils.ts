@@ -53,8 +53,12 @@ export function sortByKey(myArray) {
 		}
 		return 0;
 	}
-
 	return myArray.sort(compare);
+
+	// var collator = new Intl.Collator([], {numeric: true});
+    // return myArray.sort((a, b) => collator.compare(a[key], b[key]));
+
+
 }
 
 export async function executeCommand(flags, cmd, mdt) {

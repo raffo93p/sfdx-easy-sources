@@ -57,9 +57,14 @@ export default class Upsert extends SfdxCommand {
         Performance.getInstance().start();
 
         const baseInputDir = join((this.flags.dir || DEFAULT_PATH), RECORDTYPES_SUBPATH) as string;
-        const baseOutputDir = join((this.flags.output || baseInputDir), RECORDTYPES_SUBPATH) as string;
+        const baseOutputDir = this.flags.output == null ? baseInputDir : join(this.flags.output, RECORDTYPES_SUBPATH) as string;
         const inputObject = (this.flags.object) as string;
         const inputRecordType = (this.flags.recordtype) as string;
+
+        if(!fs.existsSync(baseInputDir)){
+            console.log('Input folder ' + baseInputDir + ' does not exist!');
+            return;
+        }
 
         var objectList = [];
         if (inputObject) {
@@ -78,6 +83,8 @@ export default class Upsert extends SfdxCommand {
             if (inputRecordType) {
                 recordTypeList = inputRecordType.split(',');
             } else {
+                if (!fs.existsSync(join(baseInputDir, obj, 'recordTypes'))) continue;
+
                 recordTypeList = fs.readdirSync(join(baseInputDir, obj, 'recordTypes'), { withFileTypes: true })
                     .filter(item => !item.isDirectory() && item.name.endsWith(RECORDTYPES_EXTENSION))
                     .map(item => item.name)
@@ -99,6 +106,7 @@ export default class Upsert extends SfdxCommand {
 
                     var jsonArray = recordtypeProperties[tag_section];
                     if (jsonArray == undefined) continue;
+                    if(!Array.isArray(jsonArray)) jsonArray = [jsonArray];
 
                     var jsonArrayNew = transformXMLtoCSV(jsonArray);
 
@@ -153,7 +161,9 @@ export default class Upsert extends SfdxCommand {
 
                     writeXmlToFile(inputFilePart, recordtypePropertiesPart);
                 } else {
-                    writeXmlToFile(inputFilePart, recordtypeProperties);
+                    if(fs.existsSync(join(baseInputDir, obj, 'recordTypes', recordtypeName))){
+                        writeXmlToFile(inputFilePart, recordtypeProperties);
+                    }
                 }
             }
         }
