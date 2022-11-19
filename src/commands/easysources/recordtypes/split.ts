@@ -56,9 +56,15 @@ export default class Split extends SfdxCommand {
         Performance.getInstance().start();
 
         const baseInputDir = join((this.flags.dir || DEFAULT_PATH), RECORDTYPES_SUBPATH) as string;
-        const baseOutputDir = join((this.flags.output || baseInputDir), RECORDTYPES_SUBPATH) as string;
+        const baseOutputDir = this.flags.output == null ? baseInputDir : join(this.flags.output, RECORDTYPES_SUBPATH) as string;
+
         const inputObject = (this.flags.object) as string;
         const inputRecordType = (this.flags.recordtype) as string;
+
+        if(!fs.existsSync(baseInputDir)){
+            console.log('Input folder ' + baseInputDir + ' does not exist!');
+            return;
+        }
 
         var objectList = [];
         if (inputObject) {
@@ -70,7 +76,7 @@ export default class Split extends SfdxCommand {
         }
 
         for (const obj of objectList) {
-
+            if (!fs.existsSync(join(baseInputDir, obj, 'recordTypes'))) continue;
 
             var recordTypeList = [];
 
@@ -82,6 +88,7 @@ export default class Split extends SfdxCommand {
                     .map(item => item.name)
             }
 
+            
             for (const filename of recordTypeList) {
                 console.log('Splitting: ' + join(obj, filename));
 
@@ -94,8 +101,10 @@ export default class Split extends SfdxCommand {
                 const outputDir = join(baseOutputDir, obj, 'recordTypes', recordTypeName);
 
                 for (const tag_section in RECORDTYPE_ITEMS) {
-                    const myjson = recordtypeProperties[RECORDTYPES_PICKVAL_ROOT];
+                    var myjson = recordtypeProperties[RECORDTYPES_PICKVAL_ROOT];
                     if (myjson == undefined) continue;
+                    if(!Array.isArray(myjson)) myjson = [myjson];
+
                     var jsforcsv = transformXMLtoCSV(myjson);
 
 
@@ -122,8 +131,10 @@ export default class Split extends SfdxCommand {
                     xmlFileContent[RECORDTYPES_ROOT_TAG][tag_section] = null;
 
                 }
-                const outputFileXML = join(outputDir, recordTypeName + XML_PART_EXTENSION);
-                writeXmlToFile(outputFileXML, xmlFileContent);
+                if (fs.existsSync(outputDir)) {
+                    const outputFileXML = join(outputDir, recordTypeName + XML_PART_EXTENSION);
+                    writeXmlToFile(outputFileXML, xmlFileContent);
+                }
             }
         }
 

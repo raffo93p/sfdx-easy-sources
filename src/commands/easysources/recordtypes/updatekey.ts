@@ -52,7 +52,10 @@ export default class UpdateKey extends SfdxCommand {
         const inputObject = (this.flags.object) as string;
         const inputRecordType = (this.flags.recordtype) as string;
 
-
+        if(!fs.existsSync(baseInputDir)){
+            console.log('Input folder ' + baseInputDir + ' does not exist!');
+            return;
+        }
 
         var objectList = [];
         if (inputObject) {
@@ -69,6 +72,8 @@ export default class UpdateKey extends SfdxCommand {
             if (inputRecordType) {
                 recordTypeList = inputRecordType.split(',');
             } else {
+                if(!fs.existsSync(join(baseInputDir, obj, 'recordTypes'))) continue;
+
                 recordTypeList = fs.readdirSync(join(baseInputDir, obj, 'recordTypes'), { withFileTypes: true })
                     .filter(item => item.isDirectory())
                     .map(item => item.name)
@@ -81,11 +86,11 @@ export default class UpdateKey extends SfdxCommand {
                 // key is each profile section (applicationVisibilities, classAccess ecc)
                 for (const tag_section in RECORDTYPE_ITEMS) {
 
-                    const csvFilePath = join(baseInputDir, dir, tag_section) + CSV_EXTENSION;
+                    const csvFilePath = join(baseInputDir, obj, 'recordTypes', dir, tag_section) + CSV_EXTENSION;
                     if (fs.existsSync(csvFilePath)) {
                         var jsonArray = await readCsvToJsonArray(csvFilePath)
                         generateTagId(jsonArray, RECORDTYPE_ITEMS[tag_section].key, RECORDTYPE_ITEMS[tag_section].headers);
-                        sortByKey(jsonArray);
+                        jsonArray = sortByKey(jsonArray);
 
                         const headers = RECORDTYPE_ITEMS[tag_section];
                         const transforms = [unwind({ paths: headers })];

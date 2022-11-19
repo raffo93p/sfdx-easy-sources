@@ -69,9 +69,14 @@ export default class Merge extends SfdxCommand {
         Performance.getInstance().start();
 
         const baseInputDir = join((this.flags.dir || DEFAULT_PATH), RECORDTYPES_SUBPATH) as string;
-        const baseOutputDir = join((this.flags.output || baseInputDir), RECORDTYPES_SUBPATH) as string;
+        const baseOutputDir = this.flags.output == null ? baseInputDir : join(this.flags.output, RECORDTYPES_SUBPATH) as string;
         const inputObject = (this.flags.object) as string;
         const inputRecordType = (this.flags.recordtype) as string;
+
+        if(!fs.existsSync(baseInputDir)){
+            console.log('Input folder ' + baseInputDir + ' does not exist!');
+            return;
+        }
 
         var objectList = [];
         if (inputObject) {
@@ -83,6 +88,8 @@ export default class Merge extends SfdxCommand {
         }
 
         for (const obj of objectList) {
+            if (!fs.existsSync(join(baseInputDir, obj, 'recordTypes'))) continue;
+
             var recordTypeList = [];
 
             if (inputRecordType) {

@@ -8,8 +8,13 @@ import { sortByKey } from "../utils"
 
 export async function merge(flags, file_subpath, file_extension, file_root_tag, file_items) {
     const baseInputDir = join((flags.dir || DEFAULT_PATH), file_subpath) as string;
-    const baseOutputDir = join((flags.output || baseInputDir), file_subpath) as string;
+    const baseOutputDir = flags.output == null ? baseInputDir : join(flags.output, file_subpath) as string;
     const inputProfile = (flags.input) as string;
+
+    if(!fs.existsSync(baseInputDir)){
+        console.log('Input folder ' + baseInputDir + ' does not exist!');
+        return;
+    }
 
     var dirList = [];
     if (inputProfile) {
@@ -23,14 +28,14 @@ export async function merge(flags, file_subpath, file_extension, file_root_tag, 
         fs.mkdirSync(baseOutputDir);
     }
 
-    // dir is the profile name without the extension
+    // dir is the file name without the extension
     for (const dir of dirList) {
         console.log('Merging: ' + dir);
         const inputXML = join(baseInputDir, dir, dir) + XML_PART_EXTENSION;
         const mergedXml = (await readXmlFromFile(inputXML)) ?? {};
 
 
-        // tag_section is each profile section (applicationVisibilities, classAccess ecc)
+        // tag_section is each file section (applicationVisibilities, classAccess ecc)
         for (const tag_section in file_items) {
             const csvFilePath = join(baseInputDir, dir, tag_section) + CSV_EXTENSION;
             if (fs.existsSync(csvFilePath)) {

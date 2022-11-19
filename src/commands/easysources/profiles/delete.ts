@@ -63,6 +63,11 @@ export default class Delete extends SfdxCommand {
         const baseInputDir = join((this.flags.dir || DEFAULT_PATH), PROFILES_SUBPATH) as string;
         const inputProfile = (this.flags.input) as string;
 
+        if(!fs.existsSync(baseInputDir)){
+            console.log('Input folder ' + baseInputDir + ' does not exist!');
+            return;
+        }
+
         var dirList = [];
         if (inputProfile) {
             dirList = inputProfile.split(',');

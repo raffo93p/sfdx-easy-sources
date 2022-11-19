@@ -10,6 +10,11 @@ export async function updatekey(flags, file_subpath, file_items) {
     const baseInputDir = join((flags.dir || DEFAULT_PATH), file_subpath) as string;
     const inputFiles = (flags.input) as string;
 
+    if(!fs.existsSync(baseInputDir)){
+        console.log('Input folder ' + baseInputDir + ' does not exist!');
+        return;
+    }
+
     var dirList = [];
     if (inputFiles) {
         dirList = inputFiles.split(',');
@@ -33,7 +38,7 @@ export async function updatekey(flags, file_subpath, file_items) {
                 var jsonArray = await readCsvToJsonArray(csvFilePath)
 
                 generateTagId(jsonArray, file_items[tag_section].key, file_items[tag_section].headers);
-                sortByKey(jsonArray);
+                jsonArray = sortByKey(jsonArray);
 
                 const headers = file_items[tag_section];
                 const transforms = [unwind({ paths: headers })];

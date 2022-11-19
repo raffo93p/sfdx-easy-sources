@@ -70,6 +70,10 @@ export default class Delete extends SfdxCommand {
         const inputObject = (this.flags.object) as string;
         const inputRecordType = (this.flags.recordtype) as string;
 
+        if (!fs.existsSync(baseInputDir)) {
+            console.log('Input folder ' + baseInputDir + ' does not exist!');
+            return;
+        }
 
         var objectList = [];
         if (inputObject) {
