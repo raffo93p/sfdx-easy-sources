@@ -88,6 +88,7 @@ export default class Split extends SfdxCommand {
                     .map(item => item.name)
             }
 
+            
             for (const filename of recordTypeList) {
                 console.log('Splitting: ' + join(obj, filename));
 
