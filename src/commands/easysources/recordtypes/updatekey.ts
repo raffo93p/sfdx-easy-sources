@@ -92,9 +92,9 @@ export default class UpdateKey extends SfdxCommand {
                         generateTagId(jsonArray, RECORDTYPE_ITEMS[tag_section].key, RECORDTYPE_ITEMS[tag_section].headers);
                         jsonArray = sortByKey(jsonArray);
 
-                        const headers = RECORDTYPE_ITEMS[tag_section];
+                        const headers = RECORDTYPE_ITEMS[tag_section].headers;
                         const transforms = [unwind({ paths: headers })];
-                        const parser = new Parser({ headers, transforms });
+                        const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
                         const csv = parser.parse(jsonArray);
 
                         try {

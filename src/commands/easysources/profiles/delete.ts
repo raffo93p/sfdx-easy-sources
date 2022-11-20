@@ -63,7 +63,7 @@ export default class Delete extends SfdxCommand {
         const baseInputDir = join((this.flags.dir || DEFAULT_PATH), PROFILES_SUBPATH) as string;
         const inputProfile = (this.flags.input) as string;
 
-        if(!fs.existsSync(baseInputDir)){
+        if (!fs.existsSync(baseInputDir)) {
             console.log('Input folder ' + baseInputDir + ' does not exist!');
             return;
         }
@@ -86,18 +86,19 @@ export default class Delete extends SfdxCommand {
             const csvFilePath = join(baseInputDir, dir, calcCsvFilename(dir, type));
             if (fs.existsSync(csvFilePath)) {
                 var jsonMap = await readCsvToJsonMap(csvFilePath)
-
-                delete jsonMap[tagid];
+                
+                for (var k of tagid.split(',')) {
+                    delete jsonMap[k];
+                }
                 var jsonArray = Object.values(jsonMap) as [];
 
 
-                const headers = PROFILE_ITEMS[type];
+                const headers = PROFILE_ITEMS[type].headers;
                 const transforms = [unwind({ paths: headers })];
-                const parser = new Parser({ headers, transforms });
+                const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
                 jsonArray = sortByKey(jsonArray);
                 const csv = parser.parse(jsonArray);
                 try {
-
                     fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
                     // file written successfully
                 } catch (err) {

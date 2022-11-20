@@ -112,7 +112,8 @@ export default class Split extends SfdxCommand {
                     generateTagId(jsforcsv, RECORDTYPE_ITEMS[tag_section].key, RECORDTYPE_ITEMS[tag_section].headers);
                     jsforcsv = sortByKey(jsforcsv);
 
-                    const parser = new Parser();
+                    const headers = RECORDTYPE_ITEMS[tag_section].headers;
+                    const parser = new Parser({fields: [...headers, '_tagid']});
                     const csv = parser.parse(jsforcsv);
 
                     const outputFileCSV = join(outputDir, calcCsvFilename(recordTypeName, tag_section));

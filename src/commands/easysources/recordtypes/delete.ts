@@ -126,9 +126,9 @@ export default class Delete extends SfdxCommand {
                     var jsonArray = Object.values(jsonMap) as [{}];
 
 
-                    const headers = RECORDTYPE_ITEMS[RECORDTYPES_PICKVAL_ROOT];
+                    const headers = RECORDTYPE_ITEMS[RECORDTYPES_PICKVAL_ROOT].headers;
                     const transforms = [unwind({ paths: headers })];
-                    const parser = new Parser({ headers, transforms });
+                    const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
                     jsonArray = sortByKey(jsonArray);
                     const csv = parser.parse(jsonArray);
                     try {
