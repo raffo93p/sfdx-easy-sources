@@ -90,6 +90,7 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
             }
 
             writeXmlToFile(inputFilePart, filePropertiesPart);
+            writeXmlToFile(inputFilePart, xmlFileContentPart);
         } else {
             writeXmlToFile(inputFilePart, fileProperties);
         }
