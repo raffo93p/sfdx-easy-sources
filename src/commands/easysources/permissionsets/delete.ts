@@ -88,17 +88,18 @@ export default class Delete extends SfdxCommand {
             if (fs.existsSync(csvFilePath)) {
                 var jsonMap = await readCsvToJsonMap(csvFilePath)
 
-                delete jsonMap[tagid];
+                for(var k of tagid.split(',')){
+                    delete jsonMap[k];
+                }
                 var jsonArray = Object.values(jsonMap) as [];
 
 
-                const headers = PERMSET_ITEMS[type];
+                const headers = PERMSET_ITEMS[type].headers;
                 const transforms = [unwind({ paths: headers })];
-                const parser = new Parser({ headers, transforms });
+                const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
                 jsonArray = sortByKey(jsonArray);
                 const csv = parser.parse(jsonArray);
                 try {
-
                     fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
                     // file written successfully
                 } catch (err) {

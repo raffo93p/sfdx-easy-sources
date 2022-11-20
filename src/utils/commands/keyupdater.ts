@@ -40,9 +40,9 @@ export async function updatekey(flags, file_subpath, file_items) {
                 generateTagId(jsonArray, file_items[tag_section].key, file_items[tag_section].headers);
                 jsonArray = sortByKey(jsonArray);
 
-                const headers = file_items[tag_section];
+                const headers = file_items[tag_section].headers;
                 const transforms = [unwind({ paths: headers })];
-                const parser = new Parser({ headers, transforms });
+                const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
                 const csv = parser.parse(jsonArray);
 
                 try {

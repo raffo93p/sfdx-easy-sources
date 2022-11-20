@@ -116,7 +116,7 @@ export default class Upsert extends SfdxCommand {
 
                     const headers = RECORDTYPE_ITEMS[tag_section].headers;
                     const transforms = [unwind({ paths: headers })];
-                    const parser = new Parser({ headers, transforms });
+                    const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
 
 
                     const outputFile = join(outputDir, calcCsvFilename(recordtypeName, tag_section));

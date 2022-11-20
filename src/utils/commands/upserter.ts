@@ -45,7 +45,7 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
 
             const headers = file_items[tag_section].headers;
             const transforms = [unwind({ paths: headers })];
-            const parser = new Parser({ headers, transforms });
+            const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
 
 
             const outputFile = join(outputDir, calcCsvFilename(fileName, tag_section));
@@ -89,7 +89,6 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
                 filePropertiesPart[k] = fileProperties[k];
             }
 
-            writeXmlToFile(inputFilePart, filePropertiesPart);
             writeXmlToFile(inputFilePart, xmlFileContentPart);
         } else {
             writeXmlToFile(inputFilePart, fileProperties);

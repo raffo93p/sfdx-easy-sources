@@ -54,7 +54,7 @@ export async function split(flags, file_subpath, file_extension, file_root_tag, 
             const headers = file_items[tag_section].headers;
             const transforms = [unwind({ paths: headers })];
 
-            const parser = new Parser({ transforms });
+            const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
             const csv = parser.parse(myjson);
 
 
