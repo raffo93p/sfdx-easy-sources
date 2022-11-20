@@ -33,10 +33,6 @@ export default class Split extends SfdxCommand {
             char: 'd',
             description: messages.getMessage('dirFlagDescription', [DEFAULT_PATH]),
         }),
-        input: flags.string({
-            char: 'i',
-            description: messages.getMessage('inputFlagDescription'),
-        }),
         output: flags.string({
             char: 'o',
             description: messages.getMessage('outputFlagDescription', [DEFAULT_PATH]),

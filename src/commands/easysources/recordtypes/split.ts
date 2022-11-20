@@ -115,7 +115,7 @@ export default class Split extends SfdxCommand {
                     const parser = new Parser();
                     const csv = parser.parse(jsforcsv);
 
-                    const outputFileCSV = join(outputDir, calcCsvFilename(filename, tag_section));
+                    const outputFileCSV = join(outputDir, calcCsvFilename(recordTypeName, tag_section));
 
                     if (!fs.existsSync(outputDir)) {
                         fs.mkdirSync(outputDir, { recursive: true });

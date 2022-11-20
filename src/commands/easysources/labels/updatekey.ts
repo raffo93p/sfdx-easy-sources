@@ -31,10 +31,6 @@ export default class UpdateKey extends SfdxCommand {
         dir: flags.string({
             char: 'd',
             description: messages.getMessage('dirFlagDescription', [DEFAULT_PATH]),
-        }),
-        input: flags.string({
-            char: 'i',
-            description: messages.getMessage('inputFlagDescription'),
         })
     };
 
