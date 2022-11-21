@@ -16,7 +16,7 @@ const { Parser, transforms: { unwind } } = require('json2csv');
 import { DEFAULT_PATH } from "../../../utils/constants/constants";
 
 import { calcCsvFilename, readCsvToJsonMap } from "../../../utils/filesUtils"
-import { sortByKey } from "../../../utils/utils"
+import { setDefault, sortByKey } from "../../../utils/utils"
 
 import { RECORDTYPES_DEFAULT_PATH, RECORDTYPES_PICKVAL_ROOT, RECORDTYPES_SUBPATH, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
 
@@ -128,7 +128,7 @@ export default class Delete extends SfdxCommand {
 
                     const headers = RECORDTYPE_ITEMS[RECORDTYPES_PICKVAL_ROOT].headers;
                     const transforms = [unwind({ paths: headers })];
-                    const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
+                    const parser = new Parser({ fields: [...setDefault(headers), '_tagid'], transforms });
                     jsonArray = sortByKey(jsonArray);
                     const csv = parser.parse(jsonArray);
                     try {

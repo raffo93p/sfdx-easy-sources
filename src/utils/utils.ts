@@ -56,9 +56,17 @@ export function sortByKey(myArray) {
 	return myArray.sort(compare);
 
 	// var collator = new Intl.Collator([], {numeric: true});
-    // return myArray.sort((a, b) => collator.compare(a[key], b[key]));
+	// return myArray.sort((a, b) => collator.compare(a[key], b[key]));
 
 
+}
+
+export function setDefault(headers) {
+	var newHeaders = [];
+	for (var field of headers) {
+		newHeaders.push({ value: field, default: "" });
+	}
+	return newHeaders;
 }
 
 export async function executeCommand(flags, cmd, mdt) {
@@ -76,3 +84,4 @@ export async function bulkExecuteCommands(flags, cmd) {
 	await executeCommand(flags, cmd, 'globalvaluesets');
 	await executeCommand(flags, cmd, 'applications');
 }
+

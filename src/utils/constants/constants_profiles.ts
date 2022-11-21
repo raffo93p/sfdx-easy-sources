@@ -35,7 +35,7 @@ export const PROFILE_FIELD_KEY = 'field';
 
 export const PROFILE_LAYOUT_ROOT = 'layoutAssignments';
 export const PROFILE_LAYOUT_HEADER = ['layout', 'recordType'];
-export const PROFILE_LAYOUT_KEY = PROFILE_LAYOUT_HEADER;
+export const PROFILE_LAYOUT_KEY = ['layout', 'recordType'];
 
 // loginFlows
 // loginHours
