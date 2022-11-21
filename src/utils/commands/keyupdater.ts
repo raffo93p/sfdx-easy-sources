@@ -1,5 +1,5 @@
 import { calcCsvFilename, readCsvToJsonArray } from '../filesUtils'
-import { sortByKey } from "../utils"
+import { setDefault, sortByKey } from "../utils"
 import { generateTagId } from '../utils'
 const { Parser, transforms: { unwind } } = require('json2csv');
 import { join } from "path";
@@ -42,7 +42,7 @@ export async function updatekey(flags, file_subpath, file_items) {
 
                 const headers = file_items[tag_section].headers;
                 const transforms = [unwind({ paths: headers })];
-                const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
+                const parser = new Parser({ fields: [...setDefault(headers), '_tagid'], transforms });
                 const csv = parser.parse(jsonArray);
 
                 try {

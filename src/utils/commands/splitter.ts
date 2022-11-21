@@ -1,5 +1,5 @@
 import { calcCsvFilename, readXmlFromFile, removeExtension, writeXmlToFile } from '../filesUtils'
-import { generateTagId } from '../utils'
+import { generateTagId, setDefault } from '../utils'
 const { Parser, transforms: { unwind } } = require('json2csv');
 import { join } from "path";
 const fs = require('fs-extra');
@@ -54,7 +54,7 @@ export async function split(flags, file_subpath, file_extension, file_root_tag, 
             const headers = file_items[tag_section].headers;
             const transforms = [unwind({ paths: headers })];
 
-            const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
+            const parser = new Parser({ fields: [...setDefault(headers), '_tagid'], transforms });
             const csv = parser.parse(myjson);
 
 
