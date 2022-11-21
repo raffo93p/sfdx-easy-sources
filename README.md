@@ -12,9 +12,11 @@ sfdx-easy-sources
 [![Downloads/week](https://img.shields.io/npm/dw/sfdx-easy-sources.svg)](https://npmjs.org/package/sfdx-easy-sources)
 [![License](https://img.shields.io/npm/l/sfdx-easy-sources.svg)](https://github.com/raffo93p/sfdx-easy-sources/blob/master/package.json)
 
+# Note: There might be bugs or errors since this plugin is still in BETA version
 
 
 This unofficial plugin provides tools to simplify Salesforce sources, by splitting files into smaller ones and in csv format.
+
 
 ## Supported metadata types
 
