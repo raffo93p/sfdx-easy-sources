@@ -156,6 +156,3 @@ For help
   $ sfdx easysources:permissionsets:delete -h
 
 ```
-
-
-
