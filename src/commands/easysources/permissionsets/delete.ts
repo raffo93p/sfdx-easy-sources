@@ -14,7 +14,7 @@ import Performance from '../../../utils/performance';
 const { Parser, transforms: { unwind } } = require('json2csv');
 import {PERMSETS_SUBPATH, PERMSET_ITEMS} from "../../../utils/constants/constants_permissionsets";
 import { readCsvToJsonMap } from "../../../utils/filesUtils"
-import { sortByKey } from "../../../utils/utils"
+import { setDefault, sortByKey } from "../../../utils/utils"
 import { CSV_EXTENSION, DEFAULT_PATH } from '../../../utils/constants/constants';
 
 
@@ -96,7 +96,7 @@ export default class Delete extends SfdxCommand {
 
                 const headers = PERMSET_ITEMS[type].headers;
                 const transforms = [unwind({ paths: headers })];
-                const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
+                const parser = new Parser({ fields: [...setDefault(headers), '_tagid'], transforms });
                 jsonArray = sortByKey(jsonArray);
                 const csv = parser.parse(jsonArray);
                 try {

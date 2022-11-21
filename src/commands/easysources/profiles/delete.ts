@@ -14,7 +14,7 @@ import Performance from '../../../utils/performance';
 const { Parser, transforms: { unwind } } = require('json2csv');
 import { PROFILES_SUBPATH, PROFILE_ITEMS } from "../../../utils/constants/constants_profiles";
 import { calcCsvFilename, readCsvToJsonMap } from "../../../utils/filesUtils"
-import { sortByKey } from "../../../utils/utils"
+import { setDefault, sortByKey } from "../../../utils/utils"
 import { DEFAULT_PATH } from '../../../utils/constants/constants';
 
 
@@ -86,7 +86,7 @@ export default class Delete extends SfdxCommand {
             const csvFilePath = join(baseInputDir, dir, calcCsvFilename(dir, type));
             if (fs.existsSync(csvFilePath)) {
                 var jsonMap = await readCsvToJsonMap(csvFilePath)
-                
+
                 for (var k of tagid.split(',')) {
                     delete jsonMap[k];
                 }
@@ -95,7 +95,7 @@ export default class Delete extends SfdxCommand {
 
                 const headers = PROFILE_ITEMS[type].headers;
                 const transforms = [unwind({ paths: headers })];
-                const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
+                const parser = new Parser({ fields: [...setDefault(headers), '_tagid'], transforms });
                 jsonArray = sortByKey(jsonArray);
                 const csv = parser.parse(jsonArray);
                 try {
