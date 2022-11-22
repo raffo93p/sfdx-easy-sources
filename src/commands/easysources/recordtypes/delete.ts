@@ -100,21 +100,21 @@ export default class Delete extends SfdxCommand {
             for (const dir of recordTypeList) {
                 console.log('Deleting on: ' + join(obj, dir));
 
-                const csvFilePath = join(baseInputDir, obj, 'recordTypes', dir, calcCsvFilename(dir,RECORDTYPES_PICKVAL_ROOT));
-                console.log(csvFilePath)
+                const csvFilePath = join(baseInputDir, obj, 'recordTypes', dir, calcCsvFilename(dir, RECORDTYPES_PICKVAL_ROOT));
+
                 if (fs.existsSync(csvFilePath)) {
                     var jsonMap = await readCsvToJsonMap(csvFilePath)
 
                     if (apiname) {
-                        for(var ap of apiname.split(',')) {
-                            delete jsonMap[join(picklist, ap)];
+                        for (var ap of apiname.split(',')) {
+                            var key = picklist + '/' + ap;
+                            delete jsonMap[key];
                         }
 
                     } else {
 
                         for (var key of Object.keys(jsonMap)) {
                             if (jsonMap[key].picklist === picklist) {
-                                console.log(key)
                                 delete jsonMap[key];
                             }
                         }
