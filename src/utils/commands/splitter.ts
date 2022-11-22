@@ -1,5 +1,5 @@
 import { calcCsvFilename, readXmlFromFile, removeExtension, writeXmlToFile } from '../filesUtils'
-import { generateTagId, setDefault } from '../utils'
+import { generateTagId } from '../utils'
 const { Parser, transforms: { unwind } } = require('json2csv');
 import { join } from "path";
 const fs = require('fs-extra');
@@ -43,7 +43,7 @@ export async function split(flags, file_subpath, file_extension, file_root_tag, 
             // skip when tag is not found in the xml
             if (myjson == undefined) continue;
             // fixes scenarios when the tag is one, since it would be read as object and not array
-            if(!Array.isArray(myjson)) myjson = [myjson];
+            if (!Array.isArray(myjson)) myjson = [myjson];
 
 
             // generate _tagId column
@@ -53,8 +53,9 @@ export async function split(flags, file_subpath, file_extension, file_root_tag, 
 
             const headers = file_items[tag_section].headers;
             const transforms = [unwind({ paths: headers })];
+            var fields = [...headers, '_tagid'];
 
-            const parser = new Parser({ fields: [...setDefault(headers), '_tagid'], transforms });
+            const parser = new Parser({ fields: fields, transforms });
             const csv = parser.parse(myjson);
 
 

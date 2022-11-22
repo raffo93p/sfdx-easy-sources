@@ -1,5 +1,5 @@
 import { readXmlFromFile, readCsvToJsonMap, jsonArrayToMap, removeExtension, writeXmlToFile, calcCsvFilename } from '../filesUtils'
-import { sortByKey, generateTagId, setDefault } from "../utils"
+import { sortByKey, generateTagId } from "../utils"
 const { Parser, transforms: { unwind } } = require('json2csv');
 import { join } from "path";
 import { DEFAULT_PATH, XML_PART_EXTENSION } from '../constants/constants';
@@ -45,7 +45,7 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
 
             const headers = file_items[tag_section].headers;
             const transforms = [unwind({ paths: headers })];
-            const parser = new Parser({ fields: [...setDefault(headers), '_tagid'], transforms });
+            const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
 
 
             const outputFile = join(outputDir, calcCsvFilename(fileName, tag_section));

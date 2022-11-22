@@ -1,3 +1,4 @@
+import { setDefault } from "../utils";
 import { DEFAULT_PATH } from "./constants";
 
 export const PERMSET_APP_ROOT = 'applicationVisibilities';
@@ -21,7 +22,7 @@ export const PERMSET_FIELD_HEADER = ['editable', 'field', 'readable'];
 export const PERMSET_FIELD_KEY = 'field';
 
 export const PERMSET_LAYOUT_ROOT = 'layoutAssignments';
-export const PERMSET_LAYOUT_HEADER = ['layout', 'recordType'];
+export const PERMSET_LAYOUT_HEADER = ['layout', setDefault('recordType')];
 export const PERMSET_LAYOUT_KEY = PERMSET_LAYOUT_HEADER;
 
 export const PERMSET_OBJECT_ROOT = 'objectPermissions';
@@ -33,7 +34,7 @@ export const PERMSET_PAGE_HEADER = ['apexPage', 'enabled'];
 export const PERMSET_PAGE_KEY = 'apexPage';
 
 export const PERMSET_RECTYPE_ROOT = 'recordTypeVisibilities';
-export const PERMSET_RECTYPE_HEADER = ['default', 'personAccountDefault', 'recordType', 'visible'];
+export const PERMSET_RECTYPE_HEADER = ['default', setDefault('personAccountDefault'), 'recordType', 'visible'];
 export const PERMSET_RECTYPE_KEY = 'recordType';
 
 export const PERMSET_TAB_ROOT = 'tabVisibilities';

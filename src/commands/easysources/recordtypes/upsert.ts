@@ -9,7 +9,7 @@ import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import { readXmlFromFile, readCsvToJsonMap, jsonArrayToMap, removeExtension, writeXmlToFile, calcCsvFilename } from '../../../utils/filesUtils'
-import { generateTagId, setDefault, sortByKey } from '../../../utils/utils'
+import { generateTagId, sortByKey } from '../../../utils/utils'
 const { Parser, transforms: { unwind } } = require('json2csv');
 import { DEFAULT_PATH, XML_PART_EXTENSION } from '../../../utils/constants/constants';
 import Performance from '../../../utils/performance';
@@ -116,7 +116,7 @@ export default class Upsert extends SfdxCommand {
 
                     const headers = RECORDTYPE_ITEMS[tag_section].headers;
                     const transforms = [unwind({ paths: headers })];
-                    const parser = new Parser({ fields: [...setDefault(headers), '_tagid'], transforms });
+                    const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
 
 
                     const outputFile = join(outputDir, calcCsvFilename(recordtypeName, tag_section));

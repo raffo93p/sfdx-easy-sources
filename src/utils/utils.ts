@@ -61,12 +61,13 @@ export function sortByKey(myArray) {
 
 }
 
-export function setDefault(headers) {
-	var newHeaders = [];
-	for (var field of headers) {
-		newHeaders.push({ value: field, default: "" });
-	}
-	return newHeaders;
+export function setDefault(header) {
+	return {value: header, default: ''};
+	// var newHeaders = [];
+	// for (var field of headers) {
+	// 	newHeaders.push({ value: field, default: 'a' });
+	// }
+	// return newHeaders;
 }
 
 export async function executeCommand(flags, cmd, mdt) {
