@@ -43,11 +43,13 @@ export async function readCsvToJsonArray(csvFilePath: string) {
 export function jsonArrayToMap(jsonArray) {
 	if (!Array.isArray(jsonArray)) jsonArray = [jsonArray]
 
-	var aMap = jsonArray.reduce(function (map, obj) {
-		map[obj['_tagid']] = obj;
-		return map;
-	}, {});
-	return aMap;
+	const myMap = new Map(
+		jsonArray.map(object => {
+			return [object['_tagid'], object];
+		}),
+	);
+
+	return myMap;
 }
 
 export async function readCsvToJsonMap(csvFilePath: string) {
@@ -69,6 +71,6 @@ export function removeExtension(inputFile: string) {
 	}
 }
 
-export function calcCsvFilename(filename, tag_section){
-	return filename +'-'+tag_section + CSV_EXTENSION;
+export function calcCsvFilename(filename, tag_section) {
+	return filename + '-' + tag_section + CSV_EXTENSION;
 }

@@ -43,12 +43,18 @@ export default class Split extends SfdxCommand {
             char: 'o',
             description: messages.getMessage('outputFlagDescription', [DEFAULT_PATH]),
         }),
+        sort: flags.enum({
+            char: 'S',
+            description: messages.getMessage('sortFlagDescription', ['false']),
+            options: ['true', 'false'],
+            default: 'false',
+        }),
     };
 
 
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
-
+        
         var result = await split(this.flags, GVSETS_SUBPATH, GVSETS_EXTENSION, GVSETS_ROOT_TAG, GVSET_ITEMS);
 
         Performance.getInstance().end();

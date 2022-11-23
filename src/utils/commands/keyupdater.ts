@@ -10,7 +10,7 @@ export async function updatekey(flags, file_subpath, file_items) {
     const baseInputDir = join((flags.dir || DEFAULT_PATH), file_subpath) as string;
     const inputFiles = (flags.input) as string;
 
-    if(!fs.existsSync(baseInputDir)){
+    if (!fs.existsSync(baseInputDir)) {
         console.log('Input folder ' + baseInputDir + ' does not exist!');
         return;
     }
@@ -32,13 +32,16 @@ export async function updatekey(flags, file_subpath, file_items) {
         // tag_Section is each file section (applicationVisibilities, classAccess ecc)
         for (const tag_section in file_items) {
 
-            const csvFilePath = join(baseInputDir, dir, calcCsvFilename(dir,tag_section));
+            const csvFilePath = join(baseInputDir, dir, calcCsvFilename(dir, tag_section));
 
             if (fs.existsSync(csvFilePath)) {
                 var jsonArray = await readCsvToJsonArray(csvFilePath)
 
                 generateTagId(jsonArray, file_items[tag_section].key, file_items[tag_section].headers);
-                jsonArray = sortByKey(jsonArray);
+
+                if (flags.sort === 'true') {
+                    jsonArray = sortByKey(jsonArray);
+                }
 
                 const headers = file_items[tag_section].headers;
                 const transforms = [unwind({ paths: headers })];

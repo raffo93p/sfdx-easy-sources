@@ -10,7 +10,7 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
     const baseOutputDir = flags.output == null ? baseInputDir : join(flags.output, file_subpath) as string;
     const inputFiles = (flags.input) as string;
 
-    if(!fs.existsSync(baseInputDir)){
+    if (!fs.existsSync(baseInputDir)) {
         console.log('Input folder ' + baseInputDir + ' does not exist!');
         return;
     }
@@ -39,7 +39,7 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
 
             var jsonArrayNew = fileProperties[tag_section];
             if (jsonArrayNew == undefined) continue;
-            if(!Array.isArray(jsonArrayNew)) jsonArrayNew = [jsonArrayNew];
+            if (!Array.isArray(jsonArrayNew)) jsonArrayNew = [jsonArrayNew];
 
             generateTagId(jsonArrayNew, file_items[tag_section].key, file_items[tag_section].headers)
 
@@ -60,15 +60,19 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
                 var jsonMapOld = await readCsvToJsonMap(csvFilePath);
                 var jsonMapNew = jsonArrayToMap(jsonArrayNew)
 
-                for (var k in jsonMapNew) {
-                    jsonMapOld[k] = jsonMapNew[k];
-                }
-                jsonArrayNew = Object.values(jsonMapOld);
+                jsonMapNew.forEach((value, key) => {
+                    jsonMapOld.set(key, value)
+                });
 
+                jsonArrayNew = Array.from(jsonMapOld.values());
+                
+            }
+
+            if (flags.sort === 'true') {
+                jsonArrayNew = sortByKey(jsonArrayNew);
             }
 
             try {
-                jsonArrayNew = sortByKey(jsonArrayNew);
                 const csv = parser.parse(jsonArrayNew);
                 fs.writeFileSync(outputFile, csv, { flag: 'w+' });
                 // file written successfully

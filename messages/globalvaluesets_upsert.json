@@ -3,6 +3,7 @@
   "dirFlagDescription": "Specify a custom dir for input globalvaluesets. Default: '%s'",
   "inputFlagDescription": "Specify a globalvalueset. Example: MyGlobalValueSet.globalvalueset-meta.xml",
   "outputFlagDescription": "Specify a custom dir for output globalvaluesets. Default: '%s'",
+  "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [

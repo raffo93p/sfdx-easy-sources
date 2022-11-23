@@ -56,7 +56,13 @@ export default class Delete extends SfdxCommand {
         apiname: flags.string({
             char: 'k',
             description: messages.getMessage('apinameFlagDescription'),
-        })
+        }),
+        sort: flags.enum({
+            char: 'S',
+            description: messages.getMessage('sortFlagDescription', ['true']),
+            options: ['true', 'false'],
+            default: 'true',
+        }),
     };
 
     public async run(): Promise<AnyJson> {
@@ -108,7 +114,7 @@ export default class Delete extends SfdxCommand {
                     if (apiname) {
                         for (var ap of apiname.split(',')) {
                             var key = picklist + '/' + ap;
-                            delete jsonMap[key];
+                            jsonMap.delete(key);
                         }
 
                     } else {
@@ -120,13 +126,16 @@ export default class Delete extends SfdxCommand {
                         }
                     }
 
-                    var jsonArray = Object.values(jsonMap) as [{}];
-
+                    var jsonArray = Array.from(jsonMap.values());
 
                     const headers = RECORDTYPE_ITEMS[RECORDTYPES_PICKVAL_ROOT].headers;
                     const transforms = [unwind({ paths: headers })];
                     const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
-                    jsonArray = sortByKey(jsonArray);
+
+                    if (this.flags.sort === 'true') {
+                        jsonArray = sortByKey(jsonArray);
+                    }
+
                     const csv = parser.parse(jsonArray);
                     try {
 

@@ -61,7 +61,13 @@ export default class Merge extends SfdxCommand {
         output: flags.string({
             char: 'o',
             description: messages.getMessage('outputFlagDescription', [DEFAULT_PATH]),
-        })
+        }),
+        sort: flags.enum({
+            char: 'S',
+            description: messages.getMessage('sortFlagDescription', ['true']),
+            options: ['true', 'false'],
+            default: 'true',
+        }),
     };
 
     public async run(): Promise<AnyJson> {
@@ -72,7 +78,7 @@ export default class Merge extends SfdxCommand {
         const inputObject = (this.flags.object) as string;
         const inputRecordType = (this.flags.recordtype) as string;
 
-        if(!fs.existsSync(baseInputDir)){
+        if (!fs.existsSync(baseInputDir)) {
             console.log('Input folder ' + baseInputDir + ' does not exist!');
             return;
         }
@@ -111,7 +117,9 @@ export default class Merge extends SfdxCommand {
                     if (fs.existsSync(csvFilePath)) {
                         var jsonArray = await readCsvToJsonArray(csvFilePath)
 
-                        jsonArray = sortByKey(jsonArray);
+                        if (this.flags.sort === 'true') {
+                            jsonArray = sortByKey(jsonArray);
+                        }
 
                         for (var i in jsonArray) {
                             delete jsonArray[i]['_tagid']

@@ -49,6 +49,12 @@ export default class Split extends SfdxCommand {
             char: 'o',
             description: messages.getMessage('outputFlagDescription', [DEFAULT_PATH]),
         }),
+        sort: flags.enum({
+            char: 'S',
+            description: messages.getMessage('sortFlagDescription', ['true']),
+            options: ['true', 'false'],
+            default: 'true',
+        }),
     };
 
 
@@ -61,7 +67,7 @@ export default class Split extends SfdxCommand {
         const inputObject = (this.flags.object) as string;
         const inputRecordType = (this.flags.recordtype) as string;
 
-        if(!fs.existsSync(baseInputDir)){
+        if (!fs.existsSync(baseInputDir)) {
             console.log('Input folder ' + baseInputDir + ' does not exist!');
             return;
         }
@@ -88,7 +94,7 @@ export default class Split extends SfdxCommand {
                     .map(item => item.name)
             }
 
-            
+
             for (const filename of recordTypeList) {
                 console.log('Splitting: ' + join(obj, filename));
 
@@ -103,17 +109,19 @@ export default class Split extends SfdxCommand {
                 for (const tag_section in RECORDTYPE_ITEMS) {
                     var myjson = recordtypeProperties[RECORDTYPES_PICKVAL_ROOT];
                     if (myjson == undefined) continue;
-                    if(!Array.isArray(myjson)) myjson = [myjson];
+                    if (!Array.isArray(myjson)) myjson = [myjson];
 
                     var jsforcsv = transformXMLtoCSV(myjson);
 
 
                     // generate _tagId column
                     generateTagId(jsforcsv, RECORDTYPE_ITEMS[tag_section].key, RECORDTYPE_ITEMS[tag_section].headers);
-                    jsforcsv = sortByKey(jsforcsv);
+                    if (this.flags.sort === 'true') {
+                        jsforcsv = sortByKey(jsforcsv);
+                    }
 
                     const headers = RECORDTYPE_ITEMS[tag_section].headers;
-                    const parser = new Parser({fields: [...headers, '_tagid']});
+                    const parser = new Parser({ fields: [...headers, '_tagid'] });
                     const csv = parser.parse(jsforcsv);
 
                     const outputFileCSV = join(outputDir, calcCsvFilename(recordTypeName, tag_section));

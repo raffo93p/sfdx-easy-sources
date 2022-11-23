@@ -49,7 +49,13 @@ export default class Delete extends SfdxCommand {
         tagid: flags.string({
             char: 'k',
             description: messages.getMessage('tagidFlagDescription'),
-        })
+        }),
+        sort: flags.enum({
+            char: 'S',
+            description: messages.getMessage('sortFlagDescription', ['true']),
+            options: ['true', 'false'],
+            default: 'true',
+        }),
     };
 
     public async run(): Promise<AnyJson> {
@@ -88,15 +94,18 @@ export default class Delete extends SfdxCommand {
                 var jsonMap = await readCsvToJsonMap(csvFilePath)
 
                 for (var k of tagid.split(',')) {
-                    delete jsonMap[k];
+                    jsonMap.delete(k);
                 }
-                var jsonArray = Object.values(jsonMap) as [];
-
+                var jsonArray = Array.from(jsonMap.values());
 
                 const headers = PROFILE_ITEMS[type].headers;
                 const transforms = [unwind({ paths: headers })];
                 const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
-                jsonArray = sortByKey(jsonArray);
+
+                if (this.flags.sort === 'true') {
+                    jsonArray = sortByKey(jsonArray);
+                }
+
                 const csv = parser.parse(jsonArray);
                 try {
                     fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });

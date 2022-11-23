@@ -49,7 +49,9 @@ export async function split(flags, file_subpath, file_extension, file_root_tag, 
             // generate _tagId column
             generateTagId(myjson, file_items[tag_section].key, file_items[tag_section].headers);
             // sorts array by _tagid. sorting is made as string
-            myjson = sortByKey(myjson);
+            if (flags.sort === 'true') {
+                myjson = sortByKey(myjson);
+            }
 
             const headers = file_items[tag_section].headers;
             const transforms = [unwind({ paths: headers })];

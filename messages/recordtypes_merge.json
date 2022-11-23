@@ -4,6 +4,7 @@
   "objectFlagDescription": "Specify an object. Example: 'Account'",
   "recordtypeFlagDescription": "Specify a recordType. Example: 'MyRecordType'",
   "outputFlagDescription": "Specify a custom dir for output recordTypes. Default: '%s'",
+  "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [

@@ -42,7 +42,13 @@ export default class UpdateKey extends SfdxCommand {
         recordtype: flags.string({
             char: 'r',
             description: messages.getMessage('recordtypeFlagDescription'),
-        })
+        }),
+        sort: flags.enum({
+            char: 'S',
+            description: messages.getMessage('sortFlagDescription', ['true']),
+            options: ['true', 'false'],
+            default: 'true',
+        }),
     };
 
 
@@ -52,7 +58,7 @@ export default class UpdateKey extends SfdxCommand {
         const inputObject = (this.flags.object) as string;
         const inputRecordType = (this.flags.recordtype) as string;
 
-        if(!fs.existsSync(baseInputDir)){
+        if (!fs.existsSync(baseInputDir)) {
             console.log('Input folder ' + baseInputDir + ' does not exist!');
             return;
         }
@@ -72,7 +78,7 @@ export default class UpdateKey extends SfdxCommand {
             if (inputRecordType) {
                 recordTypeList = inputRecordType.split(',');
             } else {
-                if(!fs.existsSync(join(baseInputDir, obj, 'recordTypes'))) continue;
+                if (!fs.existsSync(join(baseInputDir, obj, 'recordTypes'))) continue;
 
                 recordTypeList = fs.readdirSync(join(baseInputDir, obj, 'recordTypes'), { withFileTypes: true })
                     .filter(item => item.isDirectory())
@@ -90,7 +96,10 @@ export default class UpdateKey extends SfdxCommand {
                     if (fs.existsSync(csvFilePath)) {
                         var jsonArray = await readCsvToJsonArray(csvFilePath)
                         generateTagId(jsonArray, RECORDTYPE_ITEMS[tag_section].key, RECORDTYPE_ITEMS[tag_section].headers);
-                        jsonArray = sortByKey(jsonArray);
+
+                        if (this.flags.sort === 'true') {
+                            jsonArray = sortByKey(jsonArray);
+                        }
 
                         const headers = RECORDTYPE_ITEMS[tag_section].headers;
                         const transforms = [unwind({ paths: headers })];

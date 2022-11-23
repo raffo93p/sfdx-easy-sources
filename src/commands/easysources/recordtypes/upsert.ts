@@ -50,6 +50,12 @@ export default class Upsert extends SfdxCommand {
             char: 'o',
             description: messages.getMessage('outputFlagDescription', [DEFAULT_PATH]),
         }),
+        sort: flags.enum({
+            char: 'S',
+            description: messages.getMessage('sortFlagDescription', ['true']),
+            options: ['true', 'false'],
+            default: 'true',
+        }),
     };
 
 
@@ -61,7 +67,7 @@ export default class Upsert extends SfdxCommand {
         const inputObject = (this.flags.object) as string;
         const inputRecordType = (this.flags.recordtype) as string;
 
-        if(!fs.existsSync(baseInputDir)){
+        if (!fs.existsSync(baseInputDir)) {
             console.log('Input folder ' + baseInputDir + ' does not exist!');
             return;
         }
@@ -95,7 +101,7 @@ export default class Upsert extends SfdxCommand {
 
                 const inputFile = join(baseInputDir, obj, 'recordTypes', filename);
 
-                
+
                 const xmlFileContent = (await readXmlFromFile(inputFile)) ?? {};
                 const recordtypeProperties = xmlFileContent[RECORDTYPES_ROOT_TAG] ?? {};
 
@@ -106,7 +112,7 @@ export default class Upsert extends SfdxCommand {
 
                     var jsonArray = recordtypeProperties[tag_section];
                     if (jsonArray == undefined) continue;
-                    if(!Array.isArray(jsonArray)) jsonArray = [jsonArray];
+                    if (!Array.isArray(jsonArray)) jsonArray = [jsonArray];
 
                     var jsonArrayNew = transformXMLtoCSV(jsonArray);
 
@@ -131,15 +137,19 @@ export default class Upsert extends SfdxCommand {
                         var jsonMapOld = await readCsvToJsonMap(csvFilePath);
                         var jsonMapNew = jsonArrayToMap(jsonArrayNew)
 
-                        for (var k in jsonMapNew) {
-                            jsonMapOld[k] = jsonMapNew[k];
-                        }
-                        jsonArrayNew = Object.values(jsonMapOld);
+                        jsonMapNew.forEach((value, key) => {
+                            jsonMapOld.set(key, value)
+                        });
+
+                        jsonArrayNew = Array.from(jsonMapOld.values());
 
                     }
 
-                    try {
+                    if (this.flags.sort === 'true') {
                         jsonArrayNew = sortByKey(jsonArrayNew);
+                    }
+
+                    try {
                         const csv = parser.parse(jsonArrayNew);
                         fs.writeFileSync(outputFile, csv, { flag: 'w+' });
                         // file written successfully
@@ -161,7 +171,7 @@ export default class Upsert extends SfdxCommand {
 
                     writeXmlToFile(inputFilePart, xmlFileContentPart);
                 } else {
-                    if(fs.existsSync(join(baseInputDir, obj, 'recordTypes', recordtypeName))){
+                    if (fs.existsSync(join(baseInputDir, obj, 'recordTypes', recordtypeName))) {
                         writeXmlToFile(inputFilePart, recordtypeProperties);
                     }
                 }

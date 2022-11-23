@@ -31,7 +31,13 @@ export default class UpdateKey extends SfdxCommand {
         dir: flags.string({
             char: 'd',
             description: messages.getMessage('dirFlagDescription', [DEFAULT_PATH]),
-        })
+        }),
+        sort: flags.enum({
+            char: 'S',
+            description: messages.getMessage('sortFlagDescription', ['false']),
+            options: ['true', 'false'],
+            default: 'false',
+        }),
     };
 
 

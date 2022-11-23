@@ -42,7 +42,13 @@ export default class Merge extends SfdxCommand {
         output: flags.string({
             char: 'o',
             description: messages.getMessage('outputFlagDescription', [DEFAULT_PATH]),
-        })
+        }),
+        sort: flags.enum({
+            char: 'S',
+            description: messages.getMessage('sortFlagDescription', ['false']),
+            options: ['true', 'false'],
+            default: 'false',
+        }),
     };
 
     public async run(): Promise<AnyJson> {
