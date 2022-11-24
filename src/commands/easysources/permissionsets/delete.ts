@@ -12,7 +12,7 @@ const fs = require('fs-extra');
 import { join } from "path";
 import Performance from '../../../utils/performance';
 const { Parser, transforms: { unwind } } = require('json2csv');
-import {PERMSETS_SUBPATH, PERMSET_ITEMS} from "../../../utils/constants/constants_permissionsets";
+import { PERMSETS_SUBPATH, PERMSET_ITEMS } from "../../../utils/constants/constants_permissionsets";
 import { readCsvToJsonMap } from "../../../utils/filesUtils"
 import { sortByKey } from "../../../utils/utils"
 import { CSV_EXTENSION, DEFAULT_PATH } from '../../../utils/constants/constants';
@@ -49,7 +49,13 @@ export default class Delete extends SfdxCommand {
         tagid: flags.string({
             char: 'k',
             description: messages.getMessage('tagidFlagDescription'),
-        })
+        }),
+        sort: flags.enum({
+            char: 'S',
+            description: messages.getMessage('sortFlagDescription', ['true']),
+            options: ['true', 'false'],
+            default: 'true',
+        }),
     };
 
     public async run(): Promise<AnyJson> {
@@ -64,7 +70,7 @@ export default class Delete extends SfdxCommand {
         const baseInputDir = join((this.flags.dir || DEFAULT_PATH), PERMSETS_SUBPATH) as string;
         const inputProfile = (this.flags.input) as string;
 
-        if(!fs.existsSync(baseInputDir)){
+        if (!fs.existsSync(baseInputDir)) {
             console.log('Input folder ' + baseInputDir + ' does not exist!');
             return;
         }
@@ -88,16 +94,20 @@ export default class Delete extends SfdxCommand {
             if (fs.existsSync(csvFilePath)) {
                 var jsonMap = await readCsvToJsonMap(csvFilePath)
 
-                for(var k of tagid.split(',')){
-                    delete jsonMap[k];
+                for (var k of tagid.split(',')) {
+                    jsonMap.delete(k);
                 }
-                var jsonArray = Object.values(jsonMap) as [];
+                var jsonArray = Array.from(jsonMap.values());
 
 
                 const headers = PERMSET_ITEMS[type].headers;
                 const transforms = [unwind({ paths: headers })];
                 const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
-                jsonArray = sortByKey(jsonArray);
+
+                if (this.flags.sort === 'true') {
+                    jsonArray = sortByKey(jsonArray);
+                }
+
                 const csv = parser.parse(jsonArray);
                 try {
                     fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });

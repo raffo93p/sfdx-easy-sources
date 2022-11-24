@@ -7,6 +7,7 @@
   "errorNoTypeFlag": "Flag Type (-t) is required. Run 'sfdx easysources:permissionsets:delete -h' for examples",
   "errorNoValidTypeFlag": "Flag Type (-t) must be one of the following: ['applicationVisibilities','classAccesses','fieldPermissions','layoutAssignments','objectPermissions','pageAccesses','recordTypeVisibilities','tabVisibilities','userPermissions']",
   "errorNoTagIdFlag": "Flag TagId (-k) is required. Run 'sfdx easysources:permissionsets:delete -h' for examples",
+  "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [

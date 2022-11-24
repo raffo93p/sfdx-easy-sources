@@ -35,7 +35,13 @@ export default class UpdateKey extends SfdxCommand {
         input: flags.string({
             char: 'i',
             description: messages.getMessage('inputFlagDescription'),
-        })
+        }),
+        sort: flags.enum({
+            char: 'S',
+            description: messages.getMessage('sortFlagDescription', ['true']),
+            options: ['true', 'false'],
+            default: 'true',
+        }),
     };
 
 

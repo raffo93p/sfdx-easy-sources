@@ -41,6 +41,12 @@ export default class Split extends SfdxCommand {
             char: 'o',
             description: messages.getMessage('outputFlagDescription', [DEFAULT_PATH]),
         }),
+        sort: flags.enum({
+            char: 'S',
+            description: messages.getMessage('sortFlagDescription', ['true']),
+            options: ['true', 'false'],
+            default: 'true',
+        }),
     };
 
 

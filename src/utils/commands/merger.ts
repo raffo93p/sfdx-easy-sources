@@ -11,7 +11,7 @@ export async function merge(flags, file_subpath, file_extension, file_root_tag, 
     const baseOutputDir = flags.output == null ? baseInputDir : join(flags.output, file_subpath) as string;
     const inputProfile = (flags.input) as string;
 
-    if(!fs.existsSync(baseInputDir)){
+    if (!fs.existsSync(baseInputDir)) {
         console.log('Input folder ' + baseInputDir + ' does not exist!');
         return;
     }
@@ -41,7 +41,9 @@ export async function merge(flags, file_subpath, file_extension, file_root_tag, 
             if (fs.existsSync(csvFilePath)) {
                 var jsonArray = await readCsvToJsonArray(csvFilePath)
 
-                jsonArray = sortByKey(jsonArray);
+                if (flags.sort === 'true') {
+                    jsonArray = sortByKey(jsonArray);
+                }
 
                 for (var i in jsonArray) {
                     delete jsonArray[i]['_tagid']
