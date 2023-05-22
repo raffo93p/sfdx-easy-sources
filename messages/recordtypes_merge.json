@@ -9,8 +9,8 @@
   "forceFlagDescription": "WTF",
   "examples": [
     "sfdx easysources:recordtypes:merge",
-    "sfdx easysources:recordtypes:merge -d './force-app/src/default' -o './force-app/src/default'",
-    "sfdx easysources:recordtypes:merge -d './force-app/src/default' -s 'Account'",
-    "sfdx easysources:recordtypes:merge -d './force-app/src/default' -s 'Account' -r 'MyRecordType'"
+    "sfdx easysources:recordtypes:merge -x './force-app/src/default' -c './easysources'",
+    "sfdx easysources:recordtypes:merge -x './force-app/src/default' -s 'Account'",
+    "sfdx easysources:recordtypes:merge -x './force-app/src/default' -s 'Account' -r 'MyRecordType'"
   ]
 }

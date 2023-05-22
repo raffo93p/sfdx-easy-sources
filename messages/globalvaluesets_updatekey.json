@@ -7,6 +7,6 @@
   "forceFlagDescription": "WTF",
   "examples": [
     "sfdx easysources:globalvaluesets:updatekey",
-    "sfdx easysources:globalvaluesets:updatekey -i './force-app/src/default'"
+    "sfdx easysources:globalvaluesets:updatekey -c './easysources'"
   ]
 }

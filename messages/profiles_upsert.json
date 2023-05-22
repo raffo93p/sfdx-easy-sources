@@ -9,6 +9,6 @@
   "forceFlagDescription": "WTF",
   "examples": [
     "sfdx easysources:profiles:upsert",
-    "sfdx easysources:profiles:upsert -i './force-app/src/default' -o './force-app/src/default'"
+    "sfdx easysources:profiles:upsert -i './force-app/src/default' -c './easysources'"
   ]
 }

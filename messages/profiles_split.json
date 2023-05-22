@@ -8,9 +8,9 @@
   "forceFlagDescription": "WTF",
   "examples": [
     "sfdx easysources:profiles:split",
-    "sfdx easysources:profiles:split -d './force-app/src/default'",
-    "sfdx easysources:profiles:split -d './force-app/src/default' -i 'Admin.profile-meta.xml'",
-    "sfdx easysources:profiles:split -d './force-app/src/default' -o './force-app/src/default'",
-    "sfdx easysources:profiles:split -d './force-app/src/default' -i 'Admin.profile-meta.xml' -o './force-app/src/default'"
+    "sfdx easysources:profiles:split -x './force-app/src/default'",
+    "sfdx easysources:profiles:split -x './force-app/src/default' -i 'Admin.profile-meta.xml'",
+    "sfdx easysources:profiles:split -x './force-app/src/default' -c './easysources'",
+    "sfdx easysources:profiles:split -x './force-app/src/default' -i 'Admin.profile-meta.xml' -c './easysources'"
   ]
 }

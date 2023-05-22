@@ -9,9 +9,9 @@
   "forceFlagDescription": "WTF",
   "examples": [
     "sfdx easysources:recordtypes:split",
-    "sfdx easysources:recordtypes:split -d './force-app/src/default'",
-    "sfdx easysources:recordtypes:split -d './force-app/src/default' -s 'Account'",
-    "sfdx easysources:recordtypes:split -d './force-app/src/default' -o './force-app/src/default'",
-    "sfdx easysources:recordtypes:split -d './force-app/src/default' -s 'Account' -r 'MyRecordType.recordType-meta.xml'"
+    "sfdx easysources:recordtypes:split -x './force-app/src/default'",
+    "sfdx easysources:recordtypes:split -x './force-app/src/default' -s 'Account'",
+    "sfdx easysources:recordtypes:split -x './force-app/src/default' -c './easysources'",
+    "sfdx easysources:recordtypes:split -x './force-app/src/default' -s 'Account' -r 'MyRecordType.recordType-meta.xml'"
   ]
 }

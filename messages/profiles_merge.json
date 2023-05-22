@@ -8,6 +8,6 @@
   "forceFlagDescription": "WTF",
   "examples": [
     "sfdx easysources:profiles:merge",
-    "sfdx easysources:profiles:merge -d './force-app/src/default' -o './force-app/src/default'"
+    "sfdx easysources:profiles:merge -x './force-app/src/default' -c './easysources'"
   ]
 }

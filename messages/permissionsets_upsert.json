@@ -8,6 +8,6 @@
   "forceFlagDescription": "WTF",
   "examples": [
     "sfdx easysources:permissionsets:upsert",
-    "sfdx easysources:permissionsets:upsert -i './force-app/src/default' -o './force-app/src/default'"
+    "sfdx easysources:permissionsets:upsert -i './force-app/src/default' -c './easysources'"
   ]
 }

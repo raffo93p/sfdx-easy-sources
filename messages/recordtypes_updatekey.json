@@ -8,7 +8,7 @@
   "forceFlagDescription": "WTF",
   "examples": [
     "sfdx easysources:recordtypes:updatekey",
-    "sfdx easysources:recordtypes:updatekey -d './force-app/src/default' -s 'Account'",
-    "sfdx easysources:recordtypes:updatekey -d './force-app/src/default' -s 'Account' -r 'MyRecordType'"
+    "sfdx easysources:recordtypes:updatekey -x './force-app/src/default' -s 'Account'",
+    "sfdx easysources:recordtypes:updatekey -x './force-app/src/default' -s 'Account' -r 'MyRecordType'"
   ]
 }

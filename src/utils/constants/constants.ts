@@ -4,7 +4,7 @@ export const CSV_EXTENSION = '.csv';
 export const XML_PART_EXTENSION = '-part.xml';
 
 export const DEFAULT_SFXML_PATH = './force-app/main/default';
-export const DEFAULT_ESCSV_PATH = './easysources/split';
+export const DEFAULT_ESCSV_PATH = './easysources';
 
 export const SFDX_CMD = 'sfdx';
 

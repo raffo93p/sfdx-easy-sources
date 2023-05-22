@@ -8,6 +8,6 @@
   "forceFlagDescription": "WTF",
   "examples": [
     "sfdx easysources:globalvaluesets:upsert",
-    "sfdx easysources:globalvaluesets:upsert -i './force-app/src/default' -o './force-app/src/default'"
+    "sfdx easysources:globalvaluesets:upsert -i './force-app/src/default' -c './easysources'"
   ]
 }
