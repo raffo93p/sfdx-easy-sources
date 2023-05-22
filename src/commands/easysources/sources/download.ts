@@ -11,8 +11,8 @@ import { AnyJson } from '@salesforce/ts-types';
 import Performance from '../../../utils/performance';
 import { DEFAULT_PATH } from '../../../utils/constants/constants';
 import { join } from "path";
-import { DEFAULT_PACKAGE_EXT, PACKAGE_VERSION, PERMSET_TYPE, PROFILE_MEMBERS, PROFILE_TYPE, RESOURCES_MAXNUM, TYPES_PICKVAL_ROOT, TYPES_ROOT_TAG } from '../../../utils/constants/constants_sourcesdownload';
-import { readXmlFromFile, writeXmlToFile } from '../../../utils/filesUtils';
+import { DEFAULT_PACKAGE_EXT, OBJECT_SUBPART_SKIP, PACKAGE_VERSION, PERMSET_TYPE, PROFILE_MEMBERS, PROFILE_TYPE, RESOURCES_MAXNUM, TYPES_PICKVAL_ROOT, TYPES_ROOT_TAG } from '../../../utils/constants/constants_sourcesdownload';
+import { readStringFromFile, readXmlFromFile, writeXmlToFile } from '../../../utils/filesUtils';
 import { retrieveAllMetadataPackage, retrievePackage } from '../../../utils/commands/utils';
 import { executeCommand } from '../../../utils/utils';
 const fs = require('fs-extra');
@@ -94,6 +94,19 @@ export default class Download extends SfdxCommand {
 
         var typeItemsMap = jsonArrayToMap(typeItemsList);
         
+        // * STEP 1.1 - Calculate objects weight
+        const strFileContent = await readStringFromFile(inputFile);
+        var objWeights = {};
+
+        if(typeItemsMap.has('CustomObject')){
+            for(const member of typeItemsMap.get('CustomObject')){
+                var str = member+".";
+                objWeights[member] = (strFileContent.split(str) || []).length; // should be -1, but we count also the customObject itself as +1
+            }
+
+        }
+
+
 
         // * STEP 2 - Start chunkization
 
@@ -102,12 +115,12 @@ export default class Download extends SfdxCommand {
 
         // * STEP 2.1 - profiles chunkization
         var profileChunks =  splitChunksWithFixedTypes(
-                                    typeItemsMap, typesToDelete, resourcesNum, PROFILE_TYPE, PROFILE_MEMBERS);
+                                    typeItemsMap, typesToDelete, objWeights, resourcesNum, PROFILE_TYPE, PROFILE_MEMBERS);
         
 
         // * STEP 2.2 - permset chunkization
         var permsetChunks =  splitChunksWithFixedTypes(
-                                    typeItemsMap, typesToDelete, resourcesNum, PERMSET_TYPE, PROFILE_MEMBERS);
+                                    typeItemsMap, typesToDelete, objWeights, resourcesNum, PERMSET_TYPE, PROFILE_MEMBERS);
 
         // * STEP 2.3 - delete already retrieved types
         var membersToDeleteUniq = [...new Set(typesToDelete)];
@@ -120,24 +133,24 @@ export default class Download extends SfdxCommand {
         // we split the package in various chunks, in a sequencial way, each of resourcesNum number of members (except the last chunk)
         // at the end each item of typeItemsMapChunks will be a package
 
-        typeItemsMapChunks.push(...splitTypeItemsToChunks(typeItemsMap, null, resourcesNum));
+        typeItemsMapChunks.push(...splitTypeItemsToChunks(typeItemsMap, null, objWeights, resourcesNum));
 
         // * STEP 3 - Retrieve chunks
         var i = 0;
-        await retrieveChunks(profileChunks, orgname, baseInputDir, 'profiles', i);
-        await retrieveChunks(permsetChunks, orgname, baseInputDir, 'permissionsets', i);
-        await retrieveChunks(typeItemsMapChunks, orgname, baseInputDir, null, i);
-
+        await retrieveChunks(profileChunks, orgname, baseInputDir, 'profiles', i, false);
+        await retrieveChunks(permsetChunks, orgname, baseInputDir, 'permissionsets', i, false);
+        await retrieveChunks(typeItemsMapChunks, orgname, baseInputDir, null, i, false);
+        
         // console.log(typeItemsMapChunks)
 
         Performance.getInstance().end();
-
+    
         return 'OK';
     }
 
 }
 
-export function splitChunksWithFixedTypes(typeItemsMap, typesToDelete, resourcesNum, TYPE, MEMBERS) : Map<string, string[]>[] {
+export function splitChunksWithFixedTypes(typeItemsMap, typesToDelete, objWeights,resourcesNum, TYPE, MEMBERS) : Map<string, string[]>[] {
     if(typeItemsMap.has(TYPE)){
 
         var typeItemsProfile = new Map() as Map<string, string[]>
@@ -153,33 +166,37 @@ export function splitChunksWithFixedTypes(typeItemsMap, typesToDelete, resources
         var typeItemsFix = new Map() as Map<string, string[]>
         typeItemsFix.set(TYPE,typeItemsMap.get(TYPE));
 
-        return splitTypeItemsToChunks(typeItemsProfile, typeItemsFix, resourcesNum);
+        return splitTypeItemsToChunks(typeItemsProfile, typeItemsFix,objWeights, resourcesNum);
         // typeItemsMapChunks.push(...profileChunks);
     } else {
         return [];
     }
 }
 
-export async function retrieveChunks(chunks, orgname, baseInputDir, type, i){
+export async function retrieveChunks(chunks, orgname, baseInputDir, type, i, retrieve){
     var isFirst = true;
     for(var typeItemsMapChunk of chunks){
         i++;
 
         var filename = 'packageTemp' + i + '.xml';
         await writePackageXmlFile(baseInputDir, filename, typeItemsMapChunk);
-        retrievePackage(orgname, join(baseInputDir, filename) );
-
-        if(type != null && chunks.length > 1){
-            if(isFirst){
-                isFirst = false;
-                await executeCommand(flags, 'split', type);
-            } else {
-                await executeCommand(flags, 'upsert', type);
+        if(retrieve){
+            retrievePackage(orgname, join(baseInputDir, filename) );
+            if(type != null && chunks.length > 1){
+                if(isFirst){
+                    isFirst = false;
+                    await executeCommand(flags, 'split', type);
+                } else {
+                    await executeCommand(flags, 'upsert', type);
+                }
             }
         }
+
     }
-    if(type != null && chunks.length > 1){
-        await executeCommand(flags, 'merge', type);
+    if(retrieve){
+        if(type != null && chunks.length > 1){
+            await executeCommand(flags, 'merge', type);
+        }
     }
 }
 
@@ -204,7 +221,7 @@ export function toPackageXml(map) {
 }
 
 
-export function splitTypeItemsToChunks(typeItemsMap, typeItemsMapChunkInit, resourcesNum ) : Map<string, string[]>[] {
+export function splitTypeItemsToChunks(typeItemsMap, typeItemsMapChunkInit, objWeights, resourcesNum ) : Map<string, string[]>[] {
     var typeItemsMapChunks =[] as Map<string, string[]>[];
 
     // initialize variables
@@ -219,8 +236,27 @@ export function splitTypeItemsToChunks(typeItemsMap, typeItemsMapChunkInit, reso
 
         // loop on each member of the given metadata type
         for(const member of members){
-            currNum ++;
-            
+            var increment;
+            // since the customObject also downloads other subresources, to avoid hitting numResources
+            // the customObject weight is the one calculated in the STEP 1.1
+
+            if(name == 'CustomObject' && objWeights[member] != null){
+                increment = objWeights[member];
+            } else if(OBJECT_SUBPART_SKIP.includes(name)
+                        && objWeights.hasOwnProperty(member.substring(0, member.indexOf('.')))){
+                // but we can optimize the process by removing the subparts that are automatically downloaded with the customObject
+                // this would improve scenarios where objects folder has more than 10000 resources
+                // TODO should be investigated later
+                // IDEA: add another if: if name == 'one type i want to skip' and member.substring(0, indexOf(.))
+                continue;
+
+            }
+            else {
+                increment = 1;
+            }
+
+            currNum = currNum + increment;
+
             // if we reach the maximum number of resources:
             if(currNum > resourcesNum){
                 // 1 - we save the part map
@@ -231,7 +267,7 @@ export function splitTypeItemsToChunks(typeItemsMap, typeItemsMapChunkInit, reso
 
                 // 2 - we refresh the variables
                 typeItemsMapChunk = _.cloneDeep(typeItemsMapChunkInit);
-                currNum = getSizeOfMapElements(typeItemsMapChunk) + 1;
+                currNum = getSizeOfMapElements(typeItemsMapChunk) + increment;
                 membersPart = [];
             } 
 

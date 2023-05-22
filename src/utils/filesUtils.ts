@@ -13,6 +13,11 @@ export async function readXmlFromFile(file: string): Promise<any> {
 		.then((fileContent) => new Parser({ explicitArray: false }).parseStringPromise(fileContent));
 }
 
+export async function readStringFromFile(file: string): Promise<any> {
+	return promises
+		.readFile(file).then((fileContent)=> fileContent.toString());
+}
+
 export async function writeXmlToFile(
 	file: string,
 	xml: object

@@ -43,3 +43,5 @@ export const PERMSET_MEMBERS = [
     'Flow',
     'RecordType'
 ]
+
+export const OBJECT_SUBPART_SKIP = ['CustomField']; // TODO: customField, Layout, ValidationRule ecc
