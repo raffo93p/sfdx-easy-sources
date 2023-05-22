@@ -31,7 +31,6 @@ export default class Download extends SfdxCommand {
 
     public static examples = messages.getMessage('examples').split(os.EOL);
 
-
     protected static flagsConfig = {
         // flag with a value (-n, --name=VALUE)
         dir: flags.string({
@@ -136,10 +135,10 @@ export default class Download extends SfdxCommand {
         typeItemsMapChunks.push(...splitTypeItemsToChunks(typeItemsMap, null, objWeights, resourcesNum));
 
         // * STEP 3 - Retrieve chunks
-        var i = 0;
-        await retrieveChunks(profileChunks, orgname, baseInputDir, 'profiles', i, false);
-        await retrieveChunks(permsetChunks, orgname, baseInputDir, 'permissionsets', i, false);
-        await retrieveChunks(typeItemsMapChunks, orgname, baseInputDir, null, i, false);
+        var counter={ val: 0};
+        await retrieveChunks(profileChunks, orgname, baseInputDir, 'profiles', counter, false);
+        await retrieveChunks(permsetChunks, orgname, baseInputDir, 'permissionsets', counter, false);
+        await retrieveChunks(typeItemsMapChunks, orgname, baseInputDir, null, counter, false);
         
         // console.log(typeItemsMapChunks)
 
@@ -173,13 +172,14 @@ export function splitChunksWithFixedTypes(typeItemsMap, typesToDelete, objWeight
     }
 }
 
-export async function retrieveChunks(chunks, orgname, baseInputDir, type, i, retrieve){
+export async function retrieveChunks(chunks, orgname, baseInputDir, type, counter, retrieve){
     var isFirst = true;
     for(var typeItemsMapChunk of chunks){
-        i++;
+        counter['val'] = counter['val']+1;
 
-        var filename = 'packageTemp' + i + '.xml';
+        var filename = 'packageTemp' + counter['val'] + '.xml';
         await writePackageXmlFile(baseInputDir, filename, typeItemsMapChunk);
+
         if(retrieve){
             retrievePackage(orgname, join(baseInputDir, filename) );
             if(type != null && chunks.length > 1){

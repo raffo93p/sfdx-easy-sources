@@ -44,4 +44,4 @@ export const PERMSET_MEMBERS = [
     'RecordType'
 ]
 
-export const OBJECT_SUBPART_SKIP = ['CustomField']; // TODO: customField, Layout, ValidationRule ecc
+export const OBJECT_SUBPART_SKIP = ['CustomField','RecordType']; // TODO: customField, Layout, ValidationRule ecc
