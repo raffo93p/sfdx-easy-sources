@@ -1,0 +1,16 @@
+{
+  "commandDescription": "Splits applications into various csv files",
+  "dirFlagDescription" : "Specify a custom dir for input applications. Default: '%s'",
+  "inputFlagDescription": "Specify a application file in input. Example: Sales.application-meta.xml",
+  "outputFlagDescription": "Specify a custom dir for output applications. Default: '%s'",
+  "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:applications:split",
+    "sfdx easysources:applications:split -d './force-app/src/default'",
+    "sfdx easysources:applications:split -d './force-app/src/default' -i 'Admin.application-meta.xml'",
+    "sfdx easysources:applications:split -d './force-app/src/default' -o './force-app/src/default'",
+    "sfdx easysources:applications:split -d './force-app/src/default' -i 'Admin.application-meta.xml' -o './force-app/src/default'"
+  ]
+}

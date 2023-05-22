@@ -1,0 +1,14 @@
+testare sources:download (soprattutto la parte degli oggetti che potrebbero contare come più di una risorsa. Conta occorrenze di 'CustomObject.')
+
+nuovo algoritmo download:
+1 - Aggiungo uno step per creare chuck di oggetti con roba che va tutta insieme:
+    per ogni oggetto, ciclo su tutte le risorse collegate, e le aggiungo in un chunk apposito
+2 - quando chunkizzo profili e permset, aggiungo uno alla volta direttamente i chunck creati
+
+scrivere profile:clear-dependences (dalla org)
+scrivere permissionsets:clear-false (in locale)
+scrivere *:deletecsv (da usare nel download)
+scrivere profiles:download (per fare download di un profilo o una lista di profili)
+
+IDEA: apply alla SF Style:
+    parti da package.xml, fa retrieve, upsert e merge di tutte le cose menzionate nel pacchetto

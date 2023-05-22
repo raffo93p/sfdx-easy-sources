@@ -1,0 +1,12 @@
+{
+  "commandDescription": "Update _tagid on csv files, based on the other fields",
+  "dirFlagDescription": "Specify a custom dir for input applications. Default: '%s'",
+  "inputFlagDescription": "Specify a application. Example: Sales",
+  "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:applications:updatekey",
+    "sfdx easysources:applications:updatekey -i './force-app/src/default'"
+  ]
+}

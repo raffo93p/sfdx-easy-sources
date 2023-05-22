@@ -1,0 +1,13 @@
+{
+  "commandDescription": "Upsert csv files based on globalvaluesets",
+  "dirFlagDescription": "Specify a custom dir for input globalvaluesets. Default: '%s'",
+  "inputFlagDescription": "Specify a globalvalueset. Example: MyGlobalValueSet.globalvalueset-meta.xml",
+  "outputFlagDescription": "Specify a custom dir for output globalvaluesets. Default: '%s'",
+  "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:globalvaluesets:upsert",
+    "sfdx easysources:globalvaluesets:upsert -i './force-app/src/default' -o './force-app/src/default'"
+  ]
+}

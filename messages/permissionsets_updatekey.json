@@ -1,0 +1,12 @@
+{
+  "commandDescription": "Update _tagid on csv files, based on the other fields",
+  "dirFlagDescription": "Specify a custom dir for input permissionsets. Default: '%s'",
+  "inputFlagDescription": "Specify a permissionset. Example: MyPermissionSet",
+  "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:permissionsets:updatekey",
+    "sfdx easysources:permissionsets:updatekey -i './force-app/src/default'"
+  ]
+}

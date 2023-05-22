@@ -1,0 +1,16 @@
+{
+  "commandDescription": "Upsert csv files based on profiles",
+  "dirFlagDescription" : "Specify a custom dir for input recordTypes. Default: '%s'",
+  "objectFlagDescription" : "Specify an object for input recordTypes. Example: 'Account'",
+  "recordtypeFlagDescription": "Specify a recordType. Example: 'MyRecordType.recordType-meta.xml",
+  "outputFlagDescription": "Specify a custom dir for output recordTypes. Default: '%s'",
+  "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:recordtypes:upsert",
+    "sfdx easysources:recordtypes:upsert -d './force-app/src/default' -o './force-app/src/default'",
+    "sfdx easysources:recordtypes:upsert -d './force-app/src/default' -s 'Account'",
+    "sfdx easysources:recordtypes:upsert -d './force-app/src/default' -s 'Account' -r 'MyRecordType.recordType-meta.xml'"
+  ]
+}

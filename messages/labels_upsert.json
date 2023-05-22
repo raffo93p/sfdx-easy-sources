@@ -1,0 +1,12 @@
+{
+  "commandDescription": "Upsert csv files based on labels",
+  "dirFlagDescription": "Specify a custom dir for input labels. Default: '%s'",
+  "outputFlagDescription": "Specify a custom dir for output labels. Default: '%s'",
+  "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:labels:upsert",
+    "sfdx easysources:labels:upsert -d './force-app/src/default' -o './force-app/src/default'"
+  ]
+}

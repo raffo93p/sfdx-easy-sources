@@ -1,0 +1,16 @@
+{
+  "commandDescription": "Splits permissionsets into various csv files",
+  "dirFlagDescription" : "Specify a custom dir for input permissionsets. Default: '%s'",
+  "inputFlagDescription": "Specify a permissionset file in input. Example: MyPermissionSet.permissionset-meta.xml",
+  "outputFlagDescription": "Specify a custom dir for output permissionsets. Default: '%s'",
+  "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:permissionsets:split",
+    "sfdx easysources:permissionsets:split -d './force-app/src/default'",
+    "sfdx easysources:permissionsets:split -d './force-app/src/default' -i 'Admin.permissionset-meta.xml'",
+    "sfdx easysources:permissionsets:split -d './force-app/src/default' -o './force-app/src/default'",
+    "sfdx easysources:permissionsets:split -d './force-app/src/default' -i 'Admin.permissionset-meta.xml' -o './force-app/src/default'"
+  ]
+}

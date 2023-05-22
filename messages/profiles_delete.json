@@ -1,0 +1,24 @@
+{
+  "commandDescription": "Deletes references from csv files based on input",
+  "dirFlagDescription": "Specify a custom dir for input csv profiles. Default: '%s'",
+  "inputFlagDescription": "Specify a profile. Example: Admin",
+  "typeFlagDescription": "Specify the type of resource you want to delete. Required.",
+  "tagidFlagDescription": "Specify the tagid you want to delete. Required",
+  "errorNoTypeFlag": "Flag Type (-t) is required. Run 'sfdx easysources:profiles:delete -h' for examples",
+  "errorNoValidTypeFlag": "Flag Type (-t) must be one of the following: ['applicationVisibilities','classAccesses','fieldPermissions','layoutAssignments','objectPermissions','pageAccesses','recordTypeVisibilities','tabVisibilities','userPermissions']",
+  "errorNoTagIdFlag": "Flag TagId (-k) is required. Run 'sfdx easysources:profiles:delete -h' for examples",
+  "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:profiles:delete -t applicationVisibilities -k tagid",
+    "sfdx easysources:profiles:delete -t classAccesses -k tagid",
+    "sfdx easysources:profiles:delete -t fieldPermissions -k tagid",
+    "sfdx easysources:profiles:delete -t layoutAssignments -k tagid",
+    "sfdx easysources:profiles:delete -t objectPermissions -k tagid",
+    "sfdx easysources:profiles:delete -t pageAccesses -k tagid",
+    "sfdx easysources:profiles:delete -t recordTypeVisibilities -k tagid",
+    "sfdx easysources:profiles:delete -t tabVisibilities -k tagid",
+    "sfdx easysources:profiles:delete -t userPermissions -k tagid"
+  ]
+}

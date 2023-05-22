@@ -1,0 +1,14 @@
+{
+  "commandDescription": "Update _tagid on csv files, based on the other fields",
+  "dirFlagDescription": "Specify a custom dir for input csv files. Default: '%s'",
+  "objectFlagDescription": "Specify an object. Example: 'Account'",
+  "recordtypeFlagDescription": "Specify a recordType. Example: 'MyRecordType'",
+  "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:recordtypes:updatekey",
+    "sfdx easysources:recordtypes:updatekey -d './force-app/src/default' -s 'Account'",
+    "sfdx easysources:recordtypes:updatekey -d './force-app/src/default' -s 'Account' -r 'MyRecordType'"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "commandDescription": "Merge back csv files into labels",
+  "dirFlagDescription": "Specify a custom dir for input csv file. Default: '%s'",
+  "outputFlagDescription": "Specify a custom dir for output labels. Default: '%s'",
+  "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:labels:merge",
+    "sfdx easysources:labels:merge -d './force-app/src/default' -o './force-app/src/default'"
+  ]
+}

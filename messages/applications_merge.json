@@ -1,0 +1,13 @@
+{
+  "commandDescription": "Merge back csv files into applications",
+  "dirFlagDescription": "Specify a custom dir for input csv files. Default: '%s'",
+  "inputFlagDescription": "Specify a application dir in input. Example: Sales",
+  "outputFlagDescription": "Specify a custom dir for output applications. Default: '%s'",
+  "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:applications:merge",
+    "sfdx easysources:applications:merge -d './force-app/src/default' -o './force-app/src/default'"
+  ]
+}

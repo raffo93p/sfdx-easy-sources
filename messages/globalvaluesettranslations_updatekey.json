@@ -1,0 +1,12 @@
+{
+  "commandDescription": "Update _tagid on csv files, based on the other fields",
+  "dirFlagDescription": "Specify a custom dir for input globalvaluesettranslations. Default: '%s'",
+  "inputFlagDescription": "Specify a globalvaluesettranslation. Example: MyGlobalValueSet-en_US",
+  "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:globalvaluesettranslations:updatekey",
+    "sfdx easysources:globalvaluesettranslations:updatekey -i './force-app/src/default'"
+  ]
+}

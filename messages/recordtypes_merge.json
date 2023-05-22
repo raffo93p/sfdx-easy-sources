@@ -1,0 +1,16 @@
+{
+  "commandDescription": "Merge back csv files into recordtypes",
+  "dirFlagDescription": "Specify a custom dir for input csv files. Default: '%s'",
+  "objectFlagDescription": "Specify an object. Example: 'Account'",
+  "recordtypeFlagDescription": "Specify a recordType. Example: 'MyRecordType'",
+  "outputFlagDescription": "Specify a custom dir for output recordTypes. Default: '%s'",
+  "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:recordtypes:merge",
+    "sfdx easysources:recordtypes:merge -d './force-app/src/default' -o './force-app/src/default'",
+    "sfdx easysources:recordtypes:merge -d './force-app/src/default' -s 'Account'",
+    "sfdx easysources:recordtypes:merge -d './force-app/src/default' -s 'Account' -r 'MyRecordType'"
+  ]
+}

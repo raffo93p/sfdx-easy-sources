@@ -1,0 +1,13 @@
+{
+  "commandDescription": "Merge back csv files into globalvaluesettranslations",
+  "dirFlagDescription": "Specify a custom dir for input csv files. Default: '%s'",
+  "inputFlagDescription": "Specify a globalvaluesettranslation dir in input. Example: MyGlobalValueSet-en_US",
+  "outputFlagDescription": "Specify a custom dir for output globalvaluesettranslations. Default: '%s'",
+  "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:globalvaluesettranslations:merge",
+    "sfdx easysources:globalvaluesettranslations:merge -d './force-app/src/default' -o './force-app/src/default'"
+  ]
+}

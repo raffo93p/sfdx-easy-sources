@@ -1,0 +1,11 @@
+{
+  "commandDescription": "Upsert csv files based on metadata files",
+  "dirFlagDescription": "Specify a custom dir for input metadata files. Default: '%s'",
+  "outputFlagDescription": "Specify a custom dir for output metadata files. Default: '%s'",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:all:upsert",
+    "sfdx easysources:all:upsert -i './force-app/src/default' -o './force-app/src/default'"
+  ]
+}

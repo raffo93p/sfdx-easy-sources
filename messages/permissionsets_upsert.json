@@ -1,0 +1,13 @@
+{
+  "commandDescription": "Upsert csv files based on permissionsets",
+  "dirFlagDescription": "Specify a custom dir for input permissionsets. Default: '%s'",
+  "inputFlagDescription": "Specify a permissionset. Example: MyPermissionSet.permissionset-meta.xml",
+  "outputFlagDescription": "Specify a custom dir for output permissionsets. Default: '%s'",
+  "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:permissionsets:upsert",
+    "sfdx easysources:permissionsets:upsert -i './force-app/src/default' -o './force-app/src/default'"
+  ]
+}

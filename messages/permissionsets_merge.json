@@ -1,0 +1,13 @@
+{
+  "commandDescription": "Merge back csv files into permissionsets",
+  "dirFlagDescription": "Specify a custom dir for input csv files. Default: '%s'",
+  "inputFlagDescription": "Specify a permissionset dir in input. Example: MyPermissionSet",
+  "outputFlagDescription": "Specify a custom dir for output permissionsets. Default: '%s'",
+  "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:permissionsets:merge",
+    "sfdx easysources:permissionsets:merge -d './force-app/src/default' -o './force-app/src/default'"
+  ]
+}

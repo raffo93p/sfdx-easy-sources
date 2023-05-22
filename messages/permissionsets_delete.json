@@ -1,0 +1,24 @@
+{
+  "commandDescription": "Deletes references from csv files based on input",
+  "dirFlagDescription": "Specify a custom dir for input csv permissionsets. Default: '%s'",
+  "inputFlagDescription": "Specify a permissionset. Example: MyPermissionSet",
+  "typeFlagDescription": "Specify the type of resource you want to delete. Required.",
+  "tagidFlagDescription": "Specify the tagid you want to delete. Required",
+  "errorNoTypeFlag": "Flag Type (-t) is required. Run 'sfdx easysources:permissionsets:delete -h' for examples",
+  "errorNoValidTypeFlag": "Flag Type (-t) must be one of the following: ['applicationVisibilities','classAccesses','fieldPermissions','layoutAssignments','objectPermissions','pageAccesses','recordTypeVisibilities','tabVisibilities','userPermissions']",
+  "errorNoTagIdFlag": "Flag TagId (-k) is required. Run 'sfdx easysources:permissionsets:delete -h' for examples",
+  "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:permissionsets:delete -t applicationVisibilities -k tagid",
+    "sfdx easysources:permissionsets:delete -t classAccesses -k tagid",
+    "sfdx easysources:permissionsets:delete -t fieldPermissions -k tagid",
+    "sfdx easysources:permissionsets:delete -t layoutAssignments -k tagid",
+    "sfdx easysources:permissionsets:delete -t objectPermissions -k tagid",
+    "sfdx easysources:permissionsets:delete -t pageAccesses -k tagid",
+    "sfdx easysources:permissionsets:delete -t recordTypeVisibilities -k tagid",
+    "sfdx easysources:permissionsets:delete -t tabVisibilities -k tagid",
+    "sfdx easysources:permissionsets:delete -t userPermissions -k tagid"
+  ]
+}
