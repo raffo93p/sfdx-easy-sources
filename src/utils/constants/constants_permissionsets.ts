@@ -1,5 +1,5 @@
 import { setDefault } from "../utils";
-import { DEFAULT_PATH } from "./constants";
+import { DEFAULT_SFXML_PATH } from "./constants";
 
 export const PERMSET_APP_ROOT = 'applicationVisibilities';
 export const PERMSET_APP_HEADER = ['application', 'default', 'visible'];
@@ -64,4 +64,4 @@ export const PERMSETS_EXTENSION = ".permissionset-meta.xml";
 export const PERMSETS_ROOT_TAG = "PermissionSet";
 
 export const PERMSETS_SUBPATH = 'permissionsets';
-export const PERMSETS_DEFAULT_PATH = DEFAULT_PATH + '/' + PERMSETS_SUBPATH;
+export const PERMSETS_DEFAULT_SFXML_PATH = DEFAULT_SFXML_PATH + '/' + PERMSETS_SUBPATH;

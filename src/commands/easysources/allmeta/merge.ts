@@ -9,7 +9,7 @@ import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import Performance from '../../../utils/performance';
-import { DEFAULT_PATH } from '../../../utils/constants/constants';
+import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
 import { bulkExecuteCommands } from '../../../utils/utils';
 
 
@@ -30,17 +30,17 @@ export default class Merge extends SfdxCommand {
 
     protected static flagsConfig = {
         // flag with a value (-n, --name=VALUE)
-        dir: flags.string({
-            char: 'd',
-            description: messages.getMessage('dirFlagDescription', [DEFAULT_PATH]),
+        "sf-xml": flags.string({
+            char: 'x',
+            description: messages.getMessage('sfXmlFlagDescription', [DEFAULT_SFXML_PATH]),
+        }),
+        "es-csv": flags.string({
+            char: 'c',
+            description: messages.getMessage('esCsvFlagDescription', [DEFAULT_ESCSV_PATH]),
         }),
         input: flags.string({
             char: 'i',
             description: messages.getMessage('inputFlagDescription'),
-        }),
-        output: flags.string({
-            char: 'o',
-            description: messages.getMessage('outputFlagDescription', [DEFAULT_PATH]),
         })
     };
 

@@ -1,8 +1,8 @@
 {
   "commandDescription": "Splits globalvaluesets into various csv files",
-  "dirFlagDescription" : "Specify a custom dir for input globalvaluesets. Default: '%s'",
+  "sfXmlFlagDescription" : "Specify a custom dir for input globalvaluesets. Default: '%s'",
+  "esCsvFlagDescription": "Specify a custom dir for output globalvaluesets. Default: '%s'",
   "inputFlagDescription": "Specify a globalvalueset file in input. Example: MyGlobalValueSet.globalvalueset-meta.xml",
-  "outputFlagDescription": "Specify a custom dir for output globalvaluesets. Default: '%s'",
   "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",

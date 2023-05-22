@@ -1,6 +1,6 @@
 {
   "commandDescription": "Deletes references from csv files based on input",
-  "dirFlagDescription" : "Specify a custom dir for input csv recordTypes. Default: '%s'",
+  "esCsvFlagDescription" : "Specify a custom dir for input csv recordTypes. Default: '%s'",
   "objectFlagDescription" : "Specify a custom dir for input csv recordTypes. Default: '%s'",
   "recordtypeFlagDescription" : "Specify a custom dir for input csv recordTypes. Default: '%s'",
   "picklistFlagDescription": "Specify a picklist. Example: MyPicklist",

@@ -4,12 +4,12 @@ const { Parser, transforms: { unwind } } = require('json2csv');
 import { join } from "path";
 const fs = require('fs-extra');
 import { sortByKey } from "../utils"
-import { XML_PART_EXTENSION, DEFAULT_PATH } from '../constants/constants';
+import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../constants/constants';
 
 export async function split(flags, file_subpath, file_extension, file_root_tag, file_items) {
 
-    const baseInputDir = join((flags.dir || DEFAULT_PATH), file_subpath) as string;
-    const baseOutputDir = flags.output == null ? baseInputDir : join(flags.output, file_subpath) as string;
+    const baseInputDir = join((flags["sf-xml"] || DEFAULT_SFXML_PATH), file_subpath) as string;
+    const baseOutputDir = flags["es-csv"] == null ? DEFAULT_ESCSV_PATH : join(flags["es-csv"], file_subpath) as string;
     const inputFiles = (flags.input) as string;
 
     if (!fs.existsSync(baseInputDir)) {

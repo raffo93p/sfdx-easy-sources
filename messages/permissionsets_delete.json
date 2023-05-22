@@ -1,6 +1,6 @@
 {
   "commandDescription": "Deletes references from csv files based on input",
-  "dirFlagDescription": "Specify a custom dir for input csv permissionsets. Default: '%s'",
+  "esCsvFlagDescription": "Specify a custom dir for input csv permissionsets. Default: '%s'",
   "inputFlagDescription": "Specify a permissionset. Example: MyPermissionSet",
   "typeFlagDescription": "Specify the type of resource you want to delete. Required.",
   "tagidFlagDescription": "Specify the tagid you want to delete. Required",

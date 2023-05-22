@@ -11,7 +11,7 @@ import { AnyJson } from '@salesforce/ts-types';
 import { calcCsvFilename, readCsvToJsonArray } from '../../../utils/filesUtils'
 import { generateTagId, sortByKey } from '../../../utils/utils'
 const { Parser, transforms: { unwind } } = require('json2csv');
-import { DEFAULT_PATH } from '../../../utils/constants/constants';
+import { DEFAULT_ESCSV_PATH } from '../../../utils/constants/constants';
 import Performance from '../../../utils/performance';
 import { join } from "path";
 import { RECORDTYPES_SUBPATH, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
@@ -31,9 +31,9 @@ export default class UpdateKey extends SfdxCommand {
 
     protected static flagsConfig = {
         // flag with a value (-n, --name=VALUE)
-        dir: flags.string({
-            char: 'd',
-            description: messages.getMessage('dirFlagDescription', [DEFAULT_PATH]),
+        "es-csv": flags.string({
+            char: 'c',
+            description: messages.getMessage('esCsvFlagDescription', [DEFAULT_ESCSV_PATH]),
         }),
         object: flags.string({
             char: 's',
@@ -54,7 +54,7 @@ export default class UpdateKey extends SfdxCommand {
 
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
-        const baseInputDir = join((this.flags.dir || DEFAULT_PATH), RECORDTYPES_SUBPATH) as string;
+        const baseInputDir = join((this.flags["es-csv"] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
         const inputObject = (this.flags.object) as string;
         const inputRecordType = (this.flags.recordtype) as string;
 

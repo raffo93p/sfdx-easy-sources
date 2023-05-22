@@ -15,7 +15,7 @@ const { Parser, transforms: { unwind } } = require('json2csv');
 import { PERMSETS_SUBPATH, PERMSET_ITEMS } from "../../../utils/constants/constants_permissionsets";
 import { readCsvToJsonMap } from "../../../utils/filesUtils"
 import { sortByKey } from "../../../utils/utils"
-import { CSV_EXTENSION, DEFAULT_PATH } from '../../../utils/constants/constants';
+import { CSV_EXTENSION, DEFAULT_ESCSV_PATH } from '../../../utils/constants/constants';
 
 
 // Initialize Messages with the current plugin directory
@@ -34,9 +34,9 @@ export default class Delete extends SfdxCommand {
 
     protected static flagsConfig = {
         // flag with a value (-n, --name=VALUE)
-        dir: flags.string({
-            char: 'd',
-            description: messages.getMessage('dirFlagDescription', [DEFAULT_PATH]),
+        "es-csv": flags.string({
+            char: 'c',
+            description: messages.getMessage('esCsvFlagDescription', [DEFAULT_ESCSV_PATH]),
         }),
         input: flags.string({
             char: 'i',
@@ -67,7 +67,7 @@ export default class Delete extends SfdxCommand {
         if (!tagid) throw new SfError(messages.getMessage('errorNoTagIdFlag'));
         if (!Object.keys(PERMSET_ITEMS).includes(type)) throw new SfError(messages.getMessage('errorNoValidTypeFlag'));
 
-        const baseInputDir = join((this.flags.dir || DEFAULT_PATH), PERMSETS_SUBPATH) as string;
+        const baseInputDir = join((this.flags["es-csv"] || DEFAULT_ESCSV_PATH), PERMSETS_SUBPATH) as string;
         const inputProfile = (this.flags.input) as string;
 
         if (!fs.existsSync(baseInputDir)) {

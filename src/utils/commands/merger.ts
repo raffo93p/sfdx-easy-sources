@@ -1,14 +1,14 @@
 const fs = require('fs-extra');
 import { join } from "path";
-import { XML_PART_EXTENSION, DEFAULT_PATH } from "../constants/constants"
+import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from "../constants/constants"
 import { writeXmlToFile, readCsvToJsonArray, readXmlFromFile, calcCsvFilename } from "../filesUtils"
 import { sortByKey } from "../utils"
 
 
 
 export async function merge(flags, file_subpath, file_extension, file_root_tag, file_items) {
-    const baseInputDir = join((flags.dir || DEFAULT_PATH), file_subpath) as string;
-    const baseOutputDir = flags.output == null ? baseInputDir : join(flags.output, file_subpath) as string;
+    const baseInputDir = join((flags["es-csv"] || DEFAULT_ESCSV_PATH), file_subpath) as string;
+    const baseOutputDir = flags["sf-xml"] == null ? DEFAULT_SFXML_PATH : join(flags["sf-xml"], file_subpath) as string;
     const inputProfile = (flags.input) as string;
 
     if (!fs.existsSync(baseInputDir)) {

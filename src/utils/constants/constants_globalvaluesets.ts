@@ -1,5 +1,5 @@
 import { setDefault } from "../utils";
-import { DEFAULT_PATH } from "./constants";
+import { DEFAULT_SFXML_PATH } from "./constants";
 
 export const GVSETS_EXTENSION = ".globalValueSet-meta.xml";
 export const GVSETS_ROOT_TAG = "GlobalValueSet";
@@ -13,4 +13,4 @@ export const GVSET_ITEMS = {
 }
 
 export const GVSETS_SUBPATH = 'globalValueSets';
-export const GVSETS_DEFAULT_PATH = DEFAULT_PATH + '/' + GVSETS_SUBPATH;
+export const GVSETS_DEFAULT_SFXML_PATH = DEFAULT_SFXML_PATH + '/' + GVSETS_SUBPATH;

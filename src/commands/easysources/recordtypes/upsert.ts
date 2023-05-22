@@ -11,7 +11,7 @@ import { AnyJson } from '@salesforce/ts-types';
 import { readXmlFromFile, readCsvToJsonMap, jsonArrayToMap, removeExtension, writeXmlToFile, calcCsvFilename } from '../../../utils/filesUtils'
 import { generateTagId, sortByKey } from '../../../utils/utils'
 const { Parser, transforms: { unwind } } = require('json2csv');
-import { DEFAULT_PATH, XML_PART_EXTENSION } from '../../../utils/constants/constants';
+import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../../../utils/constants/constants';
 import Performance from '../../../utils/performance';
 import { join } from "path";
 import { RECORDTYPES_EXTENSION, RECORDTYPES_ROOT_TAG, RECORDTYPES_SUBPATH, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
@@ -34,9 +34,13 @@ export default class Upsert extends SfdxCommand {
 
     protected static flagsConfig = {
         // flag with a value (-n, --name=VALUE)
-        dir: flags.string({
-            char: 'd',
-            description: messages.getMessage('dirFlagDescription', [DEFAULT_PATH]),
+        "sf-xml": flags.string({
+            char: 'x',
+            description: messages.getMessage('sfXmlFlagDescription', [DEFAULT_SFXML_PATH]),
+        }),
+        "es-csv": flags.string({
+            char: 'c',
+            description: messages.getMessage('esCsvFlagDescription', [DEFAULT_ESCSV_PATH]),
         }),
         object: flags.string({
             char: 's',
@@ -45,10 +49,6 @@ export default class Upsert extends SfdxCommand {
         recordtype: flags.string({
             char: 'r',
             description: messages.getMessage('recordtypeFlagDescription'),
-        }),
-        output: flags.string({
-            char: 'o',
-            description: messages.getMessage('outputFlagDescription', [DEFAULT_PATH]),
         }),
         sort: flags.enum({
             char: 'S',
@@ -62,8 +62,8 @@ export default class Upsert extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        const baseInputDir = join((this.flags.dir || DEFAULT_PATH), RECORDTYPES_SUBPATH) as string;
-        const baseOutputDir = this.flags.output == null ? baseInputDir : join(this.flags.output, RECORDTYPES_SUBPATH) as string;
+        const baseInputDir = join((this.flags["es-csv"] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
+        const baseOutputDir = this.flags["sf-xml"] == null ? DEFAULT_SFXML_PATH : join(this.flags["sf-xml"], RECORDTYPES_SUBPATH) as string;
         const inputObject = (this.flags.object) as string;
         const inputRecordType = (this.flags.recordtype) as string;
 

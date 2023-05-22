@@ -1,9 +1,9 @@
 {
   "commandDescription": "Merge back csv files into recordtypes",
-  "dirFlagDescription": "Specify a custom dir for input csv files. Default: '%s'",
+  "sfXmlFlagDescription": "Specify a custom dir for input csv files. Default: '%s'",
+  "esCsvFlagDescription": "Specify a custom dir for output recordTypes. Default: '%s'",
   "objectFlagDescription": "Specify an object. Example: 'Account'",
   "recordtypeFlagDescription": "Specify a recordType. Example: 'MyRecordType'",
-  "outputFlagDescription": "Specify a custom dir for output recordTypes. Default: '%s'",
   "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",

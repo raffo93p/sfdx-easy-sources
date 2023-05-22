@@ -11,7 +11,7 @@ import { AnyJson } from '@salesforce/ts-types';
 import Performance from '../../../utils/performance';
 import { updatekey } from "../../../utils/commands/keyupdater";
 import { GVSETS_SUBPATH, GVSET_ITEMS } from "../../../utils/constants/constants_globalvaluesets"
-import { DEFAULT_PATH } from '../../../utils/constants/constants';
+import { DEFAULT_ESCSV_PATH } from '../../../utils/constants/constants';
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);
@@ -28,9 +28,9 @@ export default class UpdateKey extends SfdxCommand {
 
     protected static flagsConfig = {
         // flag with a value (-n, --name=VALUE)
-        dir: flags.string({
-            char: 'd',
-            description: messages.getMessage('dirFlagDescription', [DEFAULT_PATH]),
+        "es-csv": flags.string({
+            char: 'c',
+            description: messages.getMessage('esCsvFlagDescription', [DEFAULT_ESCSV_PATH]),
         }),
         input: flags.string({
             char: 'i',

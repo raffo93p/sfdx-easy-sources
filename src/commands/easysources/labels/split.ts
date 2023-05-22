@@ -11,7 +11,7 @@ import { AnyJson } from '@salesforce/ts-types';
 import Performance from '../../../utils/performance';
 import { split } from '../../../utils/commands/splitter';
 import { LABELS_ROOT_TAG, LABEL_ITEMS, LABELS_EXTENSION, LABELS_SUBPATH } from "../../../utils/constants/constants_labels";
-import { DEFAULT_PATH } from '../../../utils/constants/constants';
+import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
 
 
 // Initialize Messages with the current plugin directory
@@ -29,13 +29,13 @@ export default class Split extends SfdxCommand {
 
     protected static flagsConfig = {
         // flag with a value (-n, --name=VALUE)
-        dir: flags.string({
-            char: 'd',
-            description: messages.getMessage('dirFlagDescription', [DEFAULT_PATH]),
+        "sf-xml": flags.string({
+            char: 'x',
+            description: messages.getMessage('sfXmlFlagDescription', [DEFAULT_SFXML_PATH]),
         }),
-        output: flags.string({
-            char: 'o',
-            description: messages.getMessage('outputFlagDescription', [DEFAULT_PATH]),
+        "es-csv": flags.string({
+            char: 'c',
+            description: messages.getMessage('esCsvFlagDescription', [DEFAULT_ESCSV_PATH]),
         }),
         sort: flags.enum({
             char: 'S',

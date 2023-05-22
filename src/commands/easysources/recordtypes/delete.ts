@@ -13,7 +13,7 @@ import { join } from "path";
 import Performance from '../../../utils/performance';
 const { Parser, transforms: { unwind } } = require('json2csv');
 
-import { DEFAULT_PATH } from "../../../utils/constants/constants";
+import { DEFAULT_ESCSV_PATH } from "../../../utils/constants/constants";
 
 import { calcCsvFilename, readCsvToJsonMap } from "../../../utils/filesUtils"
 import { sortByKey } from "../../../utils/utils"
@@ -37,9 +37,9 @@ export default class Delete extends SfdxCommand {
 
     protected static flagsConfig = {
         // flag with a value (-n, --name=VALUE)
-        dir: flags.string({
-            char: 'd',
-            description: messages.getMessage('dirFlagDescription', [DEFAULT_PATH]),
+        "es-csv": flags.string({
+            char: 'c',
+            description: messages.getMessage('esCsvFlagDescription', [DEFAULT_ESCSV_PATH]),
         }),
         object: flags.string({
             char: 's',
@@ -72,7 +72,7 @@ export default class Delete extends SfdxCommand {
         const apiname = (this.flags.apiname) as string;
         if (!picklist) throw new SfError(messages.getMessage('errorNoPicklistFlag'));
 
-        const baseInputDir = join((this.flags.dir || DEFAULT_PATH), RECORDTYPES_SUBPATH) as string;
+        const baseInputDir = join((this.flags["es-csv"] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
         const inputObject = (this.flags.object) as string;
         const inputRecordType = (this.flags.recordtype) as string;
 

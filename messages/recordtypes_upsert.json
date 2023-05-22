@@ -1,9 +1,9 @@
 {
   "commandDescription": "Upsert csv files based on profiles",
-  "dirFlagDescription" : "Specify a custom dir for input recordTypes. Default: '%s'",
+  "sfXmlFlagDescription" : "Specify a custom dir for input recordTypes. Default: '%s'",
+  "esCsvFlagDescription": "Specify a custom dir for output recordTypes. Default: '%s'",
   "objectFlagDescription" : "Specify an object for input recordTypes. Example: 'Account'",
   "recordtypeFlagDescription": "Specify a recordType. Example: 'MyRecordType.recordType-meta.xml",
-  "outputFlagDescription": "Specify a custom dir for output recordTypes. Default: '%s'",
   "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",

@@ -2,7 +2,7 @@ import * as child from 'child_process';
 import * as util from 'util';
 const exec = util.promisify(child.exec);
 
-import { DEFAULT_PATH, SFDX_CMD } from "./constants/constants";
+import { DEFAULT_SFXML_PATH, SFDX_CMD } from "./constants/constants";
 
 export function generateTagId(myArray, key, headers) {
 
@@ -71,7 +71,7 @@ export function setDefault(header) {
 }
 
 export async function executeCommand(flags, cmd, mdt) {
-	var cmdString = SFDX_CMD + ' easysources:' + mdt + ':' + cmd + ' -d ' + (flags.dir || DEFAULT_PATH) + ' -o ' + (flags.output || flags.dir || DEFAULT_PATH);
+	var cmdString = SFDX_CMD + ' easysources:' + mdt + ':' + cmd + ' -d ' + (flags.dir || DEFAULT_SFXML_PATH) + ' -o ' + (flags.output || flags.dir || DEFAULT_SFXML_PATH);
 	console.log(cmdString);
 	await exec(cmdString);
 }

@@ -1,8 +1,8 @@
 {
   "commandDescription": "Upsert csv files based on applications",
-  "dirFlagDescription": "Specify a custom dir for input applications. Default: '%s'",
+  "sfXmlFlagDescription": "Specify a custom dir for input xml application folder. Default: '%s'",
+  "esCsvFlagDescription": "Specify a custom dir for output csv application folder. Default: '%s'",
   "inputFlagDescription": "Specify a application. Example: Sales.application-meta.xml",
-  "outputFlagDescription": "Specify a custom dir for output applications. Default: '%s'",
   "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",

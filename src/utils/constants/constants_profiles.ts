@@ -1,5 +1,5 @@
 import { setDefault } from "../utils";
-import { DEFAULT_PATH } from "./constants";
+import { DEFAULT_SFXML_PATH } from "./constants";
 
 export const PROFILE_APP_ROOT = 'applicationVisibilities';
 export const PROFILE_APP_HEADER = ['application', 'default', 'visible'];
@@ -87,4 +87,4 @@ export const PROFILES_EXTENSION = ".profile-meta.xml";
 export const PROFILES_ROOT_TAG = "Profile";
 
 export const PROFILES_SUBPATH = 'profiles';
-export const PROFILES_DEFAULT_PATH = DEFAULT_PATH + '/' + PROFILES_SUBPATH;
+export const PROFILES_DEFAULT_SFXML_PATH = DEFAULT_SFXML_PATH + '/' + PROFILES_SUBPATH;

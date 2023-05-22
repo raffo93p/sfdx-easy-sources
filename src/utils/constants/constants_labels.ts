@@ -1,5 +1,5 @@
 import { setDefault } from "../utils";
-import { DEFAULT_PATH } from "./constants";
+import { DEFAULT_SFXML_PATH } from "./constants";
 
 export const LABELS_EXTENSION = ".labels-meta.xml";
 export const LABELS_ROOT_TAG = "CustomLabels";
@@ -13,4 +13,4 @@ export const LABEL_ITEMS = {
 }
 
 export const LABELS_SUBPATH = 'labels';
-export const LABELS_DEFAULT_PATH = DEFAULT_PATH + '/' + LABELS_SUBPATH;
+export const LABELS_DEFAULT_SFXML_PATH = DEFAULT_SFXML_PATH + '/' + LABELS_SUBPATH;

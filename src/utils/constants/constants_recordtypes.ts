@@ -1,4 +1,4 @@
-import { DEFAULT_PATH } from "./constants";
+import { DEFAULT_SFXML_PATH } from "./constants";
 
 export const RECORDTYPES_EXTENSION = ".recordType-meta.xml";
 export const RECORDTYPES_ROOT_TAG = "RecordType";
@@ -12,4 +12,4 @@ export const RECORDTYPE_ITEMS = {
 }
 
 export const RECORDTYPES_SUBPATH = 'objects';
-export const RECORDTYPES_DEFAULT_PATH = DEFAULT_PATH + '/' + RECORDTYPES_SUBPATH;
+export const RECORDTYPES_DEFAULT_SFXML_PATH = DEFAULT_SFXML_PATH + '/' + RECORDTYPES_SUBPATH;
