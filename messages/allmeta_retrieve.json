@@ -1,0 +1,16 @@
+{
+  "commandDescription": "Retrieves all the sources from an org",
+  "dirFlagDescription" : "Specify a custom dir for input manifest. Default: '%s'",
+  "outputFlagDescription": "Specify a custom dir for output sources. Default: '%s'",
+  "orgFlagDescription": "Specify the alias of the org",
+  "resnumbFlagDescription": "Specify the maximum number of resources in a package. Default: '%s'",
+  "manifestFlagDescription": "Optionally specify a package.xml to be downloaded",
+  "dontRetrieveFlagDescription": "Optionally specify to not retrieve the sources, Default: '%s'",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:allmeta:retrieve",
+    "sfdx easysources:allmeta:retrieve -d './force-app/src/default'",
+    "sfdx easysources:allmeta:retrieve -d './force-app/src/default' -o './force-app/src/default'"
+  ]
+}
