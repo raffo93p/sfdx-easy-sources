@@ -10,7 +10,7 @@ import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import Performance from '../../../utils/performance';
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
-import { bulkExecuteCommands } from '../../../utils/utils';
+import { bulkExecuteCommands } from '../../../utils/commands/utils';
 
 
 

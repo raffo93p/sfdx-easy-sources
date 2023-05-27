@@ -3,7 +3,7 @@ import * as util from 'util';
 import { join } from "path";
 const exec = util.promisify(child.exec);
 import { MANIFEST_CREATE_CMD, DEFAULT_PACKAGE, SOURCE_RETRIEVE_CMD } from "../constants/constants_sourcesdownload";
-import { SFDX_CMD } from '../constants/constants';
+import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, SFDX_CMD } from '../constants/constants';
 const fs = require('fs');
 
 export async function retrieveAllMetadataPackage(orgname, baseInputDir){
@@ -12,7 +12,7 @@ export async function retrieveAllMetadataPackage(orgname, baseInputDir){
 	await exec(cmdString);
 }
 
-export async function retrievePackage(orgname, baseDir, filename){
+export async function retrievePackage(orgname, baseDir, filename, logdir){
 	var cmdString = SFDX_CMD + ' ' + SOURCE_RETRIEVE_CMD + ' --targetusername ' + orgname + ' --manifest '+join(baseDir, filename);
 	console.log(cmdString+'...');
 	
@@ -21,8 +21,8 @@ export async function retrievePackage(orgname, baseDir, filename){
 
 	const stdio = [
 		0,
-		fs.openSync(logFilename, 'w'),
-		fs.openSync(logFilenameErr, 'w')
+		fs.openSync(join(logdir, logFilename), 'w'),
+		fs.openSync(join(logdir, logFilenameErr), 'w')
 	  ];	
 	let p = child.spawn(cmdString, { shell: true, stdio});
 
@@ -36,7 +36,7 @@ export async function retrievePackage(orgname, baseDir, filename){
 				fileToRemove = logFilenameErr;
 			}
 
-				fs.unlink(fileToRemove, (err) => {
+				fs.unlink(join(logdir, fileToRemove), (err) => {
 					if (err) {
 					  console.error(err)
 					  return
@@ -47,4 +47,20 @@ export async function retrievePackage(orgname, baseDir, filename){
 			resolveFunc(code);
 		});
 	  });
+}
+
+export async function executeCommand(flags, cmd, mdt) {
+	var cmdString = SFDX_CMD + ' easysources:' + mdt + ':' + cmd + ' --sf-xml ' + (flags['sf-xml'] || DEFAULT_SFXML_PATH) + ' --es-csv ' + (flags['es-csv'] || DEFAULT_ESCSV_PATH);
+	console.log(cmdString);
+	await exec(cmdString);
+}
+
+export async function bulkExecuteCommands(flags, cmd) {
+	await executeCommand(flags, cmd, 'profiles');
+	await executeCommand(flags, cmd, 'recordtypes');
+	await executeCommand(flags, cmd, 'labels');
+	await executeCommand(flags, cmd, 'permissionsets');
+	await executeCommand(flags, cmd, 'globalvaluesettranslations');
+	await executeCommand(flags, cmd, 'globalvaluesets');
+	await executeCommand(flags, cmd, 'applications');
 }

@@ -9,12 +9,12 @@ import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import Performance from '../../../utils/performance';
-import { DEFAULT_PATH } from '../../../utils/constants/constants';
+import { DEFAULT_ESCSV_PATH, DEFAULT_LOG_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
 import { join } from "path";
 import { DEFAULT_PACKAGE_EXT, OBJECT_SUBPART_SKIP, PACKAGE_VERSION, PERMSET_FIX_TYPE, PROFILE_REL_TYPES, PROFILE_FIX_TYPE, RESOURCES_MAXNUM, TYPES_PICKVAL_ROOT, TYPES_ROOT_TAG, TRANSL_REL_TYPES, TRANSL_FIX_TYPES, TYPES_TO_SPLIT, CUSTOBJTRANSL_FIX_TYPES, CUSTOMOBJECT_TYPE, CUSTOMOBJECTTRANSL_TYPE } from '../../../utils/constants/constants_sourcesdownload';
 import { readStringFromFile, readXmlFromFile, writeXmlToFile } from '../../../utils/filesUtils';
 import { retrieveAllMetadataPackage, retrievePackage } from '../../../utils/commands/utils';
-import { executeCommand } from '../../../utils/utils';
+import { executeCommand } from '../../../utils/commands/utils';
 const fs = require('fs-extra');
 const _ = require('lodash') ;
 
@@ -33,17 +33,17 @@ export default class Retrieve extends SfdxCommand {
 
     protected static flagsConfig = {
         // flag with a value (-n, --name=VALUE)
-        dir: flags.string({
-            char: 'd',
-            description: messages.getMessage('dirFlagDescription', ["."]),
-        }),
         manifest: flags.string({
             char: 'm',
             description: messages.getMessage('manifestFlagDescription', [""]),
         }),
-        output: flags.string({
-            char: 'o',
-            description: messages.getMessage('outputFlagDescription', [DEFAULT_PATH]),
+        "sf-xml": flags.string({
+            char: 'x',
+            description: messages.getMessage('sfXmlFlagDescription', [DEFAULT_SFXML_PATH]),
+        }),
+        "es-csv": flags.string({
+            char: 'c',
+            description: messages.getMessage('esCsvFlagDescription', [DEFAULT_ESCSV_PATH]),
         }),
         orgname:  flags.string({
             char: 'r',
@@ -58,11 +58,13 @@ export default class Retrieve extends SfdxCommand {
         resnumb:   flags.string({
             char:  'n',
             description: messages.getMessage('resnumbFlagDescription', [RESOURCES_MAXNUM]),
-        })
+        }),
+        "log-dir": flags.string({
+            char:  'l',
+            description: messages.getMessage('logdirFlagDescription', [DEFAULT_LOG_PATH]),
+        }),
     };
-
-    static ux = this.ux;
-
+    
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
         
@@ -71,7 +73,7 @@ export default class Retrieve extends SfdxCommand {
         var orgname = this.flags.orgname;
         var manifest = this.flags.manifest;
 
-        var baseInputDir = join((this.flags.dir || '.'), 'manifest') as string;
+        var manifestDir = join( '.', 'manifest') as string;
         // const baseOutputDir = this.flags.output == null ? DEFAULT_PATH : this.flags.output;
         // const inputFiles = (this.flags.input) as string;
 
@@ -79,22 +81,30 @@ export default class Retrieve extends SfdxCommand {
 
         const resourcesNum = this.flags.resnumb || RESOURCES_MAXNUM;
 
-        if (manifest == null && !fs.existsSync(baseInputDir)) {
-            console.log('Input folder ' + baseInputDir + ' does not exist!');
+        if (manifest == null && !fs.existsSync(manifestDir)) {
+            console.log('Input folder ' + manifestDir + ' does not exist!');
             return;
         }
-    
+
+        const logdir = this.flags['log-dir'] || DEFAULT_LOG_PATH;
+
+        if(logdir === DEFAULT_LOG_PATH){
+            if (!fs.existsSync(logdir)) {
+                fs.mkdirSync(logdir, { recursive: true });
+            }
+        }
+
         // * STEP 1 - Retrieve AllMeta Package and/or read it
 
         if(manifest == null){
-           await retrieveAllMetadataPackage(orgname, baseInputDir);
+           await retrieveAllMetadataPackage(orgname, manifestDir);
         }
 
         if(manifest != null){
-            baseInputDir = manifest.substring(0,manifest.lastIndexOf('/'));
+            manifestDir = manifest.substring(0, manifest.lastIndexOf('/'));
         }
 
-        const inputFile = manifest || join(baseInputDir, DEFAULT_PACKAGE_EXT);
+        const inputFile = manifest || join(manifestDir, DEFAULT_PACKAGE_EXT);
         const xmlFileContent = (await readXmlFromFile(inputFile)) ?? {};
         const typesProperties = xmlFileContent[TYPES_ROOT_TAG] ?? {};
         const typeItemsList = typesProperties[TYPES_PICKVAL_ROOT];
@@ -113,8 +123,6 @@ export default class Retrieve extends SfdxCommand {
 
         }
 
-
-
         // * STEP 2 - Start chunkization
 
         var typeItemsMapChunks =[] as Map<string, string[]>[];
@@ -124,7 +132,6 @@ export default class Retrieve extends SfdxCommand {
         var profileChunks =  splitChunksWithFixedTypes(
                                     typeItemsMap, typesToDelete, objWeights, resourcesNum, PROFILE_FIX_TYPE, PROFILE_REL_TYPES);
         console.log('Profile chunks size: ' + profileChunks.length);
-
 
         // * STEP 2.2 - permset chunkization
         var permsetChunks =  splitChunksWithFixedTypes(
@@ -139,6 +146,7 @@ export default class Retrieve extends SfdxCommand {
             // should always be one... but just in case
             console.log('WARNING: translation chunks size is greater than 1! This situation was not expected at the moment of writing this code.');
         }
+
         // * STEP 2.4 - customObjectTranslation chunkization
         // for customObjectTranslation we need to split the chunks in a different way
         // the idea is to have some fixed types, and to cycle on every couple Object/CustomObjectTranslation
@@ -146,7 +154,6 @@ export default class Retrieve extends SfdxCommand {
         var customObjectTranslationChunks =  splitCustomObjectTranslation(
                                     typeItemsMap, typesToDelete, objWeights, resourcesNum);
         console.log('CustomObjectTranslation chunks size: ' + customObjectTranslationChunks.length);        
-
 
         // * STEP 2.5 - delete already retrieved types
         var membersToDeleteUniq = [...new Set(typesToDelete)];
@@ -165,20 +172,20 @@ export default class Retrieve extends SfdxCommand {
         // * STEP 3 - write chunk packages
         var counter = { val: 0};
 
-        var translFiles  = await writeChunkPackages(translationChunks, baseInputDir, 'translations', counter); 
-        var cotFiles     = await writeChunkPackages(customObjectTranslationChunks, baseInputDir, 'customobjtranslations', counter); 
-        var profFiles    = await writeChunkPackages(profileChunks, baseInputDir, 'profiles', counter);
-        var permsFiles   = await writeChunkPackages(permsetChunks, baseInputDir, 'permissionsets', counter);
-        var otherFiles   = await writeChunkPackages(typeItemsMapChunks, baseInputDir, null, counter);
+        var translFiles  = await writeChunkPackages(translationChunks, manifestDir, 'translations', counter); 
+        var cotFiles     = await writeChunkPackages(customObjectTranslationChunks, manifestDir, 'customobjtranslations', counter); 
+        var profFiles    = await writeChunkPackages(profileChunks, manifestDir, 'profiles', counter);
+        var permsFiles   = await writeChunkPackages(permsetChunks, manifestDir, 'permissionsets', counter);
+        var otherFiles   = await writeChunkPackages(typeItemsMapChunks, manifestDir, null, counter);
 
         // * STEP 4 - retrieve chunk packages
         if(retrieve) {
             await Promise.all([
-                retrieveChunks(translationChunks, orgname, baseInputDir, 'translations', translFiles),
-                retrieveChunks(customObjectTranslationChunks, orgname, baseInputDir, 'customobjtranslations', cotFiles),
-                retrieveChunks(profileChunks, orgname, baseInputDir, 'profiles', profFiles),
-                retrieveChunks(permsetChunks, orgname, baseInputDir, 'permissionsets', permsFiles),
-                retrieveChunks(typeItemsMapChunks, orgname, baseInputDir, null, otherFiles)
+                retrieveChunks(translationChunks, orgname, manifestDir, 'translations', translFiles, logdir),
+                retrieveChunks(customObjectTranslationChunks, orgname, manifestDir, 'customobjtranslations', cotFiles, logdir),
+                retrieveChunks(profileChunks, orgname, manifestDir, 'profiles', profFiles, logdir),
+                retrieveChunks(permsetChunks, orgname, manifestDir, 'permissionsets', permsFiles, logdir),
+                retrieveChunks(typeItemsMapChunks, orgname, manifestDir, null, otherFiles, logdir)
             ])
             
         }
@@ -297,24 +304,24 @@ export async function writeChunkPackages(chunks, baseInputDir, type, counter){
     return filenames;
 }
 
-export async function retrieveChunks(chunks, orgname, baseInputDir, type, filenames){
+export async function retrieveChunks(chunks, orgname, baseInputDir, type, filenames, logdir){
     var isFirst = true;
     for(var filename of filenames){
 
-        await retrievePackage(orgname, baseInputDir, filename);
+        await retrievePackage(orgname, baseInputDir, filename, logdir);
         if(type != null && TYPES_TO_SPLIT.includes(type) && chunks.length > 1){
             if(isFirst){
                 isFirst = false;
-                await executeCommand(flags, 'split', type);
+                await executeCommand(this.flags, 'split', type);
             } else {
-                await executeCommand(flags, 'upsert', type);
+                await executeCommand(this.flags, 'upsert', type);
             }
         }
     }
 
 
     if(type != null && chunks.length > 1){
-        await executeCommand(flags, 'merge', type);
+        await executeCommand(this.flags, 'merge', type);
     }
     
 }

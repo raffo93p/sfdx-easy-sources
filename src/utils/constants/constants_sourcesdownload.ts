@@ -36,7 +36,7 @@ export const PERMSET_REL_TYPES = [
     'ApexPage',
     'CustomApplication',
     'CustomField',
-    'CustomMetadata',
+    // 'CustomMetadata',
     'CustomObject',
     'CustomTab',
     'ExternalDataSource',

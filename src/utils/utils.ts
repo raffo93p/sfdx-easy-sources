@@ -1,9 +1,3 @@
-import * as child from 'child_process';
-import * as util from 'util';
-const exec = util.promisify(child.exec);
-
-import { DEFAULT_SFXML_PATH, SFDX_CMD } from "./constants/constants";
-
 export function generateTagId(myArray, key, headers) {
 
 	if (Array.isArray(key)) {
@@ -68,21 +62,5 @@ export function setDefault(header) {
 	// 	newHeaders.push({ value: field, default: 'a' });
 	// }
 	// return newHeaders;
-}
-
-export async function executeCommand(flags, cmd, mdt) {
-	var cmdString = SFDX_CMD + ' easysources:' + mdt + ':' + cmd + ' -d ' + (flags.dir || DEFAULT_SFXML_PATH) + ' -o ' + (flags.output || flags.dir || DEFAULT_SFXML_PATH);
-	console.log(cmdString);
-	await exec(cmdString);
-}
-
-export async function bulkExecuteCommands(flags, cmd) {
-	await executeCommand(flags, cmd, 'profiles');
-	await executeCommand(flags, cmd, 'recordtypes');
-	await executeCommand(flags, cmd, 'labels');
-	await executeCommand(flags, cmd, 'permissionsets');
-	await executeCommand(flags, cmd, 'globalvaluesettranslations');
-	await executeCommand(flags, cmd, 'globalvaluesets');
-	await executeCommand(flags, cmd, 'applications');
 }
 
