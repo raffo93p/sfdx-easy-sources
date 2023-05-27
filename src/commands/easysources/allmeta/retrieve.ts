@@ -24,9 +24,9 @@ Messages.importMessagesDirectory(__dirname);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = Messages.loadMessages('sfdx-easy-sources', 'sources_download');
+const messages = Messages.loadMessages('sfdx-easy-sources', 'allmeta_retrieve');
 
-export default class Download extends SfdxCommand {
+export default class Retrieve extends SfdxCommand {
     public static description = messages.getMessage('commandDescription');
 
     public static examples = messages.getMessage('examples').split(os.EOL);
@@ -171,9 +171,6 @@ export default class Download extends SfdxCommand {
         var permsFiles   = await writeChunkPackages(permsetChunks, baseInputDir, 'permissionsets', counter);
         var otherFiles   = await writeChunkPackages(typeItemsMapChunks, baseInputDir, null, counter);
 
-        profFiles 
-permsFiles
-otherFiles
         // * STEP 4 - retrieve chunk packages
         if(retrieve) {
             await Promise.all([
