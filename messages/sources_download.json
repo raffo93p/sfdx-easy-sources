@@ -5,6 +5,7 @@
   "orgFlagDescription": "Specify the alias of the org",
   "resnumbFlagDescription": "Specify the maximum number of resources in a package. Default: '%s'",
   "manifestFlagDescription": "Optionally specify a package.xml to be downloaded",
+  "dontRetrieveFlagDescription": "Optionally specify to not retrieve the sources, Default: '%s'",
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [

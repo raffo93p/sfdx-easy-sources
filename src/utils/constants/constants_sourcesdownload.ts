@@ -7,19 +7,19 @@ export const TYPES_PICKVAL_HEADER = ['picklist', 'values_fullName', 'values_defa
 export const TYPES_PICKVAL_KEY = ['picklist', 'values_fullName'];
 
 export const MANIFEST_CREATE_CMD = 'sfdx force:source:manifest:create';
-export const SOURCE_RETRIEVE_CMD = 'sfdx force:source:retrieve';
+export const SOURCE_RETRIEVE_CMD = 'force:source:retrieve';
 
-export const RESOURCES_MAXNUM = 15;
+export const RESOURCES_MAXNUM = 8000;
 
 export const PACKAGE_VERSION = '55.0';
 
-export const PROFILE_TYPE = 'Profile';
-export const PROFILE_MEMBERS = [
+export const PROFILE_FIX_TYPE = ['Profile'];
+export const PROFILE_REL_TYPES = [
     'ApexClass',
 	'ApexPage',
 	'CustomApplication',
 	'CustomField',
-	'CustomMetadata',
+	//'CustomMetadata',
 	'CustomObject',
 	'CustomTab',
 	'DataCategoryGroup',
@@ -30,8 +30,8 @@ export const PROFILE_MEMBERS = [
 	'FlexiPage'			
 ]
 
-export const PERMSET_TYPE = 'PermissionSet';
-export const PERMSET_MEMBERS = [
+export const PERMSET_FIX_TYPE = ['PermissionSet'];
+export const PERMSET_REL_TYPES = [
     'ApexClass',
     'ApexPage',
     'CustomApplication',
@@ -42,6 +42,36 @@ export const PERMSET_MEMBERS = [
     'ExternalDataSource',
     'Flow',
     'RecordType'
-]
+];
 
-export const OBJECT_SUBPART_SKIP = ['CustomField','RecordType']; // TODO: customField, Layout, ValidationRule ecc
+export const OBJECT_SUBPART_SKIP = ['CustomField','RecordType']; 
+
+export const TYPES_TO_SPLIT = [
+	'profiles',
+	'permissionsets'
+];
+
+export const TRANSL_FIX_TYPES = [
+	'CustomApplication',
+	'CustomLabels',
+	'CustomPageWebLink',
+	'CustomTab',
+	'QuickAction',
+	'ReportType',
+	'SControl',
+	'Translations' // we don't have the need to split the package in various chunks, because the related resources are not many
+];
+export const TRANSL_REL_TYPES = [];
+
+export const CUSTOBJTRANSL_FIX_TYPES = [
+	'Layout',
+	'QuickAction',
+	'SharingReason',
+	'WorkflowTask'
+];
+export const CUSTOMOBJECT_TYPE = 'CustomObject';
+export const CUSTOMOBJECTTRANSL_TYPE = 'CustomObjectTranslation';
+
+
+
+
