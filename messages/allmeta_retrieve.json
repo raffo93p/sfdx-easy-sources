@@ -7,6 +7,7 @@
   "manifestFlagDescription": "Optionally specify a package.xml to be downloaded",
   "dontRetrieveFlagDescription": "Optionally specify to not retrieve the sources. Default: '%s'",
   "logdirFlagDescription": "Optionally specify a dir for log files. Default: '%s'",
+  "splitMergeFlagDescription": "Optionally specify if split and merge of all metadata must be run after retrieve. Default: '%s'",
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [

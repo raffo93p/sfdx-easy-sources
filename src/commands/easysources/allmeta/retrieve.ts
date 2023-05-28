@@ -51,7 +51,7 @@ export default class Retrieve extends SfdxCommand {
             required: true
         }),
         "dont-retrieve": flags.boolean({
-            char: 'x',
+            char: 'k',
             description: messages.getMessage('dontRetrieveFlagDescription', ["false"]),
             default: false
         }),
@@ -62,6 +62,11 @@ export default class Retrieve extends SfdxCommand {
         "log-dir": flags.string({
             char:  'l',
             description: messages.getMessage('logdirFlagDescription', [DEFAULT_LOG_PATH]),
+        }),
+        "split-merge": flags.boolean({
+            char: 't',
+            description: messages.getMessage('splitMergeFlagDescription', ["false"]),
+            default: false
         }),
     };
     
@@ -78,6 +83,7 @@ export default class Retrieve extends SfdxCommand {
         // const inputFiles = (this.flags.input) as string;
 
         var retrieve = !this.flags["dont-retrieve"];
+        var splitmerge = this.flags["split-merge"];
 
         const resourcesNum = this.flags.resnumb || RESOURCES_MAXNUM;
 
@@ -188,6 +194,12 @@ export default class Retrieve extends SfdxCommand {
                 retrieveChunks(typeItemsMapChunks, orgname, manifestDir, null, otherFiles, logdir)
             ])
             
+        }
+
+        // * STEP 5 - Split and merge
+        if(splitmerge){
+            await executeCommand(this.flags, 'split', 'allmeta');
+            await executeCommand(this.flags, 'merge', 'allmeta');
         }
 
         Performance.getInstance().end();
