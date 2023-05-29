@@ -63,7 +63,7 @@ export default class Upsert extends SfdxCommand {
         Performance.getInstance().start();
 
         const baseInputDir = join((this.flags["es-csv"] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
-        const baseOutputDir = this.flags["sf-xml"] == null ? DEFAULT_SFXML_PATH : join(this.flags["sf-xml"], RECORDTYPES_SUBPATH) as string;
+        const baseOutputDir = join((this.flags["sf-xml"] || DEFAULT_SFXML_PATH), RECORDTYPES_SUBPATH) as string;
         const inputObject = (this.flags.object) as string;
         const inputRecordType = (this.flags.recordtype) as string;
 

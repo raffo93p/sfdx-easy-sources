@@ -9,7 +9,7 @@ const fs = require('fs-extra');
 export async function upsert(flags, file_subpath, file_extension, file_root_tag, file_items) {
     
     const baseInputDir = join((flags["sf-xml"] || DEFAULT_SFXML_PATH), file_subpath) as string;
-    const baseOutputDir = flags["es-csv"] == null ? DEFAULT_ESCSV_PATH : join(flags["es-csv"], file_subpath) as string;
+    const baseOutputDir = join((flags["es-csv"] || DEFAULT_ESCSV_PATH), file_subpath) as string;
     const inputFiles = (flags.input) as string;
 
     if (!fs.existsSync(baseInputDir)) {

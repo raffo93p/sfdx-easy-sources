@@ -62,7 +62,7 @@ export default class Split extends SfdxCommand {
         Performance.getInstance().start();
 
         const baseInputDir = join((this.flags["sf-xml"] || DEFAULT_SFXML_PATH), RECORDTYPES_SUBPATH) as string;
-        const baseOutputDir = this.flags["es-csv"] == null ? DEFAULT_ESCSV_PATH : join(this.flags["es-csv"], RECORDTYPES_SUBPATH) as string;
+        const baseOutputDir = join((this.flags["es-csv"] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
 
         const inputObject = (this.flags.object) as string;
         const inputRecordType = (this.flags.recordtype) as string;
