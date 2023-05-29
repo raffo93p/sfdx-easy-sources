@@ -7,7 +7,7 @@ import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, SFDX_CMD } from '../constants/c
 const fs = require('fs');
 
 export async function retrieveAllMetadataPackage(orgname, baseInputDir){
-	var cmdString = MANIFEST_CREATE_CMD + ' --fromorg ' + orgname + ' --manifestname='+DEFAULT_PACKAGE+' --outputdir=' + baseInputDir;
+	var cmdString = MANIFEST_CREATE_CMD + ' --fromorg ' + orgname + ' --manifestname='+DEFAULT_PACKAGE+' --outputdir=' + baseInputDir + " -c managed";
 	console.log(cmdString);
 	await exec(cmdString);
 }
