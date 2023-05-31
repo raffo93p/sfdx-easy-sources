@@ -4,6 +4,7 @@ import { Parser } from "xml2js";
 import { SfdxProject } from "@salesforce/core";
 import XmlFormatter from "./xmlFormatter";
 import { CSV_EXTENSION } from "./constants/constants";
+const fs = require('fs-extra');
 
 const csvparser = require("csvtojson");
 
@@ -78,4 +79,15 @@ export function removeExtension(inputFile: string) {
 
 export function calcCsvFilename(filename, tag_section) {
 	return filename + '-' + tag_section + CSV_EXTENSION;
+}
+
+export async function cleanDir(dir){
+	await fs.rm(dir, { recursive: true }, (err) => {
+		if(err){
+			// File deletion failed
+			console.error(err.message);
+			return;
+		}
+		fs.mkdirSync(dir, { recursive: true } );
+	});
 }

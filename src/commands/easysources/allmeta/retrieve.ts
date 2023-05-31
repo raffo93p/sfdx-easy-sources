@@ -12,7 +12,7 @@ import Performance from '../../../utils/performance';
 import { DEFAULT_ESCSV_PATH, DEFAULT_LOG_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
 import { join } from "path";
 import { DEFAULT_PACKAGE_EXT, OBJECT_SUBPART_SKIP, PACKAGE_VERSION, PERMSET_FIX_TYPE, PROFILE_REL_TYPES, PROFILE_FIX_TYPE, RESOURCES_MAXNUM, TYPES_PICKVAL_ROOT, TYPES_ROOT_TAG, TRANSL_REL_TYPES, TRANSL_FIX_TYPES, TYPES_TO_SPLIT, CUSTOBJTRANSL_FIX_TYPES, CUSTOMOBJECT_TYPE, CUSTOMOBJECTTRANSL_TYPE } from '../../../utils/constants/constants_sourcesdownload';
-import { readStringFromFile, readXmlFromFile, writeXmlToFile } from '../../../utils/filesUtils';
+import { cleanDir, readStringFromFile, readXmlFromFile, writeXmlToFile } from '../../../utils/filesUtils';
 import { retrieveAllMetadataPackage, retrievePackage } from '../../../utils/commands/utils';
 import { executeCommand } from '../../../utils/commands/utils';
 import { loadSettings } from '../../../utils/localSettings';
@@ -58,7 +58,7 @@ export default class Retrieve extends SfdxCommand {
             description: messages.getMessage('dontRetrieveFlagDescription', ["false"]),
             default: false
         }),
-        resnumb:   flags.string({
+        resnumb: flags.string({
             char:  'n',
             description: messages.getMessage('resnumbFlagDescription', [RESOURCES_MAXNUM]),
         }),
@@ -71,6 +71,11 @@ export default class Retrieve extends SfdxCommand {
             description: messages.getMessage('splitMergeFlagDescription', ["false"]),
             default: false
         }),
+        clean: flags.boolean({
+            char:  'e',
+            description: messages.getMessage('cleanFlagDescription', ["false"]),
+            default: false
+        })
     };
     
     public async run(): Promise<AnyJson> {
@@ -82,26 +87,35 @@ export default class Retrieve extends SfdxCommand {
         var manifest = this.flags.manifest;
 
         var manifestDir = join( '.', 'manifest') as string;
-        // const baseOutputDir = this.flags.output == null ? DEFAULT_PATH : this.flags.output;
-        // const inputFiles = (this.flags.input) as string;
 
         var retrieve = !this.flags["dont-retrieve"];
         var splitmerge = this.flags["split-merge"];
+        var clean = this.flags.clean;
 
         const resourcesNum = this.flags.resnumb || RESOURCES_MAXNUM;
 
         if (manifest == null && !fs.existsSync(manifestDir)) {
-            console.log('Input folder ' + manifestDir + ' does not exist!');
-            return;
+            fs.mkdirSync(manifestDir, { recursive: true });
         }
 
         const logdir = this.flags['log-dir'] || settings['easysources-log-path'] || DEFAULT_LOG_PATH;
+        const xmldir = this.flags['sf-xml'] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH;
+        const csvdir = this.flags['es-csv'] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH;
 
-        if(logdir === DEFAULT_LOG_PATH){
-            if (!fs.existsSync(logdir)) {
-                fs.mkdirSync(logdir, { recursive: true });
-            }
+        if (!fs.existsSync(logdir)) {
+            fs.mkdirSync(logdir, { recursive: true });
         }
+
+
+        // * STEP 0.1
+        if(clean){
+            await Promise.all([
+                cleanDir(xmldir),
+                cleanDir(logdir),
+                cleanDir(csvdir)
+            ]) ;
+        }
+        
 
         // * STEP 1 - Retrieve AllMeta Package and/or read it
 
