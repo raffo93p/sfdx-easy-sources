@@ -1,4 +1,4 @@
-import { SETTINGS_PATH } from "./constants/constants";
+import { DEFAULT_ESCSV_PATH, DEFAULT_LOG_PATH, DEFAULT_SFXML_PATH, SETTINGS_PATH } from "./constants/constants";
 
 const fs = require('fs-extra');
 
@@ -8,6 +8,11 @@ export function loadSettings() {
     return settings;
 }
 
-export function initSettings(flags: {}) {
-
+export function initSettings() {
+    const settings = {
+        "salesforce-xml-path": DEFAULT_SFXML_PATH,
+        "easysources-csv-path": DEFAULT_ESCSV_PATH,
+        "easysources-log-path": DEFAULT_LOG_PATH
+    }
+    return settings;
 }
