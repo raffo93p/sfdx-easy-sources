@@ -4,12 +4,15 @@ const { Parser, transforms: { unwind } } = require('json2csv');
 import { join } from "path";
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../constants/constants';
 import { PROFILE_USERPERM_ROOT } from '../constants/constants_profiles';
+import { loadSettings } from '../localSettings';
 const fs = require('fs-extra');
+
+const settings = loadSettings();
 
 export async function upsert(flags, file_subpath, file_extension, file_root_tag, file_items) {
     
-    const baseInputDir = join((flags["sf-xml"] || DEFAULT_SFXML_PATH), file_subpath) as string;
-    const baseOutputDir = join((flags["es-csv"] || DEFAULT_ESCSV_PATH), file_subpath) as string;
+    const baseInputDir = join((flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), file_subpath) as string;
+    const baseOutputDir = join((flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), file_subpath) as string;
     const inputFiles = (flags.input) as string;
 
     if (!fs.existsSync(baseInputDir)) {

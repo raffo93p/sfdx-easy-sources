@@ -15,8 +15,11 @@ import { DEFAULT_PACKAGE_EXT, OBJECT_SUBPART_SKIP, PACKAGE_VERSION, PERMSET_FIX_
 import { readStringFromFile, readXmlFromFile, writeXmlToFile } from '../../../utils/filesUtils';
 import { retrieveAllMetadataPackage, retrievePackage } from '../../../utils/commands/utils';
 import { executeCommand } from '../../../utils/commands/utils';
+import { loadSettings } from '../../../utils/localSettings';
 const fs = require('fs-extra');
 const _ = require('lodash') ;
+
+const settings = loadSettings();
 
 
 // Initialize Messages with the current plugin directory
@@ -92,7 +95,7 @@ export default class Retrieve extends SfdxCommand {
             return;
         }
 
-        const logdir = this.flags['log-dir'] || DEFAULT_LOG_PATH;
+        const logdir = this.flags['log-dir'] || settings['easysources-log-path'] || DEFAULT_LOG_PATH;
 
         if(logdir === DEFAULT_LOG_PATH){
             if (!fs.existsSync(logdir)) {

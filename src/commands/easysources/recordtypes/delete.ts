@@ -19,6 +19,9 @@ import { calcCsvFilename, readCsvToJsonMap } from "../../../utils/filesUtils"
 import { sortByKey } from "../../../utils/utils"
 
 import { RECORDTYPES_PICKVAL_ROOT, RECORDTYPES_SUBPATH, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
+import { loadSettings } from '../../../utils/localSettings';
+
+const settings = loadSettings();
 
 
 // Initialize Messages with the current plugin directory
@@ -72,7 +75,7 @@ export default class Delete extends SfdxCommand {
         const apiname = (this.flags.apiname) as string;
         if (!picklist) throw new SfError(messages.getMessage('errorNoPicklistFlag'));
 
-        const baseInputDir = join((this.flags["es-csv"] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
+        const baseInputDir = join((this.flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
         const inputObject = (this.flags.object) as string;
         const inputRecordType = (this.flags.recordtype) as string;
 

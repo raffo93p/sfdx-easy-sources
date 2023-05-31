@@ -3,12 +3,13 @@ import { join } from "path";
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from "../constants/constants"
 import { writeXmlToFile, readCsvToJsonArray, readXmlFromFile, calcCsvFilename } from "../filesUtils"
 import { sortByKey } from "../utils"
+import { loadSettings } from "../localSettings";
 
-
+const settings = loadSettings();
 
 export async function merge(flags, file_subpath, file_extension, file_root_tag, file_items) {
-    const baseInputDir = join((flags["es-csv"] || DEFAULT_ESCSV_PATH), file_subpath) as string;
-    const baseOutputDir = join((flags["sf-xml"] || DEFAULT_SFXML_PATH), file_subpath) as string;
+    const baseInputDir = join((flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), file_subpath) as string;
+    const baseOutputDir = join((flags["sf-xml"] || settings['salesforce-xml-path'] ||  DEFAULT_SFXML_PATH), file_subpath) as string;
     const inputProfile = (flags.input) as string;
 
     if (!fs.existsSync(baseInputDir)) {

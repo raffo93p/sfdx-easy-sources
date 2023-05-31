@@ -17,7 +17,10 @@ import { join } from "path";
 import { generateTagId, sortByKey } from '../../../utils/utils';
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../../../utils/constants/constants';
 import { transformXMLtoCSV } from '../../../utils/utils_recordtypes';
+import { loadSettings } from '../../../utils/localSettings';
 const fs = require('fs-extra');
+
+const settings = loadSettings();
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);
@@ -61,8 +64,8 @@ export default class Split extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        const baseInputDir = join((this.flags["sf-xml"] || DEFAULT_SFXML_PATH), RECORDTYPES_SUBPATH) as string;
-        const baseOutputDir = join((this.flags["es-csv"] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
+        const baseInputDir = join((this.flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), RECORDTYPES_SUBPATH) as string;
+        const baseOutputDir = join((this.flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
 
         const inputObject = (this.flags.object) as string;
         const inputRecordType = (this.flags.recordtype) as string;

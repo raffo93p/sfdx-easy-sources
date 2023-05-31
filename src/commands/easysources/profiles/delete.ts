@@ -16,7 +16,9 @@ import { PROFILES_SUBPATH, PROFILE_ITEMS } from "../../../utils/constants/consta
 import { calcCsvFilename, readCsvToJsonMap } from "../../../utils/filesUtils"
 import { sortByKey } from "../../../utils/utils"
 import { DEFAULT_ESCSV_PATH } from '../../../utils/constants/constants';
+import { loadSettings } from '../../../utils/localSettings';
 
+const settings = loadSettings();
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);
@@ -66,7 +68,7 @@ export default class Delete extends SfdxCommand {
         if (!type) throw new SfError(messages.getMessage('errorNoTypeFlag'));
         if (!tagid) throw new SfError(messages.getMessage('errorNoTagIdFlag'));
         if (!Object.keys(PROFILE_ITEMS).includes(type)) throw new SfError(messages.getMessage('errorNoValidTypeFlag'));
-        const baseInputDir = join((this.flags["es-csv"] || DEFAULT_ESCSV_PATH), PROFILES_SUBPATH) as string;
+        const baseInputDir = join((this.flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), PROFILES_SUBPATH) as string;
         const inputProfile = (this.flags.input) as string;
 
         if (!fs.existsSync(baseInputDir)) {

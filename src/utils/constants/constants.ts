@@ -7,6 +7,7 @@ export const DEFAULT_SFXML_PATH = './force-app/main/default';
 export const DEFAULT_ESCSV_PATH = './force-app/main/default';
 // export const DEFAULT_ESCSV_PATH = './easysources';
 export const DEFAULT_LOG_PATH ='./easysources/log';
+export const SETTINGS_PATH = './easysources-settings.json';
 
 export const SFDX_CMD = 'sfdx';
 

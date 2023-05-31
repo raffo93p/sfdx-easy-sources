@@ -4,10 +4,13 @@ import { generateTagId } from '../utils'
 const { Parser, transforms: { unwind } } = require('json2csv');
 import { join } from "path";
 import { DEFAULT_ESCSV_PATH } from '../constants/constants';
+import { loadSettings } from '../localSettings';
 const fs = require('fs-extra');
 
+const settings = loadSettings();
+
 export async function updatekey(flags, file_subpath, file_items) {
-    const baseInputDir = join((flags["es-csv"] || DEFAULT_ESCSV_PATH), file_subpath) as string;
+    const baseInputDir = join((flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), file_subpath) as string;
     const inputFiles = (flags.input) as string;
 
     if (!fs.existsSync(baseInputDir)) {

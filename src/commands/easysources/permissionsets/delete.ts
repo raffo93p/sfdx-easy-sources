@@ -16,6 +16,9 @@ import { PERMSETS_SUBPATH, PERMSET_ITEMS } from "../../../utils/constants/consta
 import { readCsvToJsonMap } from "../../../utils/filesUtils"
 import { sortByKey } from "../../../utils/utils"
 import { CSV_EXTENSION, DEFAULT_ESCSV_PATH } from '../../../utils/constants/constants';
+import { loadSettings } from '../../../utils/localSettings';
+
+const settings = loadSettings();
 
 
 // Initialize Messages with the current plugin directory
@@ -67,7 +70,7 @@ export default class Delete extends SfdxCommand {
         if (!tagid) throw new SfError(messages.getMessage('errorNoTagIdFlag'));
         if (!Object.keys(PERMSET_ITEMS).includes(type)) throw new SfError(messages.getMessage('errorNoValidTypeFlag'));
 
-        const baseInputDir = join((this.flags["es-csv"] || DEFAULT_ESCSV_PATH), PERMSETS_SUBPATH) as string;
+        const baseInputDir = join((this.flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), PERMSETS_SUBPATH) as string;
         const inputProfile = (this.flags.input) as string;
 
         if (!fs.existsSync(baseInputDir)) {

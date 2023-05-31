@@ -29,6 +29,9 @@ import {
 import { writeXmlToFile, readCsvToJsonArray, readXmlFromFile, calcCsvFilename } from "../../../utils/filesUtils"
 import { sortByKey } from "../../../utils/utils"
 import { transformCSVtoXML } from '../../../utils/utils_recordtypes';
+import { loadSettings } from '../../../utils/localSettings';
+
+const settings = loadSettings();
 
 
 // Initialize Messages with the current plugin directory
@@ -74,8 +77,8 @@ export default class Merge extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        const baseInputDir = join((this.flags["es-csv"] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
-        const baseOutputDir = join((this.flags["sf-xml"] || DEFAULT_SFXML_PATH), RECORDTYPES_SUBPATH) as string;
+        const baseInputDir = join((this.flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
+        const baseOutputDir = join((this.flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), RECORDTYPES_SUBPATH) as string;
         const inputObject = (this.flags.object) as string;
         const inputRecordType = (this.flags.recordtype) as string;
 
