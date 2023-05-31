@@ -13,7 +13,7 @@ import { DEFAULT_ESCSV_PATH, DEFAULT_LOG_PATH, DEFAULT_SFXML_PATH } from '../../
 import { join } from "path";
 import { DEFAULT_PACKAGE_EXT, OBJECT_SUBPART_SKIP, PACKAGE_VERSION, PERMSET_FIX_TYPE, PROFILE_REL_TYPES, PROFILE_FIX_TYPE, RESOURCES_MAXNUM, TYPES_PICKVAL_ROOT, TYPES_ROOT_TAG, TRANSL_REL_TYPES, TRANSL_FIX_TYPES, TYPES_TO_SPLIT, CUSTOBJTRANSL_FIX_TYPES, CUSTOMOBJECT_TYPE, CUSTOMOBJECTTRANSL_TYPE } from '../../../utils/constants/constants_sourcesdownload';
 import { cleanDir, readStringFromFile, readXmlFromFile, writeXmlToFile } from '../../../utils/filesUtils';
-import { retrieveAllMetadataPackage, retrievePackage } from '../../../utils/commands/utils';
+import { bulkExecuteCommands, retrieveAllMetadataPackage, retrievePackage } from '../../../utils/commands/utils';
 import { executeCommand } from '../../../utils/commands/utils';
 import { loadSettings } from '../../../utils/localSettings';
 const fs = require('fs-extra');
@@ -75,7 +75,12 @@ export default class Retrieve extends SfdxCommand {
             char:  'e',
             description: messages.getMessage('cleanFlagDescription', ["false"]),
             default: false
-        })
+        }),
+        sequencial: flags.boolean({
+            char: 's',
+            description: messages.getMessage('sequencialFlagDescription', ["false"]),
+            default: false
+        }),
     };
     
     public async run(): Promise<AnyJson> {
@@ -215,8 +220,8 @@ export default class Retrieve extends SfdxCommand {
 
         // * STEP 5 - Split and merge
         if(splitmerge){
-            await executeCommand(this.flags, 'split', 'allmeta');
-            await executeCommand(this.flags, 'merge', 'allmeta');
+            await bulkExecuteCommands(this.flags, 'split', this.flags.sequencial);
+            await bulkExecuteCommands(this.flags, 'merge', this.flags.sequencial);
         }
 
         Performance.getInstance().end();

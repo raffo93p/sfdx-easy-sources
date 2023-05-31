@@ -2,6 +2,7 @@
   "commandDescription": "Merge back csv files into metadata files",
   "esCsvFlagDescription": "Specify a custom dir for input csv files. Default: '%s'",
   "sfXmlFlagDescription": "Specify a custom dir for output metadata files. Default: '%s'",
+  "sequencialFlagDescription": "Optionally perform operation in sequence. Default: '%s'",
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [

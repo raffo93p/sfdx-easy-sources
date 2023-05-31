@@ -2,6 +2,7 @@
   "commandDescription": "Upsert csv files based on metadata files",
   "sfXmlFlagDescription": "Specify a custom dir for input metadata files. Default: '%s'",
   "esCsvFlagDescription": "Specify a custom dir for output csv files. Default: '%s'",
+  "sequencialFlagDescription": "Optionally perform operation in sequence. Default: '%s'",
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [

@@ -9,6 +9,7 @@
   "logdirFlagDescription": "Optionally specify a dir for log files. Default: '%s'",
   "splitMergeFlagDescription": "Optionally specify if split and merge of all metadata must be run after retrieve. Default: '%s'",
   "cleanFlagDescription": "Optionally clean xml, csv and log directories. Use only when the retrieved is tested successfully and in a git environment, as this option delete sources. Default: '%s'",
+  "sequencialFlagDescription": "Optionally perform operation in sequence. Default: '%s'",
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [

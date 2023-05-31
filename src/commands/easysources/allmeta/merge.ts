@@ -19,7 +19,7 @@ Messages.importMessagesDirectory(__dirname);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = Messages.loadMessages('sfdx-easy-sources', 'applications_merge');
+const messages = Messages.loadMessages('sfdx-easy-sources', 'all_merge');
 
 export default class Merge extends SfdxCommand {
     public static description = messages.getMessage('commandDescription');
@@ -38,16 +38,17 @@ export default class Merge extends SfdxCommand {
             char: 'c',
             description: messages.getMessage('esCsvFlagDescription', [DEFAULT_ESCSV_PATH]),
         }),
-        input: flags.string({
-            char: 'i',
-            description: messages.getMessage('inputFlagDescription'),
-        })
+        sequencial: flags.boolean({
+            char: 's',
+            description: messages.getMessage('sequencialFlagDescription', ["false"]),
+            default: false
+        }),
     };
 
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        await bulkExecuteCommands(this.flags, 'merge');
+        await bulkExecuteCommands(this.flags, 'merge', this.flags.sequencial);
         
         Performance.getInstance().end();
 

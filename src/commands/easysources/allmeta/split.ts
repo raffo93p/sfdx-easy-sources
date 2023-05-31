@@ -19,7 +19,7 @@ Messages.importMessagesDirectory(__dirname);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = Messages.loadMessages('sfdx-easy-sources', 'applications_split');
+const messages = Messages.loadMessages('sfdx-easy-sources', 'all_split');
 
 export default class Split extends SfdxCommand {
     public static description = messages.getMessage('commandDescription');
@@ -37,13 +37,18 @@ export default class Split extends SfdxCommand {
             char: 'c',
             description: messages.getMessage('esCsvFlagDescription', [DEFAULT_ESCSV_PATH]),
         }),
+        sequencial: flags.boolean({
+            char: 's',
+            description: messages.getMessage('sequencialFlagDescription', ["false"]),
+            default: false
+        }),
     };
 
 
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        await bulkExecuteCommands(this.flags, 'split');
+        await bulkExecuteCommands(this.flags, 'split', this.flags.sequencial);
         
         Performance.getInstance().end();
 

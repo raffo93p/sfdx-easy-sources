@@ -26,7 +26,7 @@ export async function retrievePackage(orgname, baseDir, filename, logdir){
 	  ];	
 	let p = child.spawn(cmdString, { shell: true, stdio});
 
-	return new Promise((resolveFunc) => {
+	return new Promise((resolve) => {
 		p.on("exit", (code) => {
 			console.log(cmdString+'...done '+ code);
 			var fileToRemove;
@@ -44,23 +44,49 @@ export async function retrievePackage(orgname, baseDir, filename, logdir){
 				}
 				);
 			
-			resolveFunc(code);
+			resolve(code);
 		});
 	  });
 }
 
+// export async function executeCommand(flags, cmd, mdt) {
+// 	var cmdString = SFDX_CMD + ' easysources:' + mdt + ':' + cmd + ' --sf-xml ' + (flags['sf-xml'] || DEFAULT_SFXML_PATH) + ' --es-csv ' + (flags['es-csv'] || DEFAULT_ESCSV_PATH);
+// 	console.log(cmdString);
+// 	await exec(cmdString);
+// }
+
 export async function executeCommand(flags, cmd, mdt) {
 	var cmdString = SFDX_CMD + ' easysources:' + mdt + ':' + cmd + ' --sf-xml ' + (flags['sf-xml'] || DEFAULT_SFXML_PATH) + ' --es-csv ' + (flags['es-csv'] || DEFAULT_ESCSV_PATH);
-	console.log(cmdString);
-	await exec(cmdString);
+	console.log(cmdString+'...');
+
+	let p = child.spawn(cmdString, { shell: true});
+
+	return new Promise((resolve) => {
+		p.on("exit", (code) => {
+			console.log(cmdString+'...done '+ code);
+			resolve(code);
+		});
+	});
 }
 
-export async function bulkExecuteCommands(flags, cmd) {
-	await executeCommand(flags, cmd, 'profiles');
-	await executeCommand(flags, cmd, 'recordtypes');
-	await executeCommand(flags, cmd, 'labels');
-	await executeCommand(flags, cmd, 'permissionsets');
-	await executeCommand(flags, cmd, 'globalvaluesettranslations');
-	await executeCommand(flags, cmd, 'globalvaluesets');
-	await executeCommand(flags, cmd, 'applications');
+export async function bulkExecuteCommands(flags, cmd, sequencial) {
+	if(sequencial){
+		await executeCommand(flags, cmd, 'profiles');
+		await executeCommand(flags, cmd, 'recordtypes');
+		await executeCommand(flags, cmd, 'labels');
+		await executeCommand(flags, cmd, 'permissionsets');
+		await executeCommand(flags, cmd, 'globalvaluesettranslations');
+		await executeCommand(flags, cmd, 'globalvaluesets');
+		await executeCommand(flags, cmd, 'applications');
+	} else {
+		await Promise.all([
+			executeCommand(flags, cmd, 'profiles'),
+			executeCommand(flags, cmd, 'recordtypes'),
+			executeCommand(flags, cmd, 'labels'),
+			executeCommand(flags, cmd, 'permissionsets'),
+			executeCommand(flags, cmd, 'globalvaluesettranslations'),
+			executeCommand(flags, cmd, 'globalvaluesets'),
+			executeCommand(flags, cmd, 'applications')
+		]);
+	}
 }
