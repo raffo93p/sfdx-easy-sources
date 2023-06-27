@@ -42,7 +42,10 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
         const outputDir = join(baseOutputDir, fileName);
 
         for (const tag_section in file_items) {
-            if(flags.ignoreuserperm === 'true' && tag_section == PROFILE_USERPERM_ROOT) continue;
+            if(flags.ignoreuserperm === 'true' && tag_section == PROFILE_USERPERM_ROOT) {
+                xmlFileContent[file_root_tag][tag_section] = null;
+                continue;
+            }
 
             var jsonArrayNew = fileProperties[tag_section];
             if (jsonArrayNew == undefined) continue;
