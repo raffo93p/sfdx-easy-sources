@@ -11,9 +11,9 @@ import { AnyJson } from '@salesforce/ts-types';
 import Performance from '../../../utils/performance';
 import { DEFAULT_ESCSV_PATH, DEFAULT_LOG_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
 import { join } from "path";
-import { DEFAULT_PACKAGE_EXT, OBJECT_SUBPART_SKIP, PACKAGE_VERSION, PERMSET_FIX_TYPE, PROFILE_REL_TYPES, PROFILE_FIX_TYPE, RESOURCES_MAXNUM, TYPES_PICKVAL_ROOT, TYPES_ROOT_TAG, TRANSL_REL_TYPES, TRANSL_FIX_TYPES, TYPES_TO_SPLIT, CUSTOBJTRANSL_FIX_TYPES, CUSTOMOBJECT_TYPE, CUSTOMOBJECTTRANSL_TYPE } from '../../../utils/constants/constants_sourcesdownload';
-import { cleanDir, readStringFromFile, readXmlFromFile, writeXmlToFile } from '../../../utils/filesUtils';
-import { bulkExecuteCommands, retrieveAllMetadataPackage, retrievePackage } from '../../../utils/commands/utils';
+import { DEFAULT_PACKAGE_ORG_EXT, OBJECT_SUBPART_SKIP, PACKAGE_VERSION, PERMSET_FIX_TYPE, PROFILE_REL_TYPES, PROFILE_FIX_TYPE, RESOURCES_MAXNUM, TYPES_PICKVAL_ROOT, TYPES_ROOT_TAG, TRANSL_REL_TYPES, TRANSL_FIX_TYPES, TYPES_TO_SPLIT, CUSTOBJTRANSL_FIX_TYPES, CUSTOMOBJECT_TYPE, CUSTOMOBJECTTRANSL_TYPE } from '../../../utils/constants/constants_sourcesdownload';
+import { cleanDir, jsonArrayPackageToMap, readStringFromFile, readXmlFromFile, writeXmlToFile } from '../../../utils/filesUtils';
+import { bulkExecuteCommands, retrieveAllMetadataPackageOrg, retrievePackage } from '../../../utils/commands/utils';
 import { executeCommand } from '../../../utils/commands/utils';
 import { loadSettings } from '../../../utils/localSettings';
 const fs = require('fs-extra');
@@ -125,19 +125,19 @@ export default class Retrieve extends SfdxCommand {
         // * STEP 1 - Retrieve AllMeta Package and/or read it
 
         if(manifest == null){
-           await retrieveAllMetadataPackage(orgname, manifestDir);
+           await retrieveAllMetadataPackageOrg(orgname, manifestDir);
         }
 
         if(manifest != null){
             manifestDir = manifest.substring(0, manifest.lastIndexOf('/'));
         }
 
-        const inputFile = manifest || join(manifestDir, DEFAULT_PACKAGE_EXT);
+        const inputFile = manifest || join(manifestDir, DEFAULT_PACKAGE_ORG_EXT);
         const xmlFileContent = (await readXmlFromFile(inputFile)) ?? {};
         const typesProperties = xmlFileContent[TYPES_ROOT_TAG] ?? {};
         const typeItemsList = typesProperties[TYPES_PICKVAL_ROOT];
 
-        var typeItemsMap = jsonArrayToMap(typeItemsList);
+        var typeItemsMap = jsonArrayPackageToMap(typeItemsList);
         
         // * STEP 1.1 - Calculate objects weight
         const strFileContent = await readStringFromFile(inputFile);
@@ -448,19 +448,6 @@ export function splitTypeItemsToChunks(typeItemsMap, typeItemsMapChunkInit, objW
     }
 
     return typeItemsMapChunks;
-}
-
-export function jsonArrayToMap(jsonArray){
-	if (!Array.isArray(jsonArray)) jsonArray = [jsonArray]
-
-	const myMap = new Map(
-        jsonArray.map(object => {
-            return [object['name'],
-                     Array.isArray(object['members']) ? object['members'] : [object['members']]];
-        })
-    ) as Map<string, string[]>;
-
-	return myMap;
 }
 
 export function getSizeOfMapElements(map){

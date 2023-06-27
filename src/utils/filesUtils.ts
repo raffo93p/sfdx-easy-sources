@@ -46,7 +46,7 @@ export async function readCsvToJsonArray(csvFilePath: string) {
 
 	return jsonArray;
 }
-export function jsonArrayToMap(jsonArray) {
+export function jsonArrayCsvToMap(jsonArray) {
 	if (!Array.isArray(jsonArray)) jsonArray = [jsonArray]
 
 	const myMap = new Map(
@@ -58,9 +58,22 @@ export function jsonArrayToMap(jsonArray) {
 	return myMap;
 }
 
+export function jsonArrayPackageToMap(jsonArray){
+	if (!Array.isArray(jsonArray)) jsonArray = [jsonArray]
+
+	const myMap = new Map(
+        jsonArray.map(object => {
+            return [object['name'],
+                     Array.isArray(object['members']) ? object['members'] : [object['members']]];
+        })
+    ) as Map<string, string[]>;
+
+	return myMap;
+}
+
 export async function readCsvToJsonMap(csvFilePath: string) {
 	var jsonArray = await readCsvToJsonArray(csvFilePath);
-	return jsonArrayToMap(jsonArray) as Map<string, any>;
+	return jsonArrayCsvToMap(jsonArray) as Map<string, any>;
 }
 
 export function removeExtension(inputFile: string) {
