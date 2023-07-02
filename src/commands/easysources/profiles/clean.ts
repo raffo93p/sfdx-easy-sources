@@ -104,9 +104,6 @@ export default class Clean extends SfdxCommand {
         var typeItemsMap_org = await readPackageToMap(manifestDir, DEFAULT_PACKAGE_ORG_EXT);
         var typeItemsMap_loc = await readPackageToMap(manifestDir, DEFAULT_PACKAGE_LOC_EXT);
 
-        typeItemsMap_org;
-        typeItemsMap_loc;
-
         // dir is the profile name without the extension
         for (const dir of dirList) {
             console.log('Cleaning on: ' + dir);
@@ -117,43 +114,57 @@ export default class Clean extends SfdxCommand {
                 const csvFilePath = join(baseCsvDir, dir, calcCsvFilename(dir, tag_section));
                 if (fs.existsSync(csvFilePath)) {
 
-                    // for each tagsection, get:
+                    for(const key_type of toArray(PROFILE_KEY_TYPE[tag_section]) ){
+                        // for each tagsection, get:
                         // the typename on package. eg. ApexClass
                         // the key that contains the name on the csv. eg. apexClass
-                    var typename = PROFILE_KEY_TYPE[tag_section]["typename"];
-                    var key = PROFILE_KEY_TYPE[tag_section]["key"]; // eg. 
+                    
+                        var typename = key_type["typename"];
+                        var key = key_type["key"]; 
+    
+                        // get the list of resources on the csv. eg. the list of apex classes
+                        var resListCsv = await readCsvToJsonArray(csvFilePath)
+    
+                        // get the list of resources of that type on the two packages (org and local)
+                        var resListPkg_loc =  typeItemsMap_loc.get(typename);
+                        var resListPkg_org =  typeItemsMap_org.get(typename);
+                        
+                        // res is a single resource on a given csv
+                        resListCsv = resListCsv.filter(function(res) {
+                            if(res[key] == null) return true;
 
-                    // get the list of resources on the csv. eg. the list of apex classes
-                    var resListCsv = await readCsvToJsonArray(csvFilePath)
-
-                    // get the list of resources of that type on the two packages (org and local)
-                    var resListPkg_loc =  typeItemsMap_loc[typename];
-                    var resListPkg_org =  typeItemsMap_org[typename];
+                            var locFound = false;
+                            var orgFound = false;
+                            console.log('Finding: ' + res[key]+ ' into ');
+                            console.log(resListPkg_loc);
+                            if(resListPkg_loc != null && resListPkg_loc.includes(res[key])){
+                                locFound = true;
+                            }
+                            if(resListPkg_org != null && resListPkg_org.includes(res[key])){
+                                orgFound = true;
+                            }
+                            return locFound || orgFound;
+                        })
+                    }
+                    
+                    
 
                     console.log(resListCsv);
 
-                    // get the list of resources on the package
-                    for(var res of resListCsv){
-                        if(!resListPkg.includes(res[])){
-
-                        }
-                        
-                    }
-return;
                     // for (var k of tagid.split(',')) {
                     //     jsonMap.delete(k);
                     // }
-                    var jsonArray = Array.from(jsonMap.values());
+                    //var jsonArray = Array.from(jsonMap.values());
 
                     const headers = PROFILE_ITEMS[tag_section].headers;
                     const transforms = [unwind({ paths: headers })];
                     const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
 
                     if (this.flags.sort === 'true') {
-                        jsonArray = sortByKey(jsonArray);
+                        resListCsv = sortByKey(resListCsv);
                     }
 
-                    const csv = parser.parse(jsonArray);
+                    const csv = parser.parse(resListCsv);
                     try {
                         fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
                         // file written successfully
@@ -176,6 +187,11 @@ return;
     
 }
 
+export function toArray(arr): string[]{
+    if (!Array.isArray(arr)) arr = [arr];
+    return arr;
+
+}
 
 export async function readPackageToMap(manifestDir, packageName){
     const inputFile =join(manifestDir, packageName);

@@ -6,7 +6,8 @@ export const PROFILE_KEY_TYPE = {
     [PROFILE_CMDT_ROOT]: { key: PROFILE_CMDT_KEY, typename: "CustomObject"},
     [PROFILE_CSET_ROOT]: { key: PROFILE_CSET_KEY, typename: "Settings" }, // ?? 
     [PROFILE_FIELD_ROOT]: { key: PROFILE_FIELD_KEY, typename: "CustomField" },
-    [PROFILE_LAYOUT_ROOT]: {  key: PROFILE_LAYOUT_KEY, typename: ["Layout", "RecordType"] },
+    [PROFILE_LAYOUT_ROOT]: [{  key: PROFILE_LAYOUT_KEY[0], typename: "Layout" },
+                            {  key: PROFILE_LAYOUT_KEY[1], typename: "RecordType" }],
     [PROFILE_OBJECT_ROOT]: {  key: PROFILE_OBJECT_KEY, typename: "CustomObject" },
     [PROFILE_PAGE_ROOT]: {  key: PROFILE_PAGE_KEY, typename: "ApexPage" },
     [PROFILE_RECTYPE_ROOT]: { key: PROFILE_RECTYPE_KEY, typename: "RecordType" },
