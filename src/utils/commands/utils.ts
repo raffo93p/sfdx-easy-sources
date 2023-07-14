@@ -96,3 +96,10 @@ export async function bulkExecuteCommands(flags, cmd, sequencial) {
 		]);
 	}
 }
+
+export async function getDefaultOrgName(){
+	var cmdString = SFDX_CMD + ' force:org:display --json';
+	console.log(cmdString);
+	var res = await exec(cmdString);
+	return JSON.parse(res.stdout).result.alias;
+}

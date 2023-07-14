@@ -104,3 +104,15 @@ export async function cleanDir(dir){
 		fs.mkdirSync(dir, { recursive: true } );
 	});
 }
+
+export function checkDirOrErrorSync(dir: string) {
+	if (!fs.existsSync(dir)) {
+		throw new Error('Folder ' + dir + ' does not exist!');
+	}
+}
+
+export function checkDirOrCreateSync(dir: string) {
+	if (!fs.existsSync(dir)) {
+		fs.mkdirSync(dir, { recursive: true });
+	}
+}
