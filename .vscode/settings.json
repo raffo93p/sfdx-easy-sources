@@ -9,5 +9,9 @@
   "search.exclude": {
     "**/lib": true,
     "**/bin": true
-  }
+  },
+  "mochaExplorer.files": "../test/**/*.test.ts",
+  "mochaExplorer.require": "ts-node/register",
+  "mochaExplorer.logpanel": true,
+  "mochaExplorer.cwd": "test_tmp",
 }

@@ -4,7 +4,7 @@
   "objectFlagDescription" : "Specify a custom dir for input csv recordTypes. Default: '%s'",
   "recordtypeFlagDescription" : "Specify a custom dir for input csv recordTypes. Default: '%s'",
   "picklistFlagDescription": "Specify a picklist. Example: MyPicklist",
-  "apinameFlagDescription": "Specify the type of resource you want to delete. Required.",
+  "apinameFlagDescription": "Specify the api name of resource you want to delete. Required.",
   "errorNoPicklistFlag": "Picklist flag (-p) is mandatory",
   "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
   "nameFlagDescription": "WTF",

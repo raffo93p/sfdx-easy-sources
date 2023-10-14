@@ -1,0 +1,5 @@
+"allowCreate","allowDelete","allowEdit","allowRead","modifyAllRecords","object","viewAllRecords","_tagid"
+"true","false","true","false","true","Object_A__c","true","Object_A__c"
+"false","true","false","true","true","Object_B__c","true","Object_B__c"
+"true","true","true","true","true","Object_C__c","true","Object_C__c"
+"true","true","true","true","true","Object_D__c","true","Object_D__c"

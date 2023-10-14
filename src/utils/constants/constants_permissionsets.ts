@@ -21,9 +21,10 @@ export const PERMSET_FIELD_ROOT = 'fieldPermissions';
 export const PERMSET_FIELD_HEADER = ['editable', 'field', 'readable'];
 export const PERMSET_FIELD_KEY = 'field';
 
-export const PERMSET_LAYOUT_ROOT = 'layoutAssignments';
-export const PERMSET_LAYOUT_HEADER = ['layout', setDefault('recordType')];
-export const PERMSET_LAYOUT_KEY = PERMSET_LAYOUT_HEADER;
+// doesn't exist in permissionset
+// export const PERMSET_LAYOUT_ROOT = 'layoutAssignments';
+// export const PERMSET_LAYOUT_HEADER = ['layout', setDefault('recordType')];
+// export const PERMSET_LAYOUT_KEY = PERMSET_LAYOUT_HEADER;
 
 export const PERMSET_OBJECT_ROOT = 'objectPermissions';
 export const PERMSET_OBJECT_HEADER = ['allowCreate', 'allowDelete', 'allowEdit', 'allowRead', 'modifyAllRecords', 'object', 'viewAllRecords'];
@@ -52,7 +53,7 @@ export const PERMSET_ITEMS = {
     [PERMSET_CMDT_ROOT]: { headers: PERMSET_CMDT_HEADER, key: PERMSET_CMDT_KEY },
     [PERMSET_CSET_ROOT]: { headers: PERMSET_CSET_HEADER, key: PERMSET_CSET_KEY },
     [PERMSET_FIELD_ROOT]: { headers: PERMSET_FIELD_HEADER, key: PERMSET_FIELD_KEY },
-    [PERMSET_LAYOUT_ROOT]: { headers: PERMSET_LAYOUT_HEADER, key: PERMSET_LAYOUT_KEY },
+    // [PERMSET_LAYOUT_ROOT]: { headers: PERMSET_LAYOUT_HEADER, key: PERMSET_LAYOUT_KEY },
     [PERMSET_OBJECT_ROOT]: { headers: PERMSET_OBJECT_HEADER, key: PERMSET_OBJECT_KEY },
     [PERMSET_PAGE_ROOT]: { headers: PERMSET_PAGE_HEADER, key: PERMSET_PAGE_KEY },
     [PERMSET_RECTYPE_ROOT]: { headers: PERMSET_RECTYPE_HEADER, key: PERMSET_RECTYPE_KEY },

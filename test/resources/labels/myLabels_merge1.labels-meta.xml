@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Label A</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label A</shortDescription>
+        <value>Label A</value>
+    </labels>
+    <labels>
+        <fullName>Label B Multiline</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label B Multiline</shortDescription>
+        <value>Label B line 1
+            Label B line 2
+            Label B line 3
+        </value>
+    </labels>
+    <labels>
+        <fullName>Label C Special Characters</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label C</shortDescription>
+        <value>!"£$%/()=?^\|èé+*[]òàùçàù@#¶,;.:-_</value>
+    </labels>
+</CustomLabels>

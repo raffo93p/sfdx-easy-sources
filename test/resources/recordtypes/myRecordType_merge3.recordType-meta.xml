@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>MyCustomRecordType</fullName>
+    <active>true</active>
+    <compactLayoutAssignment>MyCustomRecordType</compactLayoutAssignment>
+    <label>My Custom Record Type</label>
+    <picklistValues>
+        <picklist>Picklist A</picklist>
+        <values>
+            <fullName>Entry A 1</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Entry A 3</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Entry A 6</fullName>
+            <default>true</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Picklist B</picklist>
+        <values>
+            <fullName>Entry B 1</fullName>
+            <default>true</default>
+        </values>
+        <values>
+            <fullName>Entry B 2</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Picklist C</picklist>
+        <values>
+            <fullName>Entry C 1</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Entry C 2</fullName>
+            <default>true</default>
+        </values>
+    </picklistValues>
+</RecordType>

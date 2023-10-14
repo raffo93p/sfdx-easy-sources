@@ -1,0 +1,8 @@
+"fullName","categories","language","protected","shortDescription","value","_tagid"
+"Label A","","en_US","false","Label A","Label A updated","Label A/en_US"
+"Label B Multiline","","en_US","false","Label B Multiline","Label B line 1
+            Label B line 2
+            Label B line 3
+        ","Label B Multiline/en_US"
+"Label C Special Characters","","en_US","false","Label C","!""£$%/()=?^\|èé+*[]òàùçàù@#¶,;.:-_","Label C Special Characters/en_US"
+"Label D","","en_US","false","Label D","Label D","Label D/en_US"

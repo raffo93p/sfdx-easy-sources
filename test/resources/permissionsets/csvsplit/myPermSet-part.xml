@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <applicationVisibilities/>
+    <classAccesses/>
+    <custom>false</custom>
+    <customMetadataTypeAccesses/>
+    <customSettingAccesses/>
+    <fieldPermissions/>
+    <objectPermissions/>
+    <pageAccesses/>
+    <recordTypeVisibilities/>
+    <tabVisibilities/>
+    <userPermissions/>
+</PermissionSet>

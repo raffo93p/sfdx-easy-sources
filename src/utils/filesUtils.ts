@@ -91,3 +91,11 @@ export async function cleanDir(dir){
 		fs.mkdirSync(dir, { recursive: true } );
 	});
 }
+
+export async function areFilesEqual(filea, fileb) {
+	const fileAContent = await readStringFromFile(filea);
+	// console.log(fileAContent);
+	const fileBContent = await readStringFromFile(fileb);
+	// console.log(fileBContent);
+	return fileAContent ===  fileBContent;
+}

@@ -1,0 +1,5 @@
+"actionName","content","formFactor","pageOrSobjectType","recordType","type","profile","_tagid"
+"View","Page A","Large","Object B","RecordType A","Flexipage","Profile A","RecordType A/Page A/Profile A/View/Large"
+"View","Page A","Large","Object A","RecordType A","Flexipage","Profile B","RecordType A/Page A/Profile B/View/Large"
+"View","Page B","Large","Object B","RecordType B","Flexipage","Profile A","RecordType B/Page B/Profile A/View/Large"
+"View","Page C","Large","Object C","RecordType D","Flexipage","Profile C","RecordType C/Page C/Profile C/View/Large"

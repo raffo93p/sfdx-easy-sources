@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+    <brand>
+        <headerColor>#0070D2</headerColor>
+        <logoVersion>1</logoVersion>
+        <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
+    </brand>
+    <formFactors>Large</formFactors>
+    <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
+    <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
+    <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
+    <label>myApplication</label>
+    <navType>Console</navType>
+    <profileActionOverrides/>
+    <tabs>Tab A</tabs>
+    <tabs>Tab B</tabs>
+    <tabs>Tab C</tabs>
+    <uiType>Lightning</uiType>
+    <utilityBar>UtilityBar</utilityBar>
+    <workspaceConfig>
+        <mappings>
+            <tab>Tab A</tab>
+        </mappings>
+        <mappings>
+            <fieldName>Field name</fieldName>
+            <tab>Tab B</tab>
+        </mappings>
+    </workspaceConfig>
+</CustomApplication>
