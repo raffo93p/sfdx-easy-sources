@@ -61,6 +61,21 @@ export const PERMSET_ITEMS = {
     [PERMSET_USERPERM_ROOT]: { headers: PERMSET_USERPERM_HEADER, key: PERMSET_USERPERM_KEY }
 }
 
+// used for minify command
+export const PROFILE_TAG_BOOL = {
+    [PERMSET_APP_ROOT]:  ['default', 'visible'],
+    [PERMSET_CLASS_ROOT]: ['enabled'],
+    [PERMSET_CMDT_ROOT]: ['enabled'],
+    [PERMSET_CSET_ROOT]: ['enabled'], // ?? 
+    [PERMSET_FIELD_ROOT]: ['editable', 'readable'],
+    // [PERMSET_LAYOUT_ROOT]: [],
+    [PERMSET_OBJECT_ROOT]: ['allowCreate', 'allowDelete', 'allowEdit', 'allowRead', 'modifyAllRecords', 'viewAllRecords'],
+    [PERMSET_PAGE_ROOT]: ['enabled'],
+    [PERMSET_RECTYPE_ROOT]: ['default', 'personAccountDefault', 'visible'],
+    // [PERMSET_TAB_ROOT]: ['visibility'],
+    [PERMSET_USERPERM_ROOT]: ['enabled']
+}
+
 export const PERMSETS_EXTENSION = ".permissionset-meta.xml";
 export const PERMSETS_ROOT_TAG = "PermissionSet";
 

@@ -105,10 +105,14 @@ export async function cleanDir(dir){
 	});
 }
 
-export async function areFilesEqual(filea, fileb) {
-	const fileAContent = await readStringFromFile(filea);
-	// console.log(fileAContent);
-	const fileBContent = await readStringFromFile(fileb);
-	// console.log(fileBContent);
-	return fileAContent ===  fileBContent;
+export function checkDirOrErrorSync(dir: string) {
+	if (!fs.existsSync(dir)) {
+		throw new Error('Folder ' + dir + ' does not exist!');
+	}
+}
+
+export function checkDirOrCreateSync(dir: string) {
+	if (!fs.existsSync(dir)) {
+		fs.mkdirSync(dir, { recursive: true });
+	}
 }

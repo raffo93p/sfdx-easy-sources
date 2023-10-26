@@ -12,7 +12,7 @@ const fs = require('fs-extra');
 import { join } from "path";
 import Performance from '../../../utils/performance';
 const { Parser, transforms: { unwind } } = require('json2csv');
-import { PROFILE_ITEMS, PROFILES_SUBPATH } from "../../../utils/constants/constants_profiles";
+import { PROFILE_ITEMS } from "../../../utils/constants/constants_profiles";
 import { calcCsvFilename, checkDirOrCreateSync, checkDirOrErrorSync, jsonArrayPackageToMap, readCsvToJsonArray, readXmlFromFile } from "../../../utils/filesUtils"
 import { sortByKey } from "../../../utils/utils"
 import { DEFAULT_ESCSV_PATH, DEFAULT_LOG_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
@@ -20,6 +20,7 @@ import { loadSettings } from '../../../utils/localSettings';
 import { getDefaultOrgName, retrieveAllMetadataPackageLocal, retrieveAllMetadataPackageOrg } from '../../../utils/commands/utils';
 import { DEFAULT_PACKAGE_LOC_EXT, DEFAULT_PACKAGE_ORG_EXT, TYPES_PICKVAL_ROOT, TYPES_ROOT_TAG } from '../../../utils/constants/constants_sourcesdownload';
 import { PROFILE_KEY_TYPE } from '../../../utils/constants/constants_profiles';
+import { PERMSETS_SUBPATH } from '../../../utils/constants/constants_permissionsets';
 const _ = require('lodash') ;
 
 const prompt = require('prompt-sync')();
@@ -108,7 +109,7 @@ export default class Clean extends SfdxCommand {
         Performance.getInstance().start();
         
         const logdir = this.flags['log-dir'] || settings['easysources-log-path'] || DEFAULT_LOG_PATH;
-        const csvDir = join((this.flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), PROFILES_SUBPATH) as string;
+        const csvDir = join((this.flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), PERMSETS_SUBPATH) as string;
         const xmlDir = join((flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH)) as string;
         var orgname = this.flags.orgname || await getDefaultOrgName();
         const mode = this.flags.mode;
