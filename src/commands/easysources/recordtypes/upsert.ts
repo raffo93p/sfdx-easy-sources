@@ -8,7 +8,7 @@ import * as os from 'os';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
-import { readXmlFromFile, readCsvToJsonMap, jsonArrayToMap, removeExtension, writeXmlToFile, calcCsvFilename } from '../../../utils/filesUtils'
+import { readXmlFromFile, readCsvToJsonMap, jsonArrayCsvToMap, removeExtension, writeXmlToFile, calcCsvFilename } from '../../../utils/filesUtils'
 import { generateTagId, sortByKey } from '../../../utils/utils'
 const { Parser, transforms: { unwind } } = require('json2csv');
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../../../utils/constants/constants';
@@ -139,7 +139,7 @@ export default class Upsert extends SfdxCommand {
                         const csvFilePath = join(baseOutputDir, obj, 'recordTypes', recordtypeName, calcCsvFilename(recordtypeName, tag_section));
 
                         var jsonMapOld = await readCsvToJsonMap(csvFilePath);
-                        var jsonMapNew = jsonArrayToMap(jsonArrayNew)
+                        var jsonMapNew = jsonArrayCsvToMap(jsonArrayNew)
 
                         jsonMapNew.forEach((value, key) => {
                             jsonMapOld.set(key as string, value)

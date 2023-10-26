@@ -2,12 +2,18 @@ import * as child from 'child_process';
 import * as util from 'util';
 import { join } from "path";
 const exec = util.promisify(child.exec);
-import { MANIFEST_CREATE_CMD, DEFAULT_PACKAGE, SOURCE_RETRIEVE_CMD } from "../constants/constants_sourcesdownload";
+import { DEFAULT_PACKAGE_LOC, DEFAULT_PACKAGE_ORG, MANIFEST_CREATE_CMD, SOURCE_RETRIEVE_CMD } from "../constants/constants_sourcesdownload";
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, SFDX_CMD } from '../constants/constants';
 const fs = require('fs');
 
-export async function retrieveAllMetadataPackage(orgname, baseInputDir){
-	var cmdString = MANIFEST_CREATE_CMD + ' --fromorg ' + orgname + ' --manifestname='+DEFAULT_PACKAGE+' --outputdir=' + baseInputDir + " -c managed";
+export async function retrieveAllMetadataPackageOrg(orgname, manifestDir){
+	var cmdString = MANIFEST_CREATE_CMD + ' --fromorg ' + orgname + ' --manifestname='+DEFAULT_PACKAGE_ORG+' --outputdir=' + manifestDir + " -c managed";
+	console.log(cmdString);
+	await exec(cmdString);
+}
+
+export async function retrieveAllMetadataPackageLocal(srcDir, manifestDir){
+	var cmdString = MANIFEST_CREATE_CMD + ' --sourcepath=' + srcDir + ' --manifestname=' +DEFAULT_PACKAGE_LOC + ' --outputdir=' + manifestDir;
 	console.log(cmdString);
 	await exec(cmdString);
 }

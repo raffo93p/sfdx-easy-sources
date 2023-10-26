@@ -1,5 +1,8 @@
-export const DEFAULT_PACKAGE = 'allMetadata';
-export const DEFAULT_PACKAGE_EXT = DEFAULT_PACKAGE + '.xml';
+export const DEFAULT_PACKAGE_ORG = 'allMetadataOrg';
+export const DEFAULT_PACKAGE_ORG_EXT = DEFAULT_PACKAGE_ORG + '.xml';
+export const DEFAULT_PACKAGE_LOC = 'allMetadataLocal';
+export const DEFAULT_PACKAGE_LOC_EXT = DEFAULT_PACKAGE_LOC + '.xml';
+
 export const TYPES_ROOT_TAG = "Package";
 
 export const TYPES_PICKVAL_ROOT = 'types';
