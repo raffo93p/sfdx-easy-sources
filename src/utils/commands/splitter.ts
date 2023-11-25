@@ -6,6 +6,7 @@ const fs = require('fs-extra');
 import { sortByKey } from "../utils"
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../constants/constants';
 import { loadSettings } from '../localSettings';
+import { arrayToFlat } from '../flatArrayUtils';
 
 const settings = loadSettings();
 
@@ -50,7 +51,7 @@ export async function split(flags, file_subpath, file_extension, file_root_tag, 
             // fixes scenarios when the tag is one, since it would be read as object and not array
             if (!Array.isArray(myjson)) myjson = [myjson];
 
-
+            myjson = arrayToFlat(myjson);
             // generate _tagId column
             generateTagId(myjson, file_items[tag_section].key, file_items[tag_section].headers);
             // sorts array by _tagid. sorting is made as string

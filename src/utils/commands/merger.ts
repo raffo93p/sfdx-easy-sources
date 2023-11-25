@@ -4,6 +4,7 @@ import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from "../c
 import { writeXmlToFile, readCsvToJsonArray, readXmlFromFile, calcCsvFilename } from "../filesUtils"
 import { sortByKey } from "../utils"
 import { loadSettings } from "../localSettings";
+import { flatToArray } from "../flatArrayUtils";
 
 const settings = loadSettings();
 
@@ -49,6 +50,8 @@ export async function merge(flags, file_subpath, file_extension, file_root_tag, 
                 for (var i in jsonArray) {
                     delete jsonArray[i]['_tagid']
                 }
+
+                jsonArray = flatToArray(jsonArray)
                 mergedXml[file_root_tag][tag_section] = sortByKey(jsonArray);
             }
         }

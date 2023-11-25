@@ -1,4 +1,4 @@
-import { readXmlFromFile, readCsvToJsonMap, jsonArrayToMap, removeExtension, writeXmlToFile, calcCsvFilename } from '../filesUtils'
+import { readXmlFromFile, readCsvToJsonMap, jsonArrayCsvToMap, removeExtension, writeXmlToFile, calcCsvFilename } from '../filesUtils'
 import { sortByKey, generateTagId } from "../utils"
 const { Parser, transforms: { unwind } } = require('json2csv');
 import { join } from "path";
@@ -42,10 +42,10 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
         const outputDir = join(baseOutputDir, fileName);
 
         for (const tag_section in file_items) {
-            if(flags.ignoreuserperm === 'true' && tag_section == PROFILE_USERPERM_ROOT) {
+            if(flags.ignoreuserperm === 'true' && tag_section == PROFILE_USERPERM_ROOT){
                 xmlFileContent[file_root_tag][tag_section] = null;
                 continue;
-            }
+            } 
 
             var jsonArrayNew = fileProperties[tag_section];
             if (jsonArrayNew == undefined) continue;
@@ -68,7 +68,7 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
                 const csvFilePath = join(baseOutputDir, fileName, calcCsvFilename(fileName, tag_section));
 
                 var jsonMapOld = await readCsvToJsonMap(csvFilePath);
-                var jsonMapNew = jsonArrayToMap(jsonArrayNew)
+                var jsonMapNew = jsonArrayCsvToMap(jsonArrayNew)
 
                 jsonMapNew.forEach((value, key) => {
                     jsonMapOld.set(key as string, value)

@@ -28,6 +28,7 @@ export const PROFILE_REL_TYPES = [
 	'DataCategoryGroup',
 	'ExternalDataSource',
 	'Flow',
+	'FlowDefinition',
 	'Layout',
 	'RecordType',
 	'FlexiPage'			
@@ -44,6 +45,7 @@ export const PERMSET_REL_TYPES = [
     'CustomTab',
     'ExternalDataSource',
     'Flow',
+	'FlowDefinition',
     'RecordType'
 ];
 

@@ -23,7 +23,7 @@ export async function writeXmlToFile(
 	file: string,
 	xml: object
 ) {
-	return promises.writeFile(file, new XmlFormatter().formatXml(xml));
+	return promises.writeFile(file, new XmlFormatter().formatXml(xml, file));
 }
 
 export function getDefaultFolder(project: SfdxProject): string {
@@ -115,4 +115,20 @@ export function checkDirOrCreateSync(dir: string) {
 	if (!fs.existsSync(dir)) {
 		fs.mkdirSync(dir, { recursive: true });
 	}
+}
+
+export async function areFilesEqual(filea, fileb) {
+	const fileAContent = await readStringFromFile(filea);
+	// console.log(fileAContent);
+	const fileBContent = await readStringFromFile(fileb);
+	// console.log(fileBContent);
+	return fileAContent ===  fileBContent;
+}
+
+export async function readCsvToJsonArrayWithNulls(csvFilePath: string) {
+	var jsonArray = await csvparser().fromFile(csvFilePath);
+
+	if (!Array.isArray(jsonArray)) jsonArray = [jsonArray];
+
+	return jsonArray;
 }
