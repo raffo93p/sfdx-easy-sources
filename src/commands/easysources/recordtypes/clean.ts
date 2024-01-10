@@ -189,7 +189,8 @@ export default class Clean extends SfdxCommand {
                         if(skipStandardFields && typename === "CustomField" && !res[key].endsWith("__c")) return true;
 
                         // perform some manipulation on the item for recordTypes
-                        var item = manipulateItem(res[key], typename);
+                        var item = obj + '.' + res[key];
+                        item = manipulateItem(item, typename);
 
                         var found = false;
                         for(const typeItemsMap of typeItemsMap_list){
