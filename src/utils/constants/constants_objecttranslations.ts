@@ -13,8 +13,7 @@ export const OBJTRANSL_RECTYPE_ROOT = 'recordTypes';
 export const OBJTRANSL_RECTYPE_HEADER = [setDefault('description'), setDefault('label'), 'name'];
 export const OBJTRANSL_RECTYPE_KEY = 'name';
 
-// TODO QUICKACTIONS
-export const OBJTRANSL_QUICKACT_ROOT = 'fieldSets';
+export const OBJTRANSL_QUICKACT_ROOT = 'quickActions';
 export const OBJTRANSL_QUICKACT_HEADER = [setDefault('label'), 'name'];
 export const OBJTRANSL_QUICKACT_KEY = 'name';
 
@@ -23,14 +22,13 @@ export const OBJTRANSL_VALIDRULE_ROOT = 'validationRules';
 export const OBJTRANSL_VALIDRULE_HEADER = [setDefault('errorMessage'), 'name'];
 export const OBJTRANSL_VALIDRULE_KEY = 'name';
 
-// TODO WorkflowTasks
-export const OBJTRANSL_WORKFTASK_ROOT = 'fieldSets';
-export const OBJTRANSL_WORKFTASK_HEADER = [setDefault('label'), 'name'];
+export const OBJTRANSL_WORKFTASK_ROOT = 'workflowTasks';
+export const OBJTRANSL_WORKFTASK_HEADER = [setDefault('description'), 'name', setDefault('subject')];
 export const OBJTRANSL_WORKFTASK_KEY = 'name';
 
 // todo add relationshipLabel, help
 export const OBJTRANSL_CFIELDTRANSL_ROOT = 'fieldTranslations';
-export const OBJTRANSL_CFIELDTRANSL_HEADER = [setDefault('label'), 'name', 'picklistValues_masterLabel', 'picklistValues_translation'];
+export const OBJTRANSL_CFIELDTRANSL_HEADER = [setDefault('label'), setDefault('relationshipLabel'), 'name', 'picklistValues_masterLabel', 'picklistValues_translation'];
 export const OBJTRANSL_CFIELDTRANSL_KEY = ['name', 'picklistValues_masterLabel'];
 export const OBJTRANSL_CFIELDTRANSL_ROOT_TAG = 'CustomFieldTranslation';
 export const OBJTRANSL_FIELDTRANSL_EXTENSION = '.fieldTranslation-meta.xml';
@@ -40,9 +38,9 @@ export const OBJTRANSL_ITEMS = {
     [OBJTRANSL_FIELDSET_ROOT]: { headers: OBJTRANSL_FIELDSET_HEADER, key: OBJTRANSL_FIELDSET_KEY },
     [OBJTRANSL_LAYOUT_ROOT]: { headers: OBJTRANSL_LAYOUT_HEADER, key: OBJTRANSL_LAYOUT_KEY },
     [OBJTRANSL_RECTYPE_ROOT]: { headers: OBJTRANSL_RECTYPE_HEADER, key: OBJTRANSL_RECTYPE_KEY },
-    // [OBJTRANSL_QUICKACT_ROOT]: { headers: OBJTRANSL_QUICKACT_HEADER, key: OBJTRANSL_QUICKACT_KEY },
+    [OBJTRANSL_QUICKACT_ROOT]: { headers: OBJTRANSL_QUICKACT_HEADER, key: OBJTRANSL_QUICKACT_KEY },
     [OBJTRANSL_VALIDRULE_ROOT]: { headers: OBJTRANSL_VALIDRULE_HEADER, key: OBJTRANSL_VALIDRULE_KEY },
-    // [OBJTRANSL_WORKFTASK_ROOT]: { headers: OBJTRANSL_WORKFTASK_HEADER, key: OBJTRANSL_WORKFTASK_KEY },
+    [OBJTRANSL_WORKFTASK_ROOT]: { headers: OBJTRANSL_WORKFTASK_HEADER, key: OBJTRANSL_WORKFTASK_KEY },
     [OBJTRANSL_CFIELDTRANSL_ROOT]: { headers: OBJTRANSL_CFIELDTRANSL_HEADER, key: OBJTRANSL_CFIELDTRANSL_KEY }    
 }
 

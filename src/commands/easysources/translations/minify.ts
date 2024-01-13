@@ -96,7 +96,7 @@ export default class Clean extends SfdxCommand {
                         if(PROFILE_TAG_BOOL[tag_section] == null) return true;
 
                         for(const boolName of toArray(PROFILE_TAG_BOOL[tag_section]) ){
-                            if(res[boolName] === 'true' || res[boolName] === 'False') return true;
+                            if(res[boolName] === 'true' || res[boolName] === 'FALSE') return true;
                         }
 
                         return false;

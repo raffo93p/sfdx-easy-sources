@@ -46,6 +46,7 @@ export async function readCsvToJsonArray(csvFilePath: string) {
 
 	return jsonArray;
 }
+
 export function jsonArrayCsvToMap(jsonArray) {
 	if (!Array.isArray(jsonArray)) jsonArray = [jsonArray]
 

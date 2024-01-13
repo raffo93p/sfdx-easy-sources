@@ -17,7 +17,9 @@ export const PROFILE_CMDT_ROOT = 'customMetadataTypeAccesses';
 export const PROFILE_CMDT_HEADER = ['enabled', 'name'];
 export const PROFILE_CMDT_KEY = 'name';
 
-// customPermissions
+export const PROFILE_CPERM_ROOT = 'customPermissions';
+export const PROFILE_CPERM_HEADER = ['enabled', 'name'];
+export const PROFILE_CPERM_KEY = 'name';
 
 export const PROFILE_CSET_ROOT = 'customSettingAccesses';
 export const PROFILE_CSET_HEADER = ['enabled', 'name'];
@@ -31,13 +33,14 @@ export const PROFILE_FIELD_ROOT = 'fieldPermissions';
 export const PROFILE_FIELD_HEADER = ['editable', 'field', 'readable'];
 export const PROFILE_FIELD_KEY = 'field';
 
-// flowAccesses
+export const PROFILE_FLOW_ROOT = 'flowAccesses';
+export const PROFILE_FLOW_HEADER = ['enabled', 'flow'];
+export const PROFILE_FLOW_KEY = 'flow';
+
 // fullName
 
 export const PROFILE_LAYOUT_ROOT = 'layoutAssignments';
 export const PROFILE_LAYOUT_HEADER = ['layout', setDefault('recordType')];
-// export const PROFILE_LAYOUT_HEADER = [{value: 'layout', default: 'a'}, {value: 'recordType', default: 'a'}];
-// export const PROFILE_LAYOUT_HEADER = ['layout', 'recordType'];
 export const PROFILE_LAYOUT_KEY = ['layout', 'recordType'];
 
 // loginFlows
@@ -63,7 +66,6 @@ export const PROFILE_TAB_HEADER = ['tab', 'visibility'];
 export const PROFILE_TAB_KEY = 'tab';
 
 // userLicense
-
 export const PROFILE_USERPERM_ROOT = 'userPermissions';
 export const PROFILE_USERPERM_HEADER = ['enabled', 'name'];
 export const PROFILE_USERPERM_KEY = 'name';
@@ -73,8 +75,10 @@ export const PROFILE_ITEMS = {
     [PROFILE_APP_ROOT]: { headers: PROFILE_APP_HEADER, key: PROFILE_APP_KEY },
     [PROFILE_CLASS_ROOT]: { headers: PROFILE_CLASS_HEADER, key: PROFILE_CLASS_KEY },
     [PROFILE_CMDT_ROOT]: { headers: PROFILE_CMDT_HEADER, key: PROFILE_CMDT_KEY },
+    [PROFILE_CPERM_ROOT]: { headers: PROFILE_CPERM_HEADER, key: PROFILE_CPERM_KEY },
     [PROFILE_CSET_ROOT]: { headers: PROFILE_CSET_HEADER, key: PROFILE_CSET_KEY },
     [PROFILE_FIELD_ROOT]: { headers: PROFILE_FIELD_HEADER, key: PROFILE_FIELD_KEY },
+    [PROFILE_FLOW_ROOT]: { headers: PROFILE_FLOW_HEADER, key: PROFILE_FLOW_KEY },
     [PROFILE_LAYOUT_ROOT]: { headers: PROFILE_LAYOUT_HEADER, key: PROFILE_LAYOUT_KEY },
     [PROFILE_OBJECT_ROOT]: { headers: PROFILE_OBJECT_HEADER, key: PROFILE_OBJECT_KEY },
     [PROFILE_PAGE_ROOT]: { headers: PROFILE_PAGE_HEADER, key: PROFILE_PAGE_KEY },
@@ -89,8 +93,10 @@ export const PROFILE_KEY_TYPE = {
     [PROFILE_APP_ROOT]: { key: PROFILE_APP_KEY, typename: "CustomApplication"},
     [PROFILE_CLASS_ROOT]: { key: PROFILE_CLASS_KEY, typename: "ApexClass" },
     [PROFILE_CMDT_ROOT]: { key: PROFILE_CMDT_KEY, typename: "CustomObject"},
+    [PROFILE_CPERM_ROOT]: { key: PROFILE_CPERM_KEY, typename: "CustomPermission" },
     [PROFILE_CSET_ROOT]: { key: PROFILE_CSET_KEY, typename: "Settings" }, // ?? 
     [PROFILE_FIELD_ROOT]: { key: PROFILE_FIELD_KEY, typename: "CustomField" },
+    [PROFILE_FLOW_ROOT]: { key: PROFILE_FLOW_KEY, typename: "Flow" },
     [PROFILE_LAYOUT_ROOT]: [{  key: PROFILE_LAYOUT_KEY[0], typename: "Layout" },
                             {  key: PROFILE_LAYOUT_KEY[1], typename: "RecordType" }],
     [PROFILE_OBJECT_ROOT]: {  key: PROFILE_OBJECT_KEY, typename: "CustomObject" },
@@ -105,8 +111,10 @@ export const PROFILE_TAG_BOOL = {
     [PROFILE_APP_ROOT]:  ['default', 'visible'],
     [PROFILE_CLASS_ROOT]: ['enabled'],
     [PROFILE_CMDT_ROOT]: ['enabled'],
+    [PROFILE_CPERM_ROOT]: ['enabled'],
     [PROFILE_CSET_ROOT]: ['enabled'], // ?? 
     [PROFILE_FIELD_ROOT]: ['editable', 'readable'],
+    [PROFILE_FLOW_ROOT]: ['enabled'],
     // [PROFILE_LAYOUT_ROOT]: [],
     [PROFILE_OBJECT_ROOT]: ['allowCreate', 'allowDelete', 'allowEdit', 'allowRead', 'modifyAllRecords', 'viewAllRecords'],
     [PROFILE_PAGE_ROOT]: ['enabled'],

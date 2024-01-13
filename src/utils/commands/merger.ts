@@ -34,6 +34,12 @@ export async function merge(flags, file_subpath, file_extension, file_root_tag, 
     for (const dir of dirList) {
         console.log('Merging: ' + dir);
         const inputXML = join(baseInputDir, dir, dir) + XML_PART_EXTENSION;
+        
+        if (!fs.existsSync(inputXML)) {
+            console.log(inputXML + ' not found. Skipping...');
+            continue;
+        }
+
         const mergedXml = (await readXmlFromFile(inputXML)) ?? {};
 
 
