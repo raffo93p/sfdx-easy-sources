@@ -73,6 +73,9 @@ export function toArray(arr): string[]{
     return arr;
 }
 
+
+/*
+
 // this function creates a flat array when objects have a list attribute with other subrecords.
 export function arrayToFlat(inputArray, prefix = "") {
 	let result = [];
@@ -145,3 +148,5 @@ export function flatToArray(list) {
 	const result = Object.values(groupedObjects);
 	return result;
   }
+
+  */
