@@ -22,7 +22,7 @@ export const TRANSLAT_QACT_HEADER = [setDefault('label'), 'name'];
 export const TRANSLAT_QACT_KEY = 'name';
 
 export const TRANSLAT_REPTYPE_ROOT = 'reportTypes';
-export const TRANSLAT_REPTYPE_HEADER = ['description', setDefault('label'), 'name', setDefault('sections_label'), 'sections_name', 'sections_columns_label', 'sections_columns_name'];
+export const TRANSLAT_REPTYPE_HEADER = [setDefault('description'), setDefault('label'), 'name', setDefault('sections_label'), 'sections_name', 'sections_columns_label', 'sections_columns_name'];
 export const TRANSLAT_REPTYPE_KEY = ['name', 'sections_name', 'sections_columns_name'];
 
 
@@ -59,7 +59,7 @@ export const TRANSLAT_TAG_BOOL = {
     [TRANSLAT_CPWLINKS_ROOT]: ['label'],
     [TRANSLAT_TAB_ROOT]: ['label'],
     [TRANSLAT_QACT_ROOT]: ['label'],
-    [TRANSLAT_REPTYPE_ROOT]: ['allowCreate', 'allowDelete'] //?
+    [TRANSLAT_REPTYPE_ROOT]: ['description', 'label', 'sections_label', 'sections_columns_label'] //?
 }
 
 export const TRANSLATIONS_EXTENSION = ".translation-meta.xml";

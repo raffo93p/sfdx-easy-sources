@@ -281,12 +281,6 @@ export function manipulateItem(itemOrig, typename){
     return item;
 }
 
-export function toArray(arr): string[]{
-    if (!Array.isArray(arr)) arr = [arr];
-    return arr;
-
-}
-
 export async function readPackageToMap(manifestDir, packageName){
     const inputFile =join(manifestDir, packageName);
     const xmlFileContent = (await readXmlFromFile(inputFile)) ?? {};

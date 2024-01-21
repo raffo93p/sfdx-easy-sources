@@ -14,7 +14,7 @@ export const OBJTRANSL_RECTYPE_HEADER = [setDefault('description'), setDefault('
 export const OBJTRANSL_RECTYPE_KEY = 'name';
 
 export const OBJTRANSL_QUICKACT_ROOT = 'quickActions';
-export const OBJTRANSL_QUICKACT_HEADER = [setDefault('label'), 'name'];
+export const OBJTRANSL_QUICKACT_HEADER = [setDefault('aspect'), setDefault('label'), 'name'];
 export const OBJTRANSL_QUICKACT_KEY = 'name';
 
 
@@ -66,10 +66,17 @@ export const OBJTRANSL_TAG_BOOL = {
     [OBJTRANSL_FIELDSET_ROOT]:  ['label'],
     [OBJTRANSL_LAYOUT_ROOT]: ['sections_label'],
     [OBJTRANSL_RECTYPE_ROOT]: ['label'],
-    // [OBJTRANSL_QUICKACT_ROOT]: ['label'], 
+    [OBJTRANSL_QUICKACT_ROOT]: ['label'], 
     [OBJTRANSL_VALIDRULE_ROOT]: ['errorMessage'],
-    // [OBJTRANSL_WORKFTASK_ROOT]: ['label'],
-    [OBJTRANSL_CFIELDTRANSL_ROOT]: ['label', 'picklistValues_translation']
+    [OBJTRANSL_WORKFTASK_ROOT]: ['label'],
+    [OBJTRANSL_CFIELDTRANSL_ROOT]: ['description', 'label', 'picklistValues_translation']
+}
+
+// used to remove empty tags while merging
+export const OBJTRANSL_OPTIONAL_TAGS = {
+    [OBJTRANSL_RECTYPE_ROOT]: ['description'],
+    [OBJTRANSL_QUICKACT_ROOT]: ['aspect'], 
+    [OBJTRANSL_WORKFTASK_ROOT]: ['description']
 }
 
 export const OBJTRANSL_EXTENSION = ".objectTranslation-meta.xml";

@@ -14,7 +14,7 @@ import Performance from '../../../utils/performance';
 const { Parser, transforms: { unwind } } = require('json2csv');
 import { PROFILE_ITEMS } from "../../../utils/constants/constants_profiles";
 import { calcCsvFilename, checkDirOrCreateSync, checkDirOrErrorSync, jsonArrayPackageToMap, readCsvToJsonArray, readXmlFromFile } from "../../../utils/filesUtils"
-import { sortByKey } from "../../../utils/utils"
+import { sortByKey, toArray } from "../../../utils/utils"
 import { DEFAULT_ESCSV_PATH, DEFAULT_LOG_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
 import { loadSettings } from '../../../utils/localSettings';
 import { getDefaultOrgName, retrieveAllMetadataPackageLocal, retrieveAllMetadataPackageOrg } from '../../../utils/commands/utils';
@@ -273,12 +273,6 @@ export function manipulateItem(itemOrig, typename){
         item = null;
     }
     return item;
-}
-
-export function toArray(arr): string[]{
-    if (!Array.isArray(arr)) arr = [arr];
-    return arr;
-
 }
 
 export async function readPackageToMap(manifestDir, packageName){

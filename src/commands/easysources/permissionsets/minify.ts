@@ -14,7 +14,7 @@ import Performance from '../../../utils/performance';
 const { Parser, transforms: { unwind } } = require('json2csv');
 import { PROFILE_ITEMS, PROFILE_TAG_BOOL } from "../../../utils/constants/constants_profiles";
 import { calcCsvFilename, checkDirOrErrorSync, readCsvToJsonArray } from "../../../utils/filesUtils"
-import { sortByKey } from "../../../utils/utils"
+import { sortByKey, toArray } from "../../../utils/utils"
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
 import { loadSettings } from '../../../utils/localSettings';
 import { PERMSETS_SUBPATH } from '../../../utils/constants/constants_permissionsets';
@@ -133,11 +133,5 @@ export default class Clean extends SfdxCommand {
         return { outputString };
     }
     
-}
-
-
-export function toArray(arr): string[]{
-    if (!Array.isArray(arr)) arr = [arr];
-    return arr;
 }
 

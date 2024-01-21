@@ -15,7 +15,8 @@ import { loadSettings } from '../../../utils/localSettings';
 import { join } from "path";
 import { calcCsvFilename, checkDirOrErrorSync, readCsvToJsonArrayWithNulls, readXmlFromFile, writeXmlToFile } from '../../../utils/filesUtils';
 import { sortByKey } from '../../../utils/utils';
-import { transformFieldCSVtoXMLs, transformLayoutCSVtoXML } from '../../../utils/utils_objtransl';
+import { getFieldTranslationFiles, removeEmpyOptionalTags, transformFieldCSVtoXMLs } from '../../../utils/utils_objtransl';
+import { flatToArray } from '../../../utils/flatArrayUtils';
 
 const fs = require('fs-extra');
 
@@ -79,8 +80,6 @@ export default class Merge extends SfdxCommand {
 
         for (const obj of objectList) {
             if (!fs.existsSync(join(baseInputDir, obj, obj))) continue;
-
-            
             console.log('Merging: ' + obj);
 
             const inputXML = join(baseInputDir, obj, obj, obj) + XML_PART_EXTENSION;
@@ -101,8 +100,13 @@ export default class Merge extends SfdxCommand {
                         delete jsonArray[i]['_tagid']
                     }
 
+                    // pre-process for empty optional tags
+                    removeEmpyOptionalTags(jsonArray, tag_section);
+
+                    // pre-process for layout flatToArray
                     if(tag_section === OBJTRANSL_LAYOUT_ROOT){
-                        jsonArray = transformLayoutCSVtoXML(jsonArray);
+                        jsonArray = flatToArray(jsonArray);
+                        // jsonArray = transformLayoutCSVtoXML(jsonArray);
                     }
 
                     mergedXml[OBJTRANSL_ROOT_TAG][tag_section] = jsonArray;
@@ -135,8 +139,6 @@ export default class Merge extends SfdxCommand {
             
         }
 
-
-
         Performance.getInstance().end();
 
         var outputString = 'OK'
@@ -146,11 +148,7 @@ export default class Merge extends SfdxCommand {
 }
 
 export function deleteFieldTranslationsXmls(baseInputDir, objTrName){
-    const objTrDir = join(baseInputDir, objTrName);
-
-    var fieldTrFiles = fs.readdirSync(objTrDir, { withFileTypes: true })
-    .filter(item => !item.isDirectory() && item.name.endsWith(OBJTRANSL_FIELDTRANSL_EXTENSION))
-    .map(item => item.name)
+    var fieldTrFiles = getFieldTranslationFiles(join(baseInputDir, objTrName));
 
     for(const fieldTrFile of fieldTrFiles){
         const filePath = join(baseInputDir, objTrName, fieldTrFile);

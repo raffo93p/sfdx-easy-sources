@@ -13,7 +13,7 @@ import { join } from "path";
 import Performance from '../../../utils/performance';
 const { Parser, transforms: { unwind } } = require('json2csv');
 import { calcCsvFilename, checkDirOrErrorSync, readCsvToJsonArrayWithNulls } from "../../../utils/filesUtils"
-import { sortByKey } from "../../../utils/utils"
+import { isBlank, sortByKey, toArray } from "../../../utils/utils"
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
 import { loadSettings } from '../../../utils/localSettings';
 import { OBJTRANSL_ITEMS, OBJTRANSL_SUBPATH, OBJTRANSL_TAG_BOOL } from '../../../utils/constants/constants_objecttranslations';
@@ -97,8 +97,6 @@ export default class Clean extends SfdxCommand {
                         if(OBJTRANSL_TAG_BOOL[tag_section] == null) return true;
 
                         for(const boolName of toArray(OBJTRANSL_TAG_BOOL[tag_section]) ){
-                            console.log(res)
-                            console.log(res['name'], boolName, res[boolName], isBlank(res[boolName]))
                             if(!isBlank(res[boolName])) return true;
                         }
 
@@ -135,15 +133,5 @@ export default class Clean extends SfdxCommand {
         return { outputString };
     }
     
-}
-
-export function isBlank(str): boolean{
-    return str == undefined || str == null || str === "";
-}
-
-
-export function toArray(arr): string[]{
-    if (!Array.isArray(arr)) arr = [arr];
-    return arr;
 }
 

@@ -15,8 +15,8 @@ import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../.
 import Performance from '../../../utils/performance';
 import { join } from "path";
 import { loadSettings } from '../../../utils/localSettings';
-import { OBJTRANSL_CFIELDTRANSL_ROOT, OBJTRANSL_CFIELDTRANSL_ROOT_TAG, OBJTRANSL_EXTENSION, OBJTRANSL_FIELDTRANSL_EXTENSION, OBJTRANSL_ITEMS, OBJTRANSL_LAYOUT_ROOT, OBJTRANSL_ROOT_TAG, OBJTRANSL_SUBPATH } from '../../../utils/constants/constants_objecttranslations';
-import { transformFieldXMLtoCSV, transformLayoutXMLtoCSV } from '../../../utils/utils_objtransl';
+import { OBJTRANSL_CFIELDTRANSL_ROOT, OBJTRANSL_CFIELDTRANSL_ROOT_TAG, OBJTRANSL_EXTENSION, OBJTRANSL_ITEMS, OBJTRANSL_LAYOUT_ROOT, OBJTRANSL_ROOT_TAG, OBJTRANSL_SUBPATH } from '../../../utils/constants/constants_objecttranslations';
+import { getFieldTranslationFiles, transformFieldXMLtoCSV, transformLayoutXMLtoCSV } from '../../../utils/utils_objtransl';
 const fs = require('fs-extra');
 
 const settings = loadSettings();
@@ -107,9 +107,7 @@ export default class Upsert extends SfdxCommand {
                 if(tag_section === OBJTRANSL_CFIELDTRANSL_ROOT){
                     myjson = [];
 
-                    var fieldTrList = fs.readdirSync(join(baseInputDir, objTrName), { withFileTypes: true })
-                    .filter(item => !item.isDirectory() && item.name.endsWith(OBJTRANSL_FIELDTRANSL_EXTENSION))
-                    .map(item => item.name)
+                    var fieldTrList = getFieldTranslationFiles(join(baseInputDir, objTrName));
 
                     
                     for(const fieldTrFilename of fieldTrList){

@@ -64,6 +64,15 @@ export function setDefault(header) {
 	// return newHeaders;
 }
 
+export function isBlank(str): boolean{
+    return str == undefined || str == null || str === "";
+}
+
+export function toArray(arr): string[]{
+    if (!Array.isArray(arr)) arr = [arr];
+    return arr;
+}
+
 // this function creates a flat array when objects have a list attribute with other subrecords.
 export function arrayToFlat(inputArray, prefix = "") {
 	let result = [];

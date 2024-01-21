@@ -1,3 +1,6 @@
+import { OBJTRANSL_FIELDTRANSL_EXTENSION, OBJTRANSL_OPTIONAL_TAGS } from "./constants/constants_objecttranslations";
+const fs = require('fs-extra');
+
 export function transformLayoutXMLtoCSV(jsonArray) {
     if (!Array.isArray(jsonArray)) jsonArray = [jsonArray];
 
@@ -40,13 +43,15 @@ export function transformFieldXMLtoCSV(fieldTr){
 
     //     }
     // }   
-        var { label, name, picklistValues } = fieldTr;
+        var { label, name, relationshipLabel, picklistValues } = fieldTr;
+
         const attributesArray = [];
       
         if (!picklistValues || picklistValues.length === 0) {
             attributesArray.push({
             label,
             name,
+            relationshipLabel,
             picklistValues_masterLabel: '',
             picklistValues_translation: ''
             });
@@ -68,31 +73,53 @@ export function transformFieldXMLtoCSV(fieldTr){
 }
 
 export function transformFieldCSVtoXMLs(array) {
-    const transformedArray = [];
+  const transformedArray = [];
   const uniqueNames = [...new Set(array.map(item => item.name))];
 
   for (const name of uniqueNames) {
     const filteredItems = array.filter(item => item.name === name);
+
+    var item = {
+      "$":  {xmlns: 'http://soap.sforce.com/2006/04/metadata'},
+      label: filteredItems[0].label,
+      name: name
+    };
 
     if (filteredItems.some(item => item.hasOwnProperty("picklistValues_masterLabel") && item.picklistValues_masterLabel !=='')) {
       const picklistValues = filteredItems.map(item => ({
         masterLabel: item.picklistValues_masterLabel,
         translation: item.picklistValues_translation
       }));
-
-      transformedArray.push({
-        "$":  {xmlns: 'http://soap.sforce.com/2006/04/metadata'},
-        label: filteredItems[0].label,
-        name,
-        picklistValues
-      });
-    } else {
-      transformedArray.push({
-        "$":  {xmlns: 'http://soap.sforce.com/2006/04/metadata'},
-        label: filteredItems[0].label,
-        name
-      });
+      item['picklistValues'] = picklistValues;
     }
+
+    const relationshipLabel = filteredItems[0].relationshipLabel;
+    if(relationshipLabel !== undefined && relationshipLabel != null && relationshipLabel !== ''){
+        item['relationshipLabel'] = relationshipLabel;
+    }
+
+    transformedArray.push(item);
+
+    // if (filteredItems.some(item => item.hasOwnProperty("picklistValues_masterLabel") && item.picklistValues_masterLabel !=='')) {
+    //   const picklistValues = filteredItems.map(item => ({
+    //     masterLabel: item.picklistValues_masterLabel,
+    //     translation: item.picklistValues_translation
+    //   }));
+
+    //   transformedArray.push({
+    //     "$":  {xmlns: 'http://soap.sforce.com/2006/04/metadata'},
+    //     label: filteredItems[0].label,
+    //     name,
+    //     picklistValues
+    //   });
+    // } else {
+    //   transformedArray.push({
+    //     "$":  {xmlns: 'http://soap.sforce.com/2006/04/metadata'},
+    //     label: filteredItems[0].label,
+    //     name,
+    //     relationshipLabel: filteredItems[0].relationshipLabel
+    //   });
+    // }
   }
 
   return transformedArray;
@@ -111,4 +138,23 @@ export function transformFieldCSVtoXMLs(array) {
     //     }))
     //   };
     // return {[OBJTRANSL_CFIELDTRANSL_ROOT_TAG]: xml}; 
+}
+
+export function getFieldTranslationFiles(dir){
+    return fs.readdirSync(dir, { withFileTypes: true })
+    // we only want custom fields, not the standard ones
+    .filter(item => !item.isDirectory() && item.name.endsWith('__c' + OBJTRANSL_FIELDTRANSL_EXTENSION))
+    .map(item => item.name)
+}
+
+export function removeEmpyOptionalTags(jsonArray, tag_section){
+  if(OBJTRANSL_OPTIONAL_TAGS[tag_section]){
+    for (var i in jsonArray) {
+        for(const tag of OBJTRANSL_OPTIONAL_TAGS[tag_section]){
+            if(jsonArray[i][tag] === ''){
+                delete jsonArray[i][tag];
+            }
+        }
+    }
+}
 }

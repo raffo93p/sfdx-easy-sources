@@ -12,9 +12,9 @@ const fs = require('fs-extra');
 import { join } from "path";
 import Performance from '../../../utils/performance';
 const { Parser, transforms: { unwind } } = require('json2csv');
-import { PROFILE_ITEMS, PROFILE_TAG_BOOL, PROFILES_SUBPATH } from "../../../utils/constants/constants_profiles";
+import { TRANSLATION_ITEMS, TRANSLAT_TAG_BOOL, TRANSLATIONS_SUBPATH } from "../../../utils/constants/constants_translations";
 import { calcCsvFilename, checkDirOrErrorSync, readCsvToJsonArray } from "../../../utils/filesUtils"
-import { sortByKey } from "../../../utils/utils"
+import { isBlank, sortByKey, toArray } from "../../../utils/utils"
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
 import { loadSettings } from '../../../utils/localSettings';
 
@@ -59,32 +59,32 @@ export default class Clean extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
         
-        const csvDir = join((this.flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), PROFILES_SUBPATH) as string;
+        const csvDir = join((this.flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), TRANSLATIONS_SUBPATH) as string;
         const xmlDir = join((flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH)) as string;
 
-        const inputProfile = (this.flags.input) as string;
+        const inputTranslation = (this.flags.input) as string;
 
         checkDirOrErrorSync(csvDir);
         checkDirOrErrorSync(xmlDir);
 
-        var profileList = [];
-        if (inputProfile) {
-            profileList = inputProfile.split(',');
+        var transationList = [];
+        if (inputTranslation) {
+            transationList = inputTranslation.split(',');
         } else {
-            profileList = fs.readdirSync(csvDir, { withFileTypes: true })
+            transationList = fs.readdirSync(csvDir, { withFileTypes: true })
                 .filter(item => item.isDirectory())
                 .map(item => item.name)
         }
 
 
-        // profileName is the profile name without the extension
-        for (const profileName of profileList) {
-            console.log('Minifying on: ' + profileName);
+        // translationName is the profile name without the extension
+        for (const translationName of transationList) {
+            console.log('Minifying on: ' + translationName);
 
-            for (const tag_section in PROFILE_ITEMS) {
+            for (const tag_section in TRANSLATION_ITEMS) {
                 // tag_section is a profile section (applicationVisibilities, classAccess ecc)
 
-                const csvFilePath = join(csvDir, profileName, calcCsvFilename(profileName, tag_section));
+                const csvFilePath = join(csvDir, translationName, calcCsvFilename(translationName, tag_section));
                 if (fs.existsSync(csvFilePath)) {
 
                     // get the list of resources on the csv. eg. the list of apex classes
@@ -93,10 +93,10 @@ export default class Clean extends SfdxCommand {
                     
                     resListCsv = resListCsv.filter(function(res) {
                         // return true to persist, false to delete
-                        if(PROFILE_TAG_BOOL[tag_section] == null) return true;
+                        if(TRANSLAT_TAG_BOOL[tag_section] == null) return true;
 
-                        for(const boolName of toArray(PROFILE_TAG_BOOL[tag_section]) ){
-                            if(res[boolName] === 'true' || res[boolName] === 'FALSE') return true;
+                        for(const boolName of toArray(TRANSLAT_TAG_BOOL[tag_section]) ){
+                            if(!isBlank(res[boolName])) return true;
                         }
 
                         return false;
@@ -104,7 +104,7 @@ export default class Clean extends SfdxCommand {
                     
                     
                     // write the cleaned csv
-                    const headers = PROFILE_ITEMS[tag_section].headers;
+                    const headers = TRANSLATION_ITEMS[tag_section].headers;
                     const transforms = [unwind({ paths: headers })];
                     const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
 
@@ -132,11 +132,5 @@ export default class Clean extends SfdxCommand {
         return { outputString };
     }
     
-}
-
-
-export function toArray(arr): string[]{
-    if (!Array.isArray(arr)) arr = [arr];
-    return arr;
 }
 
