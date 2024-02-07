@@ -21,7 +21,9 @@ export default class XmlFormatter {
 			const regex = /<(\w+)\s*\/>/g;
 			xml = xml.replace(regex, '<$1></$1>');
 		}
-		return xml.replaceAll("&#xD;", "") + '\n';
+		xml = xml.replaceAll("&#xD;", "") + '\n';
+		xml = xml.replace('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>', '<?xml version="1.0" encoding="UTF-8"?>');
+		return xml;
 	}
 
 }
