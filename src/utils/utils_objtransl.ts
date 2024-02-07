@@ -43,12 +43,13 @@ export function transformFieldXMLtoCSV(fieldTr){
 
     //     }
     // }   
-        var { label, name, relationshipLabel, picklistValues } = fieldTr;
+        var { help, label, name, relationshipLabel, picklistValues } = fieldTr;
 
         const attributesArray = [];
       
         if (!picklistValues || picklistValues.length === 0) {
             attributesArray.push({
+            help, 
             label,
             name,
             relationshipLabel,
@@ -60,6 +61,7 @@ export function transformFieldXMLtoCSV(fieldTr){
 
             for (const { masterLabel, translation } of picklistValues) {
             attributesArray.push({
+                help,
                 label,
                 name,
                 picklistValues_masterLabel: masterLabel,
@@ -80,10 +82,16 @@ export function transformFieldCSVtoXMLs(array) {
     const filteredItems = array.filter(item => item.name === name);
 
     var item = {
-      "$":  {xmlns: 'http://soap.sforce.com/2006/04/metadata'},
-      label: filteredItems[0].label,
-      name: name
+      "$":  {xmlns: 'http://soap.sforce.com/2006/04/metadata'}
     };
+
+    const help = filteredItems[0].help;
+    if(help !== undefined && help != null && help !== ''){
+        item['help'] = help;
+    }
+
+    item['label'] = filteredItems[0].label;
+    item['name'] = name;
 
     if (filteredItems.some(item => item.hasOwnProperty("picklistValues_masterLabel") && item.picklistValues_masterLabel !=='')) {
       const picklistValues = filteredItems.map(item => ({

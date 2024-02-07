@@ -85,7 +85,7 @@ export default class Clean extends SfdxCommand {
                 // tag_section is a profile section (applicationVisibilities, classAccess ecc)
 
                 const csvFilePath = join(csvDir, objTrName, 'csv', calcCsvFilename(objTrName, tag_section));
-                console.log(csvFilePath);
+
                 if (fs.existsSync(csvFilePath)) {
 
                     // get the list of resources on the csv. eg. the list of apex classes
