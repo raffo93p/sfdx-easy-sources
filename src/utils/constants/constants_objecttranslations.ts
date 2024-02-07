@@ -69,7 +69,7 @@ export const OBJTRANSL_TAG_BOOL = {
     [OBJTRANSL_QUICKACT_ROOT]: ['label'], 
     [OBJTRANSL_VALIDRULE_ROOT]: ['errorMessage'],
     [OBJTRANSL_WORKFTASK_ROOT]: ['label'],
-    [OBJTRANSL_CFIELDTRANSL_ROOT]: ['description', 'label', 'picklistValues_translation']
+    [OBJTRANSL_CFIELDTRANSL_ROOT]: ['help', 'description', 'label', 'picklistValues_translation']
 }
 
 // used to remove empty tags while merging
