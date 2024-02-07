@@ -80,9 +80,16 @@ export default class Merge extends SfdxCommand {
 
         for (const obj of objectList) {
             if (!fs.existsSync(join(baseInputDir, obj, 'csv'))) continue;
+            const inputXML = join(baseInputDir, obj, 'csv', obj) + XML_PART_EXTENSION;
+
+            if(!fs.existsSync(inputXML)){
+                console.log('Skipping  ' + obj +'; File ' + inputXML + ' does not exist!');
+                continue;
+            }
+
             console.log('Merging: ' + obj);
 
-            const inputXML = join(baseInputDir, obj, 'csv', obj) + XML_PART_EXTENSION;
+
             const mergedXml = (await readXmlFromFile(inputXML)) ?? {};
             const outputDir = join(baseOutputDir, obj);
 
