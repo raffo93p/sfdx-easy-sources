@@ -79,9 +79,16 @@ export default class Split extends SfdxCommand {
         }
 
         for (const objTrName of objectTList) {
+            const inputFile = join(baseInputDir, objTrName, objTrName + OBJTRANSL_EXTENSION);
+
+            if (!fs.existsSync(inputFile)) {
+                console.log('Skipping  ' + objTrName +'; File ' + inputFile + ' does not exist!');
+                continue;
+            }
+
             console.log('Splitting: ' + objTrName);
 
-            const inputFile = join(baseInputDir, objTrName, objTrName + OBJTRANSL_EXTENSION);
+
             const xmlFileContent = (await readXmlFromFile(inputFile)) ?? {};
             const objTranslProperties = xmlFileContent[OBJTRANSL_ROOT_TAG] ?? {};
 

@@ -79,9 +79,14 @@ export default class Upsert extends SfdxCommand {
         for (const objTrName of objectTList) {
             // if (!fs.existsSync(join(baseInputDir, objTrName, objTrName))) continue;
             const fullFilename = objTrName.endsWith(OBJTRANSL_EXTENSION) ? objTrName : objTrName + OBJTRANSL_EXTENSION;
-            console.log('Upserting: ' + objTrName);
-
             const inputFile = join(baseInputDir, objTrName, fullFilename);
+
+            if (!fs.existsSync(inputFile)) {
+                console.log('Skipping  ' + objTrName +'; File ' + inputFile + ' does not exist!');
+                continue;
+            }
+
+            console.log('Upserting: ' + objTrName);
 
 
             const xmlFileContent = (await readXmlFromFile(inputFile)) ?? {};
