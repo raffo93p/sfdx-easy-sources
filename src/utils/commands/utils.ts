@@ -76,25 +76,47 @@ export async function executeCommand(flags, cmd, mdt) {
 }
 
 export async function bulkExecuteCommands(flags, cmd, sequencial) {
-	if(sequencial){
-		await executeCommand(flags, cmd, 'profiles');
-		await executeCommand(flags, cmd, 'recordtypes');
-		await executeCommand(flags, cmd, 'labels');
-		await executeCommand(flags, cmd, 'permissionsets');
-		await executeCommand(flags, cmd, 'globalvaluesettranslations');
-		await executeCommand(flags, cmd, 'globalvaluesets');
-		await executeCommand(flags, cmd, 'applications');
-	} else {
-		await Promise.all([
-			executeCommand(flags, cmd, 'profiles'),
-			executeCommand(flags, cmd, 'recordtypes'),
-			executeCommand(flags, cmd, 'labels'),
-			executeCommand(flags, cmd, 'permissionsets'),
-			executeCommand(flags, cmd, 'globalvaluesettranslations'),
-			executeCommand(flags, cmd, 'globalvaluesets'),
-			executeCommand(flags, cmd, 'applications')
-		]);
+	if(cmd === 'minify'){
+		if(sequencial){
+			await executeCommand(flags, cmd, 'profiles');
+			await executeCommand(flags, cmd, 'permissionsets');
+			await executeCommand(flags, cmd, 'objecttranslations');
+			await executeCommand(flags, cmd, 'translations');
+		} else {
+			await Promise.all([
+				executeCommand(flags, cmd, 'profiles'),
+				executeCommand(flags, cmd, 'permissionsets'),
+				executeCommand(flags, cmd, 'objecttranslations'),
+				executeCommand(flags, cmd, 'translations')
+			]);
+		}
 	}
+	else {
+		if(sequencial){
+			await executeCommand(flags, cmd, 'profiles');
+			await executeCommand(flags, cmd, 'recordtypes');
+			await executeCommand(flags, cmd, 'labels');
+			await executeCommand(flags, cmd, 'permissionsets');
+			await executeCommand(flags, cmd, 'globalvaluesettranslations');
+			await executeCommand(flags, cmd, 'globalvaluesets');
+			await executeCommand(flags, cmd, 'applications');
+			await executeCommand(flags, cmd, 'objecttranslations');
+			await executeCommand(flags, cmd, 'translations');
+		} else {
+			await Promise.all([
+				executeCommand(flags, cmd, 'profiles'),
+				executeCommand(flags, cmd, 'recordtypes'),
+				executeCommand(flags, cmd, 'labels'),
+				executeCommand(flags, cmd, 'permissionsets'),
+				executeCommand(flags, cmd, 'globalvaluesettranslations'),
+				executeCommand(flags, cmd, 'globalvaluesets'),
+				executeCommand(flags, cmd, 'applications'),
+				executeCommand(flags, cmd, 'objecttranslations'),
+				executeCommand(flags, cmd, 'translations')
+			]);
+		}
+	}
+	
 }
 
 export async function getDefaultOrgName(){
