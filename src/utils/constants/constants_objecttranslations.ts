@@ -28,7 +28,7 @@ export const OBJTRANSL_WORKFTASK_KEY = 'name';
 
 // todo add relationshipLabel, help
 export const OBJTRANSL_CFIELDTRANSL_ROOT = 'fieldTranslations';
-export const OBJTRANSL_CFIELDTRANSL_HEADER = [setDefault('label'), setDefault('relationshipLabel'), 'name', 'picklistValues_masterLabel', 'picklistValues_translation'];
+export const OBJTRANSL_CFIELDTRANSL_HEADER = [setDefault('help'), setDefault('label'), setDefault('relationshipLabel'), 'name', 'picklistValues_masterLabel', 'picklistValues_translation'];
 export const OBJTRANSL_CFIELDTRANSL_KEY = ['name', 'picklistValues_masterLabel'];
 export const OBJTRANSL_CFIELDTRANSL_ROOT_TAG = 'CustomFieldTranslation';
 export const OBJTRANSL_FIELDTRANSL_EXTENSION = '.fieldTranslation-meta.xml';
@@ -76,7 +76,8 @@ export const OBJTRANSL_TAG_BOOL = {
 export const OBJTRANSL_OPTIONAL_TAGS = {
     [OBJTRANSL_RECTYPE_ROOT]: ['description'],
     [OBJTRANSL_QUICKACT_ROOT]: ['aspect'], 
-    [OBJTRANSL_WORKFTASK_ROOT]: ['description']
+    [OBJTRANSL_WORKFTASK_ROOT]: ['description'],
+    [OBJTRANSL_CFIELDTRANSL_ROOT]: ['help', 'relationshipLabel']
 }
 
 export const OBJTRANSL_EXTENSION = ".objectTranslation-meta.xml";
