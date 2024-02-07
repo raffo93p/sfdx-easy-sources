@@ -79,16 +79,16 @@ export default class Merge extends SfdxCommand {
         }
 
         for (const obj of objectList) {
-            if (!fs.existsSync(join(baseInputDir, obj, obj))) continue;
+            if (!fs.existsSync(join(baseInputDir, obj, 'csv'))) continue;
             console.log('Merging: ' + obj);
 
-            const inputXML = join(baseInputDir, obj, obj, obj) + XML_PART_EXTENSION;
+            const inputXML = join(baseInputDir, obj, 'csv', obj) + XML_PART_EXTENSION;
             const mergedXml = (await readXmlFromFile(inputXML)) ?? {};
             const outputDir = join(baseOutputDir, obj);
 
             for (const tag_section in OBJTRANSL_ITEMS) {
                 if(tag_section === OBJTRANSL_CFIELDTRANSL_ROOT) continue;
-                const csvFilePath = join(baseInputDir, obj, obj, calcCsvFilename(obj, tag_section));
+                const csvFilePath = join(baseInputDir, obj, 'csv', calcCsvFilename(obj, tag_section));
                 if (fs.existsSync(csvFilePath)) {
                     var jsonArray = await readCsvToJsonArrayWithNulls(csvFilePath)
 
@@ -121,7 +121,7 @@ export default class Merge extends SfdxCommand {
 
             
             // only for ObjectTranslations, recreate all the fieldTranslation xml files
-            const csvFilePath = join(baseInputDir, obj, obj, calcCsvFilename(obj, OBJTRANSL_CFIELDTRANSL_ROOT));
+            const csvFilePath = join(baseInputDir, obj, 'csv', calcCsvFilename(obj, OBJTRANSL_CFIELDTRANSL_ROOT));
             if (fs.existsSync(csvFilePath)) {
                 var jsonArray = await readCsvToJsonArrayWithNulls(csvFilePath);
 

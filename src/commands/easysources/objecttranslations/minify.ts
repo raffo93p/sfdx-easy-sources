@@ -84,7 +84,7 @@ export default class Clean extends SfdxCommand {
             for (const tag_section in OBJTRANSL_ITEMS) {
                 // tag_section is a profile section (applicationVisibilities, classAccess ecc)
 
-                const csvFilePath = join(csvDir, objTrName,objTrName, calcCsvFilename(objTrName, tag_section));
+                const csvFilePath = join(csvDir, objTrName, 'csv', calcCsvFilename(objTrName, tag_section));
                 console.log(csvFilePath);
                 if (fs.existsSync(csvFilePath)) {
 

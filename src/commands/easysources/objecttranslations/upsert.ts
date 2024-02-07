@@ -87,7 +87,7 @@ export default class Upsert extends SfdxCommand {
             const xmlFileContent = (await readXmlFromFile(inputFile)) ?? {};
             const objTranslProperties = xmlFileContent[OBJTRANSL_ROOT_TAG] ?? {};
 
-            const outputDir = join(baseOutputDir, objTrName, objTrName);
+            const outputDir = join(baseOutputDir, objTrName, 'csv');
 
 
 
@@ -131,7 +131,7 @@ export default class Upsert extends SfdxCommand {
                 checkDirOrCreateSync(outputDir);
 
                 if (fs.existsSync(outputFile)) {
-                    const csvFilePath = join(baseOutputDir, objTrName,  objTrName, calcCsvFilename(objTrName, tag_section));
+                    const csvFilePath = join(baseOutputDir, objTrName,  'csv', calcCsvFilename(objTrName, tag_section));
 
                     var jsonMapOld = await readCsvToJsonMap(csvFilePath);
                     var jsonMapNew = jsonArrayCsvToMap(myjson)
@@ -161,7 +161,7 @@ export default class Upsert extends SfdxCommand {
                 if(tag_section !== OBJTRANSL_CFIELDTRANSL_ROOT) xmlFileContent[OBJTRANSL_ROOT_TAG][tag_section] = null;
 
             }
-            const inputFilePart = join(baseInputDir, objTrName, objTrName, objTrName + XML_PART_EXTENSION);
+            const inputFilePart = join(baseInputDir, objTrName, 'csv', objTrName + XML_PART_EXTENSION);
 
             if (fs.existsSync(inputFilePart)) {
                 const xmlFileContentPart = (await readXmlFromFile(inputFilePart)) ?? {};

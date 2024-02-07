@@ -85,7 +85,7 @@ export default class Split extends SfdxCommand {
             const xmlFileContent = (await readXmlFromFile(inputFile)) ?? {};
             const objTranslProperties = xmlFileContent[OBJTRANSL_ROOT_TAG] ?? {};
 
-            const outputDir = join(baseOutputDir, objTrName, objTrName);
+            const outputDir = join(baseOutputDir, objTrName, 'csv');
 
             for (const tag_section in OBJTRANSL_ITEMS) {
                 var myjson = objTranslProperties[tag_section];
