@@ -1,7 +1,7 @@
 {
   "name": "sfdx-easy-sources",
   "description": "This plugin provides tools to simplify Salesforce sources",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "author": "Raffaele Prudenzano @raffo93p",
   "bugs": "https://github.com/raffo93p/sfdx-easy-sources/issues",
   "dependencies": {
