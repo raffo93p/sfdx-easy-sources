@@ -101,7 +101,7 @@ export default class Upsert extends SfdxCommand {
                 var myjson = objTranslProperties[tag_section];
 
                 // skip when tag is not found in the xml
-                if (myjson == undefined && tag_section !== OBJTRANSL_CFIELDTRANSL_ROOT) continue;
+                if ((myjson == undefined || myjson == '') && tag_section !== OBJTRANSL_CFIELDTRANSL_ROOT) continue;
                 // fixes scenarios when the tag is one, since it would be read as object and not array
                 if (!Array.isArray(myjson)) myjson = [myjson];
 
