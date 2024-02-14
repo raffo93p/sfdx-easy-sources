@@ -107,6 +107,11 @@ export default class Merge extends SfdxCommand {
                         delete jsonArray[i]['_tagid']
                     }
 
+                    if(jsonArray.length == 0){
+                        delete mergedXml[OBJTRANSL_ROOT_TAG][tag_section];
+                        continue;
+                    }
+
                     // pre-process for empty optional tags
                     removeEmpyOptionalTags(jsonArray, tag_section);
 
