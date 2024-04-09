@@ -19,7 +19,7 @@ Messages.importMessagesDirectory(__dirname);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = Messages.loadMessages('sfdx-easy-sources', 'profiles_upsert');
+const messages = Messages.loadMessages('sfdx-easy-sources', 'translations_upsert');
 
 export default class Upsert extends SfdxCommand {
     public static description = messages.getMessage('commandDescription');
@@ -48,13 +48,7 @@ export default class Upsert extends SfdxCommand {
             description: messages.getMessage('sortFlagDescription', ['true']),
             options: ['true', 'false'],
             default: 'true',
-        }),
-        ignoreuserperm: flags.enum({
-            char: 'u',
-            description: messages.getMessage('ignoreuserpermFlagDescription', ['false']),
-            options: ['true', 'false'],
-            default: 'false',
-        }),
+        })
     };
 
 

@@ -1,0 +1,13 @@
+{
+  "commandDescription": "Minify all supported csv files. Through this command all the csv rows that don't have a meaningful value will be removed.",
+  "sfXmlFlagDescription" : "Specify a custom dir for input metadata files. Default: '%s'",
+  "esCsvFlagDescription": "Specify a custom dir for output csv files. Default: '%s'",
+  "sequencialFlagDescription": "Optionally perform operation in sequence. Default: '%s'",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:all:minify",
+    "sfdx easysources:all:minify -x './force-app/src/default'",
+    "sfdx easysources:all:minify -x './force-app/src/default' -c './easysources'"
+  ]
+}

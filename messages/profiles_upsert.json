@@ -2,13 +2,15 @@
   "commandDescription": "Upsert csv files based on profiles",
   "sfXmlFlagDescription": "Specify a custom dir for input profiles. Default: '%s'",
   "esCsvFlagDescription": "Specify a custom dir for output profiles. Default: '%s'",
-  "inputFlagDescription": "Specify a profile. Example: Admin.profile-meta.xml",
+  "inputFlagDescription": "Specify a profile. Example: Admin",
   "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
   "ignoreuserpermFlagDescription": "Specify if user permission must be ignored. Default '%s'",
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
     "sfdx easysources:profiles:upsert",
-    "sfdx easysources:profiles:upsert -i './force-app/src/default' -c './easysources'"
+    "sfdx easysources:profiles:upsert -i Admin",
+    "sfdx easysources:profiles:upsert -i 'Admin,Another Profile'",
+    "sfdx easysources:profiles:upsert -c './force-app/src/default' -c './easysources'"
   ]
 }

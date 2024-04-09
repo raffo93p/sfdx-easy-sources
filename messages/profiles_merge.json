@@ -8,6 +8,7 @@
   "forceFlagDescription": "WTF",
   "examples": [
     "sfdx easysources:profiles:merge",
+    "sfdx easysources:profiles:merge -i 'Admin,Another Profile'",
     "sfdx easysources:profiles:merge -x './force-app/src/default' -c './easysources'"
   ]
 }

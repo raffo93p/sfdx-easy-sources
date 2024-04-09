@@ -21,7 +21,7 @@ Messages.importMessagesDirectory(__dirname);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = Messages.loadMessages('sfdx-easy-sources', 'profiles_merge');
+const messages = Messages.loadMessages('sfdx-easy-sources', 'translations_merge');
 
 export default class Merge extends SfdxCommand {
     public static description = messages.getMessage('commandDescription');

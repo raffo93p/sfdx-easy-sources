@@ -1,0 +1,15 @@
+{
+  "commandDescription": "Upsert csv files based on object translations",
+  "sfXmlFlagDescription": "Specify a custom dir for input object translations. Default: '%s'",
+  "esCsvFlagDescription": "Specify a custom dir for output object translations. Default: '%s'",
+  "inputFlagDescription": "Specify an object translation. Example: MyObject-en_US",
+  "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:objecttranslations:upsert",
+    "sfdx easysources:objecttranslations:upsert -i MyObject-en_US",
+    "sfdx easysources:objecttranslations:upsert -i 'MyObject-en_US,MyObject-es-CO'",
+    "sfdx easysources:objecttranslations:upsert -c './force-app/src/default' -c './easysources'"
+  ]
+}

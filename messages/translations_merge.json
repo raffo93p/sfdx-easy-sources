@@ -1,0 +1,14 @@
+{
+  "commandDescription": "Merge back csv files into translations.",
+  "esCsvFlagDescription": "Specify a custom dir for input csv files. Default: '%s'",
+  "sfXmlFlagDescription": "Specify a custom dir for output translations. Default: '%s'",
+  "inputFlagDescription": "Specify a translation dir in input. Example: en_US",
+  "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:translations:merge",
+    "sfdx easysources:translations:merge -i 'en_US'",
+    "sfdx easysources:translations:merge -x './force-app/src/default' -c './easysources'"
+  ]
+}

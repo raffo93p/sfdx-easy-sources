@@ -7,6 +7,6 @@
   "forceFlagDescription": "WTF",
   "examples": [
     "sfdx easysources:profiles:updatekey",
-    "sfdx easysources:profiles:updatekey -i './force-app/src/default'"
+    "sfdx easysources:profiles:updatekey -c './force-app/src/default'"
   ]
 }

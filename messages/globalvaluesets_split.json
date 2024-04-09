@@ -2,15 +2,13 @@
   "commandDescription": "Splits globalvaluesets into various csv files",
   "sfXmlFlagDescription" : "Specify a custom dir for input globalvaluesets. Default: '%s'",
   "esCsvFlagDescription": "Specify a custom dir for output globalvaluesets. Default: '%s'",
-  "inputFlagDescription": "Specify a globalvalueset file in input. Example: MyGlobalValueSet.globalvalueset-meta.xml",
+  "inputFlagDescription": "Specify a globalvalueset file in input. Example: MyGlobalValueSet",
   "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
     "sfdx easysources:globalvaluesets:split",
-    "sfdx easysources:globalvaluesets:split -x './force-app/src/default'",
-    "sfdx easysources:globalvaluesets:split -x './force-app/src/default' -i 'MyGlobalValueSet.globalvalueset-meta.xml'",
-    "sfdx easysources:globalvaluesets:split -x './force-app/src/default' -c './easysources'",
-    "sfdx easysources:globalvaluesets:split -x './force-app/src/default' -i 'MyGlobalValueSet.globalvalueset-meta.xml' -c './easysources'"
+    "sfdx easysources:globalvaluesets:split -i 'MyGlobalValueSet1'",
+    "sfdx easysources:globalvaluesets:split -x './force-app/src/default' -c './easysources'"
   ]
 }

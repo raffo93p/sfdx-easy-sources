@@ -4,11 +4,6 @@
   "esCsvFlagDescription": "Specify a custom dir for input csv objects. Default: '%s'",
   "objectFlagDescription": "Specify an object. Example: Case",
   "orgFlagDescription": "Specify the alias of the org",
-  "typeFlagDescription": "Specify the type of resource you want to delete. Required.",
-  "tagidFlagDescription": "Specify the tagid you want to delete. Required",
-  "errorNoTypeFlag": "Flag Type (-t) is required. Run 'sfdx easysources:profiles:delete -h' for examples",
-  "errorNoValidTypeFlag": "Flag Type (-t) must be one of the following: ['applicationVisibilities','classAccesses','fieldPermissions','layoutAssignments','objectPermissions','pageAccesses','recordTypeVisibilities','tabVisibilities','userPermissions']",
-  "errorNoTagIdFlag": "Flag TagId (-k) is required. Run 'sfdx easysources:profiles:delete -h' for examples",
   "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
   "modeFlagDescription" : "Specify the mode you want to run the command.'clean' directly deletes ghost references, 'interactive' prompt the user everytime, 'log' writes references in a file. Default: %s",
   "logdirFlagDescription": "Optionally specify a dir for log files. Default: '%s'",
@@ -20,6 +15,8 @@
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:profiles:clean"
-  ]
+    "sfdx easysources:recorodtypes:clean",
+    "sfdx easysources:recorodtypes:clean --mode=log --target=local",
+    "sfdx easysources:recorodtypes:clean --mode=clean --target=org --orgname='myOrgAlias",
+    "sfdx easysources:recorodtypes:clean --mode=log --target=both --orgname='myOrgAlias"  ]
 }

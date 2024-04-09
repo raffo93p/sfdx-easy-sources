@@ -28,7 +28,7 @@ Messages.importMessagesDirectory(__dirname);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = Messages.loadMessages('sfdx-easy-sources', 'profiles_split');
+const messages = Messages.loadMessages('sfdx-easy-sources', 'objtransl_split');
 
 export default class Split extends SfdxCommand {
     public static description = messages.getMessage('commandDescription');

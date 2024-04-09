@@ -1,0 +1,15 @@
+{
+  "commandDescription": "Splits translations into various csv files",
+  "sfXmlFlagDescription" : "Specify a custom dir for input translations. Default: '%s'",
+  "esCsvFlagDescription": "Specify a custom dir for output translations. Default: '%s'",
+  "inputFlagDescription": "Specify a translation file in input. Example: en_US",
+  "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:objecttranslations:split",
+    "sfdx easysources:objecttranslations:split -x './force-app/src/default'",
+    "sfdx easysources:objecttranslations:split -i 'en_US'",
+    "sfdx easysources:objecttranslations:split -x './force-app/src/default' -c './easysources'"
+  ]
+}

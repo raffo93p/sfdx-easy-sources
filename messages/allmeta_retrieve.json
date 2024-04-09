@@ -1,8 +1,8 @@
 {
-  "commandDescription": "Retrieves all the sources from an org",
+  "commandDescription": "Retrieves all the sources from an org - Note: can still have problems if packages of profiles/permissionsets have more than 10000 resources",
   "sfXmlFlagDescription": "Specify a custom dir for metadata files. Default: '%s'",
   "esCsvFlagDescription": "Specify a custom dir for csv files. Default: '%s'",
-  "orgFlagDescription": "Specify the alias of the org",
+  "orgFlagDescription": "Specify the alias of the target org",
   "resnumbFlagDescription": "Specify the maximum number of resources in a package. Default: '%s'",
   "manifestFlagDescription": "Optionally specify a package.xml to be downloaded",
   "dontRetrieveFlagDescription": "Optionally specify to not retrieve the sources. Default: '%s'",
@@ -13,8 +13,13 @@
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:allmeta:retrieve",
-    "sfdx easysources:allmeta:retrieve -d './force-app/src/default'",
-    "sfdx easysources:allmeta:retrieve -d './force-app/src/default' -o './force-app/src/default'"
+    "sfdx easysources:allmeta:retrieve -r 'myOrgAlias'",
+    "sfdx easysources:allmeta:retrieve -x './force-app/src/default' -r 'myOrgAlias'",
+    "sfdx easysources:allmeta:retrieve -x './force-app/src/default' -c './force-app/src/default' -r 'myOrgAlias'",
+    "sfdx easysources:allmeta:retrieve -x './force-app/src/default' -c './force-app/src/default' -r 'myOrgAlias' -n 9000",
+    "sfdx easysources:allmeta:retrieve -x './force-app/src/default' -c './force-app/src/default' -r 'myOrgAlias' --clean --split-merge",
+    "sfdx easysources:allmeta:retrieve -x './force-app/src/default' -c './force-app/src/default' -r 'myOrgAlias' --dont-retrieve"
+
+
   ]
 }

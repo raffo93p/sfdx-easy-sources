@@ -2,12 +2,13 @@
   "commandDescription": "Upsert csv files based on applications",
   "sfXmlFlagDescription": "Specify a custom dir for input xml application folder. Default: '%s'",
   "esCsvFlagDescription": "Specify a custom dir for output csv application folder. Default: '%s'",
-  "inputFlagDescription": "Specify a application. Example: Sales.application-meta.xml",
+  "inputFlagDescription": "Specify a application. Example: Sales,Marketing",
   "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
     "sfdx easysources:applications:upsert",
-    "sfdx easysources:applications:upsert -i './force-app/src/default' -c './easysources'"
+    "sfdx easysources:applications:upsert -i 'Sales,Marketing'",
+    "sfdx easysources:applications:upsert -x './force-app/src/default' -c './easysources'"
   ]
 }

@@ -1,0 +1,13 @@
+{
+  "commandDescription": "Deletes references from csv files that don't contain a translation",
+  "sfXmlFlagDescription": "Specify a custom dir for xml sources. Default: '%s'",
+  "esCsvFlagDescription": "Specify a custom dir for input csv translation. Default: '%s'",
+  "inputFlagDescription": "Specify a translation. Example: en_US",
+  "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:profiles:minify",
+    "sfdx easysources:profiles:minify -i en_US"
+  ]
+}

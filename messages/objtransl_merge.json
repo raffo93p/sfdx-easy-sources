@@ -1,0 +1,14 @@
+{
+  "commandDescription": "Merge back csv files into object translations. Please note that this merge will first delete all the fieldTranslation xml files in order to recreate them",
+  "esCsvFlagDescription": "Specify a custom dir for input csv files. Default: '%s'",
+  "sfXmlFlagDescription": "Specify a custom dir for output object translations. Default: '%s'",
+  "inputFlagDescription": "Specify a objectTranslation dir in input. Example: MyObject-en_US",
+  "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
+  "nameFlagDescription": "WTF",
+  "forceFlagDescription": "WTF",
+  "examples": [
+    "sfdx easysources:objecttranslations:merge",
+    "sfdx easysources:objecttranslations:merge -i 'MyObject1-en_US,MyObject1-es_CO'",
+    "sfdx easysources:objecttranslations:merge -x './force-app/src/default' -c './easysources'"
+  ]
+}
