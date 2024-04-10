@@ -21,10 +21,11 @@ With this plugin you can:
 - Delete some reference or permission from all the csv of a given metadata type
 - Minify the csv by removing all the rows that don't increase the value of the file
 - Clean the csv references to some resources that doesn't exist in the target org
+- Setup a custom git merger to automatically resolve the csv conflicts while cherry picking or merging in git
 
 ## Supported metadata types
 
-| Metadata | Action | Available commands    |
+| Metadata Label| Metadata api | Available commands    |
 | :---:    | :---:  | :---: | 
 | All Meta | allmeta   | split, upsert, merge, minify, retrieve   |
 | Profiles | profiles | split, upsert, merge, minify, updatekey, delete, clean |
@@ -40,13 +41,15 @@ With this plugin you can:
 
 ```sh-session
 $ npm install -g sfdx-easy-sources
-$ sfdx COMMAND
-running command...
-$ sfdx (--version)
-sfdx-easy-sources/0.0.1 darwin-arm64 node-v18.11.0
-$ sfdx --help [COMMAND]
-USAGE
-  $ sfdx COMMAND
+or
+$ sfdx plugin:install sfdx-easy-sources
+
+GENERAL USAGE
+  $ sfdx easysources:<metadataapi>:<command> [...parameters]
+  $ sfdx easysources:<metadataapi>:<command> --help    // to get help, the list of parameters and some examples
+Examples
+  $ sfdx easysources:profiles:split
+  $ sfdx easysources:labels:upsert
 ...
 ```
 
@@ -59,6 +62,12 @@ Based on the source type, this plugin provides the following commands:
 - Delete: Bulk deletes a single permission from all the resources of the same type (only applies to Profiles, PermissionSets and Record Types)
 - Minify: Bulk deletes each entry that doesn't add value to the file (example: a permission in a profile xml which has all permissions set to false)
 - Clean: Bulk deletes all the references that are not present in the target org or in the repository
+
+# Disclaimer
+- Please experiment at first inside a dummy project!
+- The command allmeta:retrieve --clean performs a delete of all the sources before retrieving them from the org. If something goes wrong while retrieving, you could have lost all the sources if you are not in a git environment. Please be careful!
+- This software is given as-is, without warranty that it is free of bugs. So test the process before implement it in production.
+
 
 # Let's start!
 ## Prerequisites
@@ -74,6 +83,16 @@ This file contains the directory of:
 - the csv files (by default the same of the salesforce sources)
 - the log files.
 
+Since I prefer to have the csv files near the xml ones, I left the default directories in my project. Consider that, in this case, you should need to:
+- have a .forceignore file to ignore .csv and .part-xml files when running sfdx commands
+- have a .pipelineignore file to ignore .csv and .part-xml files when running other plugins, for example when using sfdx-git-delta.
+
+Simply put these lines inside those files
+```sh-session
+# easysources
+*-part.xml
+*.csv
+```
 
 ### Prerequisite 2 - Retrieve all metadata
 To deal with Salesforce files all the source code from the org must be downloaded in the repository.
@@ -88,6 +107,9 @@ Some useful parameters are:
 - --clean: if set to true, automatically deletes al the source folder before performing the retrieve
 - --split-merge: if set to true, automatically performes a split and then a merge of all the sources, after they are retrieved
 
+This command actually splits all the resources into various packages, trying to count the resources in every package to not exceed the "resnumb" number. It also creates some little packages, because profiles, permissionsets, translations and other particular metadata types should be retrieved building the package in a given way.
+Suppose the profile packages are more then one, the algorithm should automatically perform a split after retrieving the first profile package, then it should perform an upsert after every other profile package retrieved, and at the end it should perform a merge and delete the created csv. Unfortunately, at this moment I didn't test this scenario!
+
 ### Prerequisite 3 - Create the csv files for the first time
 Once all the metadata have been downloaded, before to start dealing with the csv files, you should create them the first time.
 To do this run these commands (but first, please, understand the meaning of each command reading this guide)
@@ -98,31 +120,21 @@ $ sfdx easysources:allmeta:minify
 $ sfdx easysources:allmeta:merge
 ```
 
-
 ## Description of each command
 
 
 ### Split
-
-
 The split command creates a folder at the same level of the file that it is splitting, containing various csv files and a part.xml file.
 Inside the csv files you can find all the rows of a given type: each tag attribute becomes a column; the tags that are not mapped are copied in the part.xml file.
-[TODO] This is an example of an admin xml profile splitted in csv.
+
+This is an example of an xml profile splitted in csv.
+Once we run the command
 
 ```sh-session
-
-For help
-  $ sfdx easysources:profiles:split -h
-  $ sfdx easysources:recordtypes:split -h
-  $ sfdx easysources:labels:split -h
-  $ sfdx easysources:permissionsets:split -h
-  $ sfdx easysources:globalvaluesettranslations:split -h
-  $ sfdx easysources:globalvaluesets:split -h
-  $ sfdx easysources:applications:split -h
-  
-  $ sfdx easysources:allmeta:split -h
-
+  $ sfdx easysources:profiles:split
 ```
+the plugin generates a folder with all the csv files.
+![profile_split](.images/profile_split.png)
 
 ### Upsert
 Suppose the developer cretes a new object, he creates some fields, he assigns the fields, the layouts and the object permissions to the various profiles.
@@ -133,20 +145,7 @@ To update the profiles on the repository, he can:
 4. *Execute the upsert command for profiles. The upsert command will insert the new tags into the csv*
 5. Then he can merge back to have the profiles to be deployed elsewhere
 
-```sh-session
 
-For help
-  $ sfdx easysources:profiles:upsert -h
-  $ sfdx easysources:recordtypes:upsert -h
-  $ sfdx easysources:labels:upsert -h
-  $ sfdx easysources:permissionsets:upsert -h
-  $ sfdx easysources:globalvaluesettranslations:upsert -h
-  $ sfdx easysources:globalvaluesets:upsert -h
-  $ sfdx easysources:applications:upsert -h
-  
-  $ sfdx easysources:allmeta:upsert -h
-
-```
 **NOTE: the upsert doesn't delete any unused reference. If the user deletes a field, he should run the delete command**
 
 
@@ -154,49 +153,55 @@ For help
 
 Suppose the developer makes some modification directly on the csv. With the updatekey command, he can update the tagid column if needed.
 
-```sh-session
-
-For help
-  $ sfdx easysources:profiles:updatekey -h
-  $ sfdx easysources:recordtypes:updatekey -h
-  $ sfdx easysources:labels:updatekey -h
-  $ sfdx easysources:permissionsets:updatekey -h
-  $ sfdx easysources:globalvaluesettranslations:updatekey -h
-  $ sfdx easysources:globalvaluesets:updatekey -h
-  $ sfdx easysources:applications:updatekey -h
-  
-```
 
 ### Merge
 
-When the user needs to deploy the code, he needs to merge back the csv files to restore and update the original xml file.
+When the user needs to deploy the code, he first needs to merge back the csv files to restore and update the original xml file starting from the content of the csv files.
 
-```sh-session
-
-For help
-  $ sfdx easysources:profiles:merge -h
-  $ sfdx easysources:recordtypes:merge -h
-  $ sfdx easysources:labels:merge -h
-  $ sfdx easysources:permissionsets:merge -h
-  $ sfdx easysources:globalvaluesettranslations:merge -h
-  $ sfdx easysources:globalvaluesets:merge -h
-  $ sfdx easysources:applications:merge -h
-  
-  $ sfdx easysources:allmeta:merge -h
-
-```
+Another scenario could be during a cherry pick or a merge conflict. Suppose a developer has created a custom field and he retrieves the package with the field and the profiles. Then he performs the upsert to insert the field into the csv, and then he merges the profiles to have again the full xml files. He commits and all is OK in the dev environment. If the profiles are not aligned between the sandboxes, the cherry pick or the merge through the UAT branch could raise a conflict on the xml files. If you configured a git merger for the csv files, you probably will not have conflicts on the csv. So you can simply run the merge command again, to restore the correct version of the xml files automatically and without any effort!
 
 ### Delete
 **Note: only applies to Profiles, PermissionSets and RecordTypes**
 
 Suppose the developer deletes a field on the org, he needs to delete all the references for that field for all Profiles, PermissionSets and RecordTypes.
-This command is intended to delete references, and it has flags to specify the name of the field. Run with -h flag to get a better description of the possible flags for each metadata type.
+This command is intended to delete references, and it has flags to specify the name of the field. Run with --help flag to get a better description of the possible flags for each metadata type.
+
+### Minify
+
+This command is very useful if you don't want to have the in your csv files all the lines that not add value to the file.
+
+For example, in the following image, the lines in red don't specify any permission so they could be removed.
 
 ```sh-session
-
-For help
-  $ sfdx easysources:profiles:delete -h
-  $ sfdx easysources:recordtypes:delete -h
-  $ sfdx easysources:permissionsets:delete -h
-
+  $ sfdx easysources:profiles:minify
 ```
+
+![profile_minify](.images/profile_minify.png)
+
+If you want a permission to be ignored even if it is false you can write FALSE instead of false: when I tested this feature, it was work correctly in Salesforce.
+
+## A special note on object translations
+The object translation metadata is a little different, because when you download all custom objects with all object translations, salesforce retrieves an xml file for each field of the objects.
+
+The split command will create the usual folder with all the csv, but for the fieldTranslations all the little xml files will become a row on the field translation csv file.
+The merge command will first delete all the field translation xml files and then recreate them by "merging" the csv rows into the various little field translation files.
+I know that the name of the commands is counterintuitive but I already developed these commands on the other metadata types so I left these names.
+Remember that the split command performs a xml2csv conversion, and the merge commands perfors a csv2xml conversion.
+The minify command in this case is very useful because many times we don't have a translation for each field, so we will simply delete all the empty fieldTranslation xml files (in my project we could delete almost 14k files from the repository)
+
+## A special note on translations
+Due to complexity of converting xml2csv on the flow translations, this part is totally copied in the part.xml file when splitting. In this file, the upsert doesn't work.
+
+## Git Considerations
+In my experience, merging or cherry picking csv files is much better then doing it on xml files. But this is not enough.
+To build a better experience to developers and release manager, one can configure a custom git merger to automatically resolve conflicts on csv files.
+For this reason, the csv files have the _tagid column, that is a key on which the automatic resolution of conflicts can be done.
+I built a custom csv git merger that in my mind should work well, but at the moment there is no ETA to publish it. In my project I configured [this open source git merger](https://github.com/sctweedie/csvdiff3).
+
+## Other considerations
+In my project I still have the xml files even if they are supported by csv.
+It could be a great idea and it could avoid many conflicts and waste of time if the release manager removes the xml files from the repository, and the pipeline merges automatically the csv into the xml at runtime while deploying.
+
+I know that the commands parameters can easily lead to misunderstanding or can be forgotten. I'm developing a vscode extension to easily launch the commands, get the parameters, select the resources on which a command must be run. But at the moment there is no ETA to finish it.
+
+
