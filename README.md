@@ -203,5 +203,3 @@ In my project I still have the xml files even if they are supported by csv.
 It could be a great idea and it could avoid many conflicts and waste of time if the release manager removes the xml files from the repository, and the pipeline merges automatically the csv into the xml at runtime while deploying.
 
 I know that the commands parameters can easily lead to misunderstanding or can be forgotten. I'm developing a vscode extension to easily launch the commands, get the parameters, select the resources on which a command must be run. But at the moment there is no ETA to finish it.
-
-
