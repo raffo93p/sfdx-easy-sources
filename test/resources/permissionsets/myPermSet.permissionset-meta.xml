@@ -146,22 +146,22 @@
         <recordType>Object_B__c.RecordType_B</recordType>
         <visible>true</visible>
     </recordTypeVisibilities>
-    <tabVisibilities>
+    <tabSettings>
         <tab>Tab A</tab>
         <visibility>Hidden</visibility>
-    </tabVisibilities>
-    <tabVisibilities>
+    </tabSettings>
+    <tabSettings>
         <tab>Tab B</tab>
         <visibility>DefaultOn</visibility>
-    </tabVisibilities>
-    <tabVisibilities>
+    </tabSettings>
+    <tabSettings>
         <tab>Tab C</tab>
         <visibility>DefaultOn</visibility>
-    </tabVisibilities>
-    <tabVisibilities>
+    </tabSettings>
+    <tabSettings>
         <tab>Tab D</tab>
         <visibility>DefaultOn</visibility>
-    </tabVisibilities>
+    </tabSettings>
     <userPermissions>
         <enabled>true</enabled>
         <name>User Permission A</name>

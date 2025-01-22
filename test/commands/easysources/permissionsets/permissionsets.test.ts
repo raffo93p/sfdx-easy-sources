@@ -34,7 +34,7 @@ describe('easysources:permissionsets ', function () {
             expect(await areFilesEqual(join(resourcesFolder, 'csvsplit', 'myPermSet-objectPermissions.csv'), join(csvFolder, 'MyPermSet-objectPermissions.csv'))).to.be.true;
             expect(await areFilesEqual(join(resourcesFolder, 'csvsplit', 'myPermSet-pageAccesses.csv'), join(csvFolder, 'MyPermSet-pageAccesses.csv'))).to.be.true;
             expect(await areFilesEqual(join(resourcesFolder, 'csvsplit', 'myPermSet-recordTypeVisibilities.csv'), join(csvFolder, 'MyPermSet-recordTypeVisibilities.csv'))).to.be.true;
-            expect(await areFilesEqual(join(resourcesFolder, 'csvsplit', 'myPermSet-tabVisibilities.csv'), join(csvFolder, 'MyPermSet-tabVisibilities.csv'))).to.be.true;
+            expect(await areFilesEqual(join(resourcesFolder, 'csvsplit', 'myPermSet-tabSettings.csv'), join(csvFolder, 'MyPermSet-tabSettings.csv'))).to.be.true;
             expect(await areFilesEqual(join(resourcesFolder, 'csvsplit', 'myPermSet-userPermissions.csv'), join(csvFolder, 'MyPermSet-userPermissions.csv'))).to.be.true;
         });
 
@@ -65,7 +65,7 @@ describe('easysources:permissionsets ', function () {
             expect(await areFilesEqual(join(resourcesFolder, 'csvupsert', 'myPermSet-objectPermissions.csv'), join(csvFolder, 'MyPermSet-objectPermissions.csv'))).to.be.true;
             expect(await areFilesEqual(join(resourcesFolder, 'csvupsert', 'myPermSet-pageAccesses.csv'), join(csvFolder, 'MyPermSet-pageAccesses.csv'))).to.be.true;
             expect(await areFilesEqual(join(resourcesFolder, 'csvupsert', 'myPermSet-recordTypeVisibilities.csv'), join(csvFolder, 'MyPermSet-recordTypeVisibilities.csv'))).to.be.true;
-            expect(await areFilesEqual(join(resourcesFolder, 'csvupsert', 'myPermSet-tabVisibilities.csv'), join(csvFolder, 'MyPermSet-tabVisibilities.csv'))).to.be.true;
+            expect(await areFilesEqual(join(resourcesFolder, 'csvupsert', 'myPermSet-tabSettings.csv'), join(csvFolder, 'MyPermSet-tabSettings.csv'))).to.be.true;
             expect(await areFilesEqual(join(resourcesFolder, 'csvupsert', 'myPermSet-userPermissions.csv'), join(csvFolder, 'MyPermSet-userPermissions.csv'))).to.be.true;            }
         );
 

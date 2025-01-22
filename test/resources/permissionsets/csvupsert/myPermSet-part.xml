@@ -9,6 +9,6 @@
     <objectPermissions/>
     <pageAccesses/>
     <recordTypeVisibilities/>
-    <tabVisibilities/>
+    <tabSettings/>
     <userPermissions/>
 </PermissionSet>
