@@ -139,10 +139,10 @@ export default class Merge extends SfdxCommand {
 
                 const fieldXmlArray = transformFieldCSVtoXMLs(jsonArray);
 
-                deleteFieldTranslationsXmls(baseInputDir, obj);
+                deleteFieldTranslationsXmls(baseOutputDir, obj);
 
                 for(const entry of fieldXmlArray){
-                     await writeXmlToFile(join(baseInputDir, obj, entry.name + OBJTRANSL_FIELDTRANSL_EXTENSION), 
+                     await writeXmlToFile(join(baseOutputDir, obj, entry.name + OBJTRANSL_FIELDTRANSL_EXTENSION), 
                      {[OBJTRANSL_CFIELDTRANSL_ROOT_TAG]: entry}
                      );
 
