@@ -90,11 +90,10 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
                 console.error(err);
             }
             xmlFileContent[file_root_tag][tag_section] = null;
-
-
+            
         }
 
-        const inputFilePart = join(baseInputDir, fileName, fileName + XML_PART_EXTENSION);
+        const inputFilePart = join(baseOutputDir, fileName, fileName + XML_PART_EXTENSION);
         if (fs.existsSync(inputFilePart)) {
             const xmlFileContentPart = (await readXmlFromFile(inputFilePart)) ?? {};
             const filePropertiesPart = xmlFileContentPart[file_root_tag] ?? {};

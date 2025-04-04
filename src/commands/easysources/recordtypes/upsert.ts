@@ -65,8 +65,8 @@ export default class Upsert extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        const baseInputDir = join((this.flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
-        const baseOutputDir = join((this.flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), RECORDTYPES_SUBPATH) as string;
+        const baseInputDir = join((this.flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), RECORDTYPES_SUBPATH) as string;
+        const baseOutputDir = join((this.flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
         const inputObject = (this.flags.object) as string;
         const inputRecordType = (this.flags.recordtype) as string;
 
@@ -163,7 +163,7 @@ export default class Upsert extends SfdxCommand {
                     xmlFileContent[RECORDTYPES_ROOT_TAG][tag_section] = null;
 
                 }
-                const inputFilePart = join(baseInputDir, obj, 'recordTypes', recordtypeName, recordtypeName + XML_PART_EXTENSION);
+                const inputFilePart = join(baseOutputDir, obj, 'recordTypes', recordtypeName, recordtypeName + XML_PART_EXTENSION);
 
                 if (fs.existsSync(inputFilePart)) {
                     const xmlFileContentPart = (await readXmlFromFile(inputFilePart)) ?? {};
