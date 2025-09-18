@@ -1,0 +1,11 @@
+{
+  "commandDescription": "Clear empty CSV files from translations and remove empty folders",
+  "sfXmlFlagDescription": "Salesforce XML source path (default: %s)",
+  "esCsvFlagDescription": "Easy Sources CSV path (default: %s)",
+  "inputFlagDescription": "Comma-separated list of translation names to process. If not specified, all translations will be processed",
+  "examples": [
+    "$ sfdx easysources:translations:clearempty",
+    "$ sfdx easysources:translations:clearempty --input en_US,it",
+    "$ sfdx easysources:translations:clearempty --es-csv ./csv --sf-xml ./force-app"
+  ]
+}

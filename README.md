@@ -34,8 +34,8 @@ With this plugin you can:
 | Global Value Sets | globalvaluesets | split, upsert, merge, updatekey |
 | Global Value Set Translations | globalvaluesettranslations | split, upsert, merge, updatekey |
 | Applications | applications | split, upsert, merge, updatekey |
-| Object Translations | objecttranslations | split, upsert, merge, updatekey |
-| Translations | translations | split, upsert, merge, updatekey |
+| Object Translations | objecttranslations | split, upsert, merge, updatekey, clearempty |
+| Translations | translations | split, upsert, merge, updatekey, clearempty |
 
 
 
@@ -62,6 +62,7 @@ Based on the source type, this plugin provides the following commands:
 - Delete: Bulk deletes a single permission from all the resources of the same type (only applies to Profiles, PermissionSets and Record Types)
 - Minify: Bulk deletes each entry that doesn't add value to the file (example: a permission in a profile xml which has all permissions set to false)
 - Clean: Bulk deletes all the references that are not present in the target org or in the repository
+- Clearempty: Removes empty CSV files and folders from the generated CSV files (available for Object Translations and Translations)
 
 # Disclaimer
 - Please experiment at first inside a dummy project!
@@ -203,3 +204,9 @@ In my project I still have the xml files even if they are supported by csv.
 It could be a great idea and it could avoid many conflicts and waste of time if the release manager removes the xml files from the repository, and the pipeline merges automatically the csv into the xml at runtime while deploying.
 
 I know that the commands parameters can easily lead to misunderstanding or can be forgotten. I'm developing a vscode extension to easily launch the commands, get the parameters, select the resources on which a command must be run. But at the moment there is no ETA to finish it.
+
+## Release Notes
+
+### Version 0.6.0
+- Added `objecttranslations:clearempty` command that removes empty CSV files and folders from the generated CSV files. This command helps clean up the repository by removing unnecessary empty files and directories that may be created during the split process.
+- Added `translations:clearempty` command that removes empty CSV files and folders from translations. Similar to the object translations command, it helps maintain a clean repository structure by removing empty CSV files and unused folders.
