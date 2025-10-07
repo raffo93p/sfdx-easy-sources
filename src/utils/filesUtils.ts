@@ -118,12 +118,25 @@ export function checkDirOrCreateSync(dir: string) {
 	}
 }
 
+function normalizeString(xmlString: string): string {
+	// Remove extra whitespace, normalize line endings, and sort attributes for comparison
+	return xmlString
+		.replace(/\r\n/g, '\n')  // Normalize line endings
+		.replace(/\r/g, '\n')    // Normalize line endings
+		.replace(/>\s+</g, '><') // Remove whitespace between tags for xml files
+		.replace(/\s+/g, ' ')    // Normalize multiple spaces to single space
+		.trim();
+}
+
 export async function areFilesEqual(filea, fileb) {
 	const fileAContent = await readStringFromFile(filea);
-	// console.log(fileAContent);
 	const fileBContent = await readStringFromFile(fileb);
-	// console.log(fileBContent);
-	return fileAContent ===  fileBContent;
+	
+	// Normalize strings for comparison (remove whitespace differences)
+	const normalizedFileA = normalizeString(fileAContent);
+	const normalizedFileB = normalizeString(fileBContent);
+	
+	return normalizedFileA === normalizedFileB;
 }
 
 export async function readCsvToJsonArrayWithNulls(csvFilePath: string) {

@@ -1,0 +1,23 @@
+{
+  "commandDescription": "Validates alignment between XML and CSV representations of permission sets using string comparison or logic comparison",
+  "sfXmlFlagDescription": "Salesforce XML path (default: %s)",
+  "esCsvFlagDescription": "Easy Sources CSV path (default: %s)",
+  "inputFlagDescription": "Comma-separated list of permission set names to validate (without extension). If not specified, all permission sets will be validated",
+  "sortFlagDescription": "Sort CSV data before merging (default: %s)",
+  "modeFlagDescription": "Validation mode: 'string' for full string comparison, 'logic' for in-memory structure comparison (default: %s)",
+  "validationSuccess": "✅ Permission set '%s' is properly aligned",
+  "validationError": "❌ Permission set '%s' has misalignment",
+  "differenceFound": "   - %s",
+  "noItemsFound": "No permission sets found to validate",
+  "missingXmlFile": "❌ Original XML file not found: %s",
+  "missingCsvDirectory": "❌ CSV directory not found: %s",
+  "validationSummary": "Validation Summary: %s permission sets validated, %s aligned, %s misaligned",
+  "examples": [
+    "sfdx easysources:permissionsets:arealigned",
+    "sfdx easysources:permissionsets:arealigned --mode string",
+    "sfdx easysources:permissionsets:arealigned --mode logic",
+    "sfdx easysources:permissionsets:arealigned -i Admin_Access,Custom_Permissions -m string",
+    "sfdx easysources:permissionsets:arealigned -x ./force-app/main/default -c ./easysources --mode logic",
+    "sfdx easysources:permissionsets:arealigned --sort false --mode string"
+  ]
+}

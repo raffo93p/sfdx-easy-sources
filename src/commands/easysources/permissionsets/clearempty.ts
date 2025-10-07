@@ -10,7 +10,7 @@ import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import Performance from '../../../utils/performance';
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
-import { TRANSLATION_ITEMS, TRANSLATIONS_SUBPATH } from '../../../utils/constants/constants_translations';
+import { PERMSET_ITEMS, PERMSETS_SUBPATH } from '../../../utils/constants/constants_permissionsets';
 import { clearEmpty } from '../../../utils/commands/emptyClearer';
 
 // Initialize Messages with the current plugin directory
@@ -18,7 +18,7 @@ Messages.importMessagesDirectory(__dirname);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = Messages.loadMessages('sfdx-easy-sources', 'translations_clearempty');
+const messages = Messages.loadMessages('sfdx-easy-sources', 'permissionsets_clearempty');
 
 export default class ClearEmpty extends SfdxCommand {
     public static description = messages.getMessage('commandDescription');
@@ -46,7 +46,7 @@ export default class ClearEmpty extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
         
-        const result = await clearEmpty(this.flags, TRANSLATIONS_SUBPATH, TRANSLATION_ITEMS);
+        const result = await clearEmpty(this.flags, PERMSETS_SUBPATH, PERMSET_ITEMS);
 
         Performance.getInstance().end();
         return {

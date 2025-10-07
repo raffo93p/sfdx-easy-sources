@@ -1,0 +1,22 @@
+{
+  "commandDescription": "Validates alignment between XML and CSV representations of applications using string comparison or logic comparison",
+  "sfXmlFlagDescription": "Salesforce XML path (default: %s)",
+  "esCsvFlagDescription": "Easy Sources CSV path (default: %s)",
+  "inputFlagDescription": "Comma-separated list of application names to validate (without extension). If not specified, all applications will be validated",
+  "sortFlagDescription": "Sort CSV data before merging (default: %s)",
+  "modeFlagDescription": "Validation mode: 'string' for full string comparison, 'logic' for in-memory structure comparison (default: %s)",
+  "validationSuccess": "✅ Application '%s' is properly aligned",
+  "validationError": "❌ Application '%s' has misalignment",
+  "differenceFound": "   - %s",
+  "noApplicationsFound": "No applications found to validate",
+  "missingXmlFile": "❌ Original XML file not found: %s",
+  "missingCsvDirectory": "❌ CSV directory not found: %s",
+  "validationSummary": "Validation Summary: %s applications validated, %s aligned, %s misaligned",
+  "examples": [
+    "sfdx easysources:applications:arealigned",
+    "sfdx easysources:applications:arealigned --mode string",
+    "sfdx easysources:applications:arealigned --mode logic",
+    "sfdx easysources:applications:arealigned -i Sales,Service -m string",
+    "sfdx easysources:applications:arealigned -x ./force-app/main/default -c ./easysources --mode logic"
+  ]
+}

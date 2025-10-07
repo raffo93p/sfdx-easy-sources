@@ -54,7 +54,21 @@ describe('easysources:applications ', function () {
                 
             expect(await areFilesEqual(join(resourcesFolder, 'myApplication_merge2.app-meta.xml'), join(sourceFolder, 'MyApplication.app-meta.xml'))).to.be.true;
         });
-        
+
+    test
+        .stdout()
+        .command(['easysources:applications:arealigned', '-i', 'MyApplication', '--mode', 'logic'])
+        .it('runs easysources:applications:arealigned with logic mode', async (ctx) => {
+            expect(ctx.stdout).to.contain('1 aligned');
+        });
+
+    test
+        .stdout()
+        .command(['easysources:applications:arealigned', '-i', 'MyApplication', '--mode', 'string'])
+        .it('runs easysources:applications:arealigned with string mode', async (ctx) => {
+            expect(ctx.stdout).to.contain('1 aligned');
+        });
+
     test
         .stdout()
         .do(() => {

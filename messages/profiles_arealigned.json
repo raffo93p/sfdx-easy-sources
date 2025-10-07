@@ -1,0 +1,23 @@
+{
+  "commandDescription": "Validates alignment between XML and CSV representations of profiles using string comparison or logic comparison",
+  "sfXmlFlagDescription": "Salesforce XML path (default: %s)",
+  "esCsvFlagDescription": "Easy Sources CSV path (default: %s)",
+  "inputFlagDescription": "Comma-separated list of profile names to validate (without extension). If not specified, all profiles will be validated",
+  "sortFlagDescription": "Sort CSV data before merging (default: %s)",
+  "modeFlagDescription": "Validation mode: 'string' for full string comparison, 'logic' for in-memory structure comparison (default: %s)",
+  "validationSuccess": "✅ Profile '%s' is properly aligned",
+  "validationError": "❌ Profile '%s' has misalignment",
+  "differenceFound": "   - %s",
+  "noProfilesFound": "No profiles found to validate",
+  "missingXmlFile": "❌ Original XML file not found: %s",
+  "missingCsvDirectory": "❌ CSV directory not found: %s",
+  "validationSummary": "Validation Summary: %s profiles validated, %s aligned, %s misaligned",
+  "examples": [
+    "sfdx easysources:profiles:arealigned",
+    "sfdx easysources:profiles:arealigned --mode string",
+    "sfdx easysources:profiles:arealigned --mode logic",
+    "sfdx easysources:profiles:arealigned -i Admin,StandardUser -m string",
+    "sfdx easysources:profiles:arealigned -x ./force-app/main/default -c ./easysources --mode logic",
+    "sfdx easysources:profiles:arealigned --sort false --mode string"
+  ]
+}

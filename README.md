@@ -11,31 +11,32 @@ SFDX plugin to simplify the management of Salesforce sources, splitting some lon
 [![License](https://img.shields.io/npm/l/sfdx-easy-sources.svg)](https://github.com/raffo93p/sfdx-easy-sources/blob/master/package.json)
 
 # What is sfdx-easy-sources?
-This plugin helps salesforce developers, architects and release managers with the management of some Salesforce xml sources, expecially those which become easily very long and difficult to be handled with git version history.
+This plugin helps Salesforce developers, architects and release managers with the management of Salesforce XML sources, especially those which become very long and difficult to handle with git version history.
 
 With this plugin you can:
-- Split those long xml files into some smaller csv
-- Have a better look and comprehension of what is written in those files, thanks to all the VSCode extensions that can be used to manage csv
-- Upsert the csv files after retrieving a package with some resources that are built based on what you put inside the package
-- Merge the csv files into the original xml ones
-- Delete some reference or permission from all the csv of a given metadata type
-- Minify the csv by removing all the rows that don't increase the value of the file
-- Clean the csv references to some resources that doesn't exist in the target org
-- Setup a custom git merger to automatically resolve the csv conflicts while cherry picking or merging in git
+- **Split** long XML files into smaller, manageable CSV files
+- **Better visualize and understand** file contents using VSCode CSV extensions and tools
+- **Upsert** CSV files after retrieving packages with new resources
+- **Merge** CSV files back into the original XML format for deployment
+- **Bulk delete** references or permissions from all CSV files of a given metadata type
+- **Minify** CSV files by removing rows that don't add value to the configuration
+- **Clean** CSV references to resources that don't exist in the target org or repository
+- **Setup custom git mergers** to automatically resolve CSV conflicts during cherry-picking or merging
 
 ## Supported metadata types
 
 | Metadata Label| Metadata api | Available commands    |
 | :---:    | :---:  | :---: | 
 | All Meta | allmeta   | split, upsert, merge, minify, retrieve   |
-| Profiles | profiles | split, upsert, merge, minify, updatekey, delete, clean |
-| Record Types | recordtypes | split, upsert, merge, updatekey, delete, clean |
-| Labels | labels | split, upsert, merge, updatekey |
-| Global Value Sets | globalvaluesets | split, upsert, merge, updatekey |
-| Global Value Set Translations | globalvaluesettranslations | split, upsert, merge, updatekey |
-| Applications | applications | split, upsert, merge, updatekey |
-| Object Translations | objecttranslations | split, upsert, merge, updatekey, clearempty |
-| Translations | translations | split, upsert, merge, updatekey, clearempty |
+| Profiles | profiles | split, upsert, merge, minify, updatekey, delete, clean, clearempty, arealigned |
+| Permission Sets | permissionsets | split, upsert, merge, minify, updatekey, delete, clean, clearempty, arealigned |
+| Record Types | recordtypes | split, upsert, merge, updatekey, delete, clean, arealigned |
+| Labels | labels | split, upsert, merge, updatekey, arealigned |
+| Global Value Sets | globalvaluesets | split, upsert, merge, updatekey, arealigned |
+| Global Value Set Translations | globalvaluesettranslations | split, upsert, merge, updatekey, arealigned |
+| Applications | applications | split, upsert, merge, updatekey, arealigned |
+| Object Translations | objecttranslations | split, upsert, merge, minify, updatekey, clearempty, arealigned |
+| Translations | translations | split, upsert, merge, minify, updatekey, clearempty, arealigned |
 
 
 
@@ -55,14 +56,15 @@ Examples
 
 
 Based on the source type, this plugin provides the following commands:
-- Split: Splits the resources into various csv files, and eventually an xml containing all the tags that weren't split
-- Merge: Merges back all the resources previously split
-- Upsert: It's like the split, but goes on upsert.
-- Updatekey: Maybe sometimes a developer changes something on the csv file, this command simply updates the key for that record
-- Delete: Bulk deletes a single permission from all the resources of the same type (only applies to Profiles, PermissionSets and Record Types)
-- Minify: Bulk deletes each entry that doesn't add value to the file (example: a permission in a profile xml which has all permissions set to false)
-- Clean: Bulk deletes all the references that are not present in the target org or in the repository
-- Clearempty: Removes empty CSV files and folders from the generated CSV files (available for Object Translations and Translations)
+- **Split**: Splits the resources into various CSV files, and creates an XML file containing all the tags that weren't split
+- **Merge**: Merges back all the resources previously split from CSV files into XML format
+- **Upsert**: Similar to split, but adds new entries to existing CSV files instead of recreating them
+- **Updatekey**: Updates the `_tagid` column when developers make changes directly in CSV files
+- **Delete**: Bulk deletes a single permission from all resources of the same type (only applies to Profiles, PermissionSets and Record Types)
+- **Minify**: Removes entries that don't add value to the file (available for profiles, permissionsets, objecttranslations, and translations)
+- **Clean**: Removes all references that are not present in the target org or in the repository
+- **Clearempty**: Removes empty CSV files and folders from the generated CSV files (available for profiles, permissionsets, objecttranslations, and translations)
+- **AreAligned**: Validates alignment between XML and CSV representations, ensuring data integrity with logic or string comparison modes
 
 # Disclaimer
 - Please experiment at first inside a dummy project!
@@ -109,7 +111,7 @@ Some useful parameters are:
 - --split-merge: if set to true, automatically performes a split and then a merge of all the sources, after they are retrieved
 
 This command actually splits all the resources into various packages, trying to count the resources in every package to not exceed the "resnumb" number. It also creates some little packages, because profiles, permissionsets, translations and other particular metadata types should be retrieved building the package in a given way.
-Suppose the profile packages are more then one, the algorithm should automatically perform a split after retrieving the first profile package, then it should perform an upsert after every other profile package retrieved, and at the end it should perform a merge and delete the created csv. Unfortunately, at this moment I didn't test this scenario!
+> **⚠️ Important Note:** Suppose the profile packages are more then one, the algorithm should automatically perform a split after retrieving the first profile package, then it should perform an upsert after every other profile package retrieved, and at the end it should perform a merge and delete the created csv. Unfortunately, **at this moment I didn't test this scenario!**
 
 ### Prerequisite 3 - Create the csv files for the first time
 Once all the metadata have been downloaded, before to start dealing with the csv files, you should create them the first time.
@@ -138,13 +140,13 @@ the plugin generates a folder with all the csv files.
 ![profile_split](.images/profile_split.png)
 
 ### Upsert
-Suppose the developer cretes a new object, he creates some fields, he assigns the fields, the layouts and the object permissions to the various profiles.
-To update the profiles on the repository, he can:
+Suppose the developer creates a new object, creates some fields, and assigns the fields, layouts and object permissions to the various profiles.
+To update the profiles in the repository, the developer can:
 1. Make the changes on Salesforce org
 2. Create a package xml with the object, layout, fields and all profiles
 3. Retrieve the package. All profiles will now contain only the tags related to the new object, layout and fields
-4. *Execute the upsert command for profiles. The upsert command will insert the new tags into the csv*
-5. Then he can merge back to have the profiles to be deployed elsewhere
+4. *Execute the upsert command for profiles. The upsert command will insert the new tags into the CSV files*
+5. Then merge back to have the profiles ready to be deployed elsewhere
 
 
 **NOTE: the upsert doesn't delete any unused reference. If the user deletes a field, he should run the delete command**
@@ -152,14 +154,14 @@ To update the profiles on the repository, he can:
 
 ### UpdateKey
 
-Suppose the developer makes some modification directly on the csv. With the updatekey command, he can update the tagid column if needed.
+Suppose the developer makes some modifications directly in the CSV files. With the updatekey command, they can update the tagid column if needed.
 
 
 ### Merge
 
-When the user needs to deploy the code, he first needs to merge back the csv files to restore and update the original xml file starting from the content of the csv files.
+When the developer needs to deploy the code, he first needs to merge back the CSV files to restore and update the original XML files based on the content of the CSV files.
 
-Another scenario could be during a cherry pick or a merge conflict. Suppose a developer has created a custom field and he retrieves the package with the field and the profiles. Then he performs the upsert to insert the field into the csv, and then he merges the profiles to have again the full xml files. He commits and all is OK in the dev environment. If the profiles are not aligned between the sandboxes, the cherry pick or the merge through the UAT branch could raise a conflict on the xml files. If you configured a git merger for the csv files, you probably will not have conflicts on the csv. So you can simply run the merge command again, to restore the correct version of the xml files automatically and without any effort!
+Another scenario could be during a cherry pick or a merge conflict. Suppose a developer has created a custom field and he retrieves the package with the field and the profiles. Then he performs the upsert to insert the field into the csv, and then he merges the profiles to have again the full xml files. He commits and all is OK in the dev environment. If the profiles are not aligned between the sandboxes, the cherry pick or the merge through the UAT branch could raise a conflict on the xml files. If he configured a git merger for the csv files, he probably will not have conflicts on the csv. So he can simply run the merge command again, to restore the correct version of the xml files automatically and without any effort!
 
 ### Delete
 **Note: only applies to Profiles, PermissionSets and RecordTypes**
@@ -169,17 +171,57 @@ This command is intended to delete references, and it has flags to specify the n
 
 ### Minify
 
-This command is very useful if you don't want to have the in your csv files all the lines that not add value to the file.
+This command is very useful if you don't want to have in your csv files all the lines that don't add value to the file. The minify command is available for **profiles**, **permissionsets**, **objecttranslations**, and **translations**.
 
 For example, in the following image, the lines in red don't specify any permission so they could be removed.
 
 ```sh-session
   $ sfdx easysources:profiles:minify
+  $ sfdx easysources:permissionsets:minify
+  $ sfdx easysources:objecttranslations:minify
+  $ sfdx easysources:translations:minify
 ```
 
 ![profile_minify](.images/profile_minify.png)
 
-If you want a permission to be ignored even if it is false you can write FALSE instead of false: when I tested this feature, it was work correctly in Salesforce.
+If you want a permission to be ignored even if it is false you can write FALSE instead of false: when I tested this feature, it worked correctly in Salesforce.
+
+### Clearempty
+
+This command removes empty CSV files and folders from the generated CSV files, helping to keep your repository clean. The clearempty command is available for **profiles**, **permissionsets**, **objecttranslations**, and **translations**.
+
+After splitting metadata into CSV files, you might end up with empty CSV files or empty folders that don't contain any meaningful data. This command identifies and removes these empty files and directories automatically.
+
+```sh-session
+  $ sfdx easysources:profiles:clearempty
+  $ sfdx easysources:permissionsets:clearempty
+  $ sfdx easysources:objecttranslations:clearempty
+  $ sfdx easysources:translations:clearempty
+```
+
+This is particularly useful for object translations where you might have many empty field translation files, or for translations where some language files might be empty.
+
+### AreAligned
+
+This command validates whether XML files and their corresponding CSV files are properly synchronized and aligned. It's particularly useful for ensuring data integrity and troubleshooting issues where CSV and XML representations might have diverged.
+
+The command supports two validation modes:
+
+**String Mode** (`--mode string` - default):
+```sh-session
+$ sfdx easysources:profiles:arealigned --mode string
+# or simply (uses string mode by default):
+$ sfdx easysources:profiles:arealigned
+```
+Performs an exact string comparison by temporarily merging CSV files back into XML format and comparing the complete file content character by character. This mode detects even minor formatting differences and is the default mode.
+
+**Logic Mode** (`--mode logic`):
+```sh-session
+$ sfdx easysources:profiles:arealigned --mode logic
+```
+Performs a logical comparison by parsing both XML and CSV data structures and comparing the actual values. This mode is faster and focuses on data content rather than formatting differences.
+
+Both modes provide detailed validation reports showing which files are aligned, misaligned, or have warnings, helping developers identify and resolve synchronization issues between XML and CSV representations.
 
 ## A special note on object translations
 The object translation metadata is a little different, because when you download all custom objects with all object translations, salesforce retrieves an xml file for each field of the objects.
@@ -206,6 +248,13 @@ It could be a great idea and it could avoid many conflicts and waste of time if 
 I know that the commands parameters can easily lead to misunderstanding or can be forgotten. I'm developing a vscode extension to easily launch the commands, get the parameters, select the resources on which a command must be run. But at the moment there is no ETA to finish it.
 
 ## Release Notes
+
+### Version 0.7.0
+- **New Feature: `arealigned` command for all metadata types** - Introduced a new validation command that checks if XML and corresponding CSV files are properly aligned. This command is available for all supported metadata types (profiles, recordtypes, translations, objecttranslations, etc.) and provides two validation modes:
+  - `--mode string` (default): Performs exact string comparison by temporarily merging CSV files back to XML and comparing the full file content
+  - `--mode logic`: Performs logical comparison at the value level, comparing the actual data structures after parsing
+- **New Feature: `clearempty` command for profiles and permissionsets** - Added the clearempty command for `profiles:clearempty` and `permissionsets:clearempty` that removes empty CSV files and folders from the generated CSV files. This command helps clean up the repository by removing unnecessary empty files and directories that may be created during the split process.
+- **Bug Fix: Enhanced `recordtypes:delete` command** - Fixed and improved the delete command for record types. Now supports comma-separated notation for both picklist values and picklist entries, providing more flexibility when specifying multiple items to delete.
 
 ### Version 0.6.0
 - Added `objecttranslations:clearempty` command that removes empty CSV files and folders from the generated CSV files. This command helps clean up the repository by removing unnecessary empty files and directories that may be created during the split process.

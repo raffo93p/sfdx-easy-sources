@@ -55,7 +55,21 @@ describe('easysources:glovalvaluesets ', function () {
                 
             expect(await areFilesEqual(join(resourcesFolder, 'myGVS_merge2.globalValueSet-meta.xml'), join(sourceFolder, 'MyGVS.globalValueSet-meta.xml'))).to.be.true;
         });
-        
+
+    test
+        .stdout()
+        .command(['easysources:globalvaluesets:arealigned', '-i', 'MyGVS', '--mode', 'logic'])
+        .it('runs easysources:globalvaluesets:arealigned with logic mode', async (ctx) => {
+            expect(ctx.stdout).to.contain('1 aligned');
+        });
+
+    test
+        .stdout()
+        .command(['easysources:globalvaluesets:arealigned', '-i', 'MyGVS', '--mode', 'string'])
+        .it('runs easysources:globalvaluesets:arealigned with string mode', async (ctx) => {
+            expect(ctx.stdout).to.contain('1 aligned');
+        });
+    
     test
         .stdout()
         .do(() => {

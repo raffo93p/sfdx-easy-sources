@@ -1,0 +1,22 @@
+{
+  "commandDescription": "Validates alignment between XML and CSV representations of labels using string comparison or logic comparison",
+  "sfXmlFlagDescription": "Salesforce XML path (default: %s)",
+  "esCsvFlagDescription": "Easy Sources CSV path (default: %s)",
+  "inputFlagDescription": "Comma-separated list of label names to validate (without extension). If not specified, all labels will be validated",
+  "sortFlagDescription": "Sort CSV data before merging (default: %s)",
+  "modeFlagDescription": "Validation mode: 'string' for full string comparison, 'logic' for in-memory structure comparison (default: %s)",
+  "validationSuccess": "✅ Label '%s' is properly aligned",
+  "validationError": "❌ Label '%s' has misalignment",
+  "differenceFound": "   - %s",
+  "noLabelsFound": "No labels found to validate",
+  "missingXmlFile": "❌ Original XML file not found: %s",
+  "missingCsvDirectory": "❌ CSV directory not found: %s",
+  "validationSummary": "Validation Summary: %s labels validated, %s aligned, %s misaligned",
+  "examples": [
+    "sfdx easysources:labels:arealigned",
+    "sfdx easysources:labels:arealigned --mode string",
+    "sfdx easysources:labels:arealigned --mode logic",
+    "sfdx easysources:labels:arealigned -i CustomLabels -m string",
+    "sfdx easysources:labels:arealigned -x ./force-app/main/default -c ./easysources --mode logic"
+  ]
+}

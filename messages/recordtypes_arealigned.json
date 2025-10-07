@@ -1,0 +1,26 @@
+{
+  "commandDescription": "Validates alignment between XML and CSV representations of record types using string comparison or logic comparison",
+  "sfXmlFlagDescription": "Salesforce XML path (default: %s)",
+  "esCsvFlagDescription": "Easy Sources CSV path (default: %s)",
+  "inputFlagDescription": "Comma-separated list of record type names to validate (without extension). If not specified, all record types will be validated",
+  "objectFlagDescription": "Comma-separated list of object names to validate. If not specified, all objects will be processed",
+  "recordtypeFlagDescription": "Comma-separated list of specific record type names to validate within objects",
+  "sortFlagDescription": "Sort CSV data before merging (default: %s)",
+  "modeFlagDescription": "Validation mode: 'string' for full string comparison, 'logic' for in-memory structure comparison (default: %s)",
+  "validationSuccess": "✅ Record type '%s' is properly aligned",
+  "validationError": "❌ Record type '%s' has misalignment",
+  "differenceFound": "   - %s",
+  "noItemsFound": "No record types found to validate",
+  "missingXmlFile": "❌ Original XML file not found: %s",
+  "missingCsvDirectory": "❌ CSV directory not found: %s",
+  "validationSummary": "Validation Summary: %s record types validated, %s aligned, %s misaligned",
+  "examples": [
+    "sfdx easysources:recordtypes:arealigned",
+    "sfdx easysources:recordtypes:arealigned --mode string",
+    "sfdx easysources:recordtypes:arealigned --mode logic",
+    "sfdx easysources:recordtypes:arealigned -s Account,Contact --mode string",
+    "sfdx easysources:recordtypes:arealigned -s Account -r Standard,Custom -m logic",
+    "sfdx easysources:recordtypes:arealigned -x ./force-app/main/default -c ./easysources --mode logic",
+    "sfdx easysources:recordtypes:arealigned --sort false --mode string"
+  ]
+}

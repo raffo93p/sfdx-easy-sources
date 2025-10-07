@@ -8,24 +8,22 @@ import * as os from 'os';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
+import { TRANSLATION_ITEMS, TRANSLATIONS_EXTENSION, TRANSLATIONS_ROOT_TAG, TRANSLATIONS_SUBPATH } from '../../../utils/constants/constants_translations';
 import Performance from '../../../utils/performance';
+import { areAligned, validateAlignment } from '../../../utils/commands/alignmentChecker';
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
-import { TRANSLATION_ITEMS, TRANSLATIONS_SUBPATH } from '../../../utils/constants/constants_translations';
-import { clearEmpty } from '../../../utils/commands/emptyClearer';
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = Messages.loadMessages('sfdx-easy-sources', 'translations_clearempty');
+const messages = Messages.loadMessages('sfdx-easy-sources', 'translations_arealigned');
 
-export default class ClearEmpty extends SfdxCommand {
+export default class AreAligned extends SfdxCommand {
     public static description = messages.getMessage('commandDescription');
 
     public static examples = messages.getMessage('examples').split(os.EOL);
-
-    public static args = [{ name: 'file' }];
 
     protected static flagsConfig = {
         // flag with a value (-n, --name=VALUE)
@@ -41,18 +39,31 @@ export default class ClearEmpty extends SfdxCommand {
             char: 'i',
             description: messages.getMessage('inputFlagDescription'),
         }),
+        sort: flags.enum({
+            char: 'S',
+            description: messages.getMessage('sortFlagDescription', ['true']),
+            options: ['true', 'false'],
+            default: 'true',
+        }),
+        mode: flags.enum({
+            char: 'm',
+            description: messages.getMessage('modeFlagDescription', ['string']),
+            options: ['string', 'logic'],
+            default: 'string',
+        }),
     };
 
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
-        
-        const result = await clearEmpty(this.flags, TRANSLATIONS_SUBPATH, TRANSLATION_ITEMS);
+
+        let result;
+        if (this.flags.mode === 'string') {
+            result = await areAligned(this.flags, TRANSLATIONS_SUBPATH, TRANSLATIONS_EXTENSION, TRANSLATIONS_ROOT_TAG, TRANSLATION_ITEMS);
+        } else {
+            result = await validateAlignment(this.flags, TRANSLATIONS_SUBPATH, TRANSLATIONS_EXTENSION, TRANSLATIONS_ROOT_TAG, TRANSLATION_ITEMS);
+        }
 
         Performance.getInstance().end();
-        return {
-            outputString: result.outputString,
-            deletedFiles: result.deletedFiles,
-            deletedFolders: result.deletedFolders
-        };
+        return result;
     }
 }

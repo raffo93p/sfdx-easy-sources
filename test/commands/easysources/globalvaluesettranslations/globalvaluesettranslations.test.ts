@@ -55,7 +55,21 @@ describe('easysources:glovalvaluesetranslations ', function () {
                 
             expect(await areFilesEqual(join(resourcesFolder, 'myGVST-en_US_merge2.globalValueSetTranslation-meta.xml'), join(sourceFolder, 'MyGVST-en_US.globalValueSetTranslation-meta.xml'))).to.be.true;
         });
-        
+
+    test
+        .stdout()
+        .command(['easysources:globalvaluesettranslations:arealigned', '-i', 'MyGVST-en_US', '--mode', 'logic'])
+        .it('runs easysources:globalvaluesettranslations:arealigned with logic mode', async (ctx) => {
+            expect(ctx.stdout).to.contain('1 aligned');
+        });
+
+    test
+        .stdout()
+        .command(['easysources:globalvaluesettranslations:arealigned', '-i', 'MyGVST-en_US', '--mode', 'string'])
+        .it('runs easysources:globalvaluesettranslations:arealigned with string mode', async (ctx) => {
+            expect(ctx.stdout).to.contain('1 aligned');
+        });
+
     test
         .stdout()
         .do(() => {

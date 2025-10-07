@@ -1,0 +1,11 @@
+{
+  "commandDescription": "Clear empty CSV files from profiles and remove empty folders",
+  "sfXmlFlagDescription": "Salesforce XML source path (default: %s)",
+  "esCsvFlagDescription": "Easy Sources CSV path (default: %s)",
+  "inputFlagDescription": "Comma-separated list of profile names to process. If not specified, all profiles will be processed",
+  "examples": [
+    "$ sfdx easysources:profiles:clearempty",
+    "$ sfdx easysources:profiles:clearempty --input Admin,Sales",
+    "$ sfdx easysources:profiles:clearempty --es-csv ./csv --sf-xml ./force-app"
+  ]
+}

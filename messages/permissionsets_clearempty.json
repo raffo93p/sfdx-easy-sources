@@ -1,0 +1,11 @@
+{
+  "commandDescription": "Clear empty CSV files from permission sets and remove empty folders",
+  "sfXmlFlagDescription": "Salesforce XML source path (default: %s)",
+  "esCsvFlagDescription": "Easy Sources CSV path (default: %s)",
+  "inputFlagDescription": "Comma-separated list of permission set names to process. If not specified, all permission sets will be processed",
+  "examples": [
+    "$ sfdx easysources:permissionsets:clearempty",
+    "$ sfdx easysources:permissionsets:clearempty --input Admin_Access,Custom_Perms",
+    "$ sfdx easysources:permissionsets:clearempty --es-csv ./csv --sf-xml ./force-app"
+  ]
+}

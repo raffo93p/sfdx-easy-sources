@@ -1,0 +1,23 @@
+{
+  "commandDescription": "Validates alignment between XML and CSV representations of translations using string comparison or logic comparison",
+  "sfXmlFlagDescription": "Salesforce XML path (default: %s)",
+  "esCsvFlagDescription": "Easy Sources CSV path (default: %s)",
+  "inputFlagDescription": "Comma-separated list of translation names to validate (without extension). If not specified, all translations will be validated",
+  "sortFlagDescription": "Sort CSV data before merging (default: %s)",
+  "modeFlagDescription": "Validation mode: 'string' for full string comparison, 'logic' for in-memory structure comparison (default: %s)",
+  "validationSuccess": "✅ Translation '%s' is properly aligned",
+  "validationError": "❌ Translation '%s' has misalignment",
+  "differenceFound": "   - %s",
+  "noItemsFound": "No translations found to validate",
+  "missingXmlFile": "❌ Original XML file not found: %s",
+  "missingCsvDirectory": "❌ CSV directory not found: %s",
+  "validationSummary": "Validation Summary: %s translations validated, %s aligned, %s misaligned",
+  "examples": [
+    "sfdx easysources:translations:arealigned",
+    "sfdx easysources:translations:arealigned --mode string",
+    "sfdx easysources:translations:arealigned --mode logic",
+    "sfdx easysources:translations:arealigned -i en_US,it_IT -m string",
+    "sfdx easysources:translations:arealigned -x ./force-app/main/default -c ./easysources --mode logic",
+    "sfdx easysources:translations:arealigned --sort false --mode string"
+  ]
+}

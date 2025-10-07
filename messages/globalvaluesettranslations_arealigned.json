@@ -1,0 +1,22 @@
+{
+  "commandDescription": "Validates alignment between XML and CSV representations of global value set translations using string comparison or logic comparison",
+  "sfXmlFlagDescription": "Salesforce XML path (default: %s)",
+  "esCsvFlagDescription": "Easy Sources CSV path (default: %s)",
+  "inputFlagDescription": "Comma-separated list of global value set translation names to validate (without extension). If not specified, all global value set translations will be validated",
+  "sortFlagDescription": "Sort CSV data before merging (default: %s)",
+  "modeFlagDescription": "Validation mode: 'string' for full string comparison, 'logic' for in-memory structure comparison (default: %s)",
+  "validationSuccess": "✅ Global Value Set Translation '%s' is properly aligned",
+  "validationError": "❌ Global Value Set Translation '%s' has misalignment",
+  "differenceFound": "   - %s",
+  "noGlobalValueSetTranslationsFound": "No global value set translations found to validate",
+  "missingXmlFile": "❌ Original XML file not found: %s",
+  "missingCsvDirectory": "❌ CSV directory not found: %s",
+  "validationSummary": "Validation Summary: %s global value set translations validated, %s aligned, %s misaligned",
+  "examples": [
+    "sfdx easysources:globalvaluesettranslations:arealigned",
+    "sfdx easysources:globalvaluesettranslations:arealigned --mode string",
+    "sfdx easysources:globalvaluesettranslations:arealigned --mode logic",
+    "sfdx easysources:globalvaluesettranslations:arealigned -i Priority-en_US,Status-es -m string",
+    "sfdx easysources:globalvaluesettranslations:arealigned -x ./force-app/main/default -c ./easysources --mode logic"
+  ]
+}

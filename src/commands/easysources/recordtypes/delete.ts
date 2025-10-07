@@ -121,10 +121,11 @@ export default class Delete extends SfdxCommand {
                         }
 
                     } else {
-                        
-                        for (var key of jsonMap.keys()) {
-                            if (jsonMap.get(key).picklist === picklist) {
-                                jsonMap.delete(key);
+                        for(var pick of picklist.split(',')){
+                            for (var key of jsonMap.keys()) {
+                                if (jsonMap.get(key).picklist === pick) {
+                                    jsonMap.delete(key);
+                                }
                             }
                         }
                     }

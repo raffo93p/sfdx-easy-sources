@@ -55,7 +55,21 @@ describe('easysources:labels ', function () {
                 
             expect(await areFilesEqual(join(resourcesFolder, 'myLabels_merge2.labels-meta.xml'), join(sourceFolder, 'CustomLabels.labels-meta.xml'))).to.be.true;
         });
-        
+
+    test
+        .stdout()
+        .command(['easysources:labels:arealigned', '-i', 'CustomLabels', '--mode', 'logic'])
+        .it('runs easysources:labels:arealigned with logic mode', async (ctx) => {
+            expect(ctx.stdout).to.contain('1 aligned');
+        });
+
+    test
+        .stdout()
+        .command(['easysources:labels:arealigned', '-i', 'CustomLabels', '--mode', 'string'])
+        .it('runs easysources:labels:arealigned with string mode', async (ctx) => {
+            expect(ctx.stdout).to.contain('1 aligned');
+        });
+
     test
         .stdout()
         .do(() => {

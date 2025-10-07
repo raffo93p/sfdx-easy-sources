@@ -110,5 +110,19 @@ describe('easysources:profiles ', function () {
                 
             expect(await areFilesEqual(join(resourcesFolder, 'myProfile_merge3.profile-meta.xml'), join(sourceFolder, 'MyProfile.profile-meta.xml'))).to.be.true;
         });
+
+    test
+        .stdout()
+        .command(['easysources:profiles:arealigned', '-i', 'MyProfile', '--mode', 'logic'])
+        .it('runs easysources:profiles:arealigned with logic mode', async (ctx) => {
+            expect(ctx.stdout).to.contain('1 aligned');
+        });
+
+    test
+        .stdout()
+        .command(['easysources:profiles:arealigned', '-i', 'MyProfile', '--mode', 'string'])
+        .it('runs easysources:profiles:arealigned with string mode', async (ctx) => {
+            expect(ctx.stdout).to.contain('1 aligned');
+        });
 });
 

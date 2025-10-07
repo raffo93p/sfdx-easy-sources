@@ -110,5 +110,19 @@ describe('easysources:permissionsets ', function () {
                 
             expect(await areFilesEqual(join(resourcesFolder, 'myPermSet_merge3.permissionset-meta.xml'), join(sourceFolder, 'MyPermSet.permissionset-meta.xml'))).to.be.true;
         });
+
+    test
+        .stdout()
+        .command(['easysources:permissionsets:arealigned', '-i', 'MyPermSet', '--mode', 'logic'])
+        .it('runs easysources:permissionsets:arealigned with logic mode', async (ctx) => {
+            expect(ctx.stdout).to.contain('1 aligned');
+        });
+
+    test
+        .stdout()
+        .command(['easysources:permissionsets:arealigned', '-i', 'MyPermSet', '--mode', 'string'])
+        .it('runs easysources:permissionsets:arealigned with string mode', async (ctx) => {
+            expect(ctx.stdout).to.contain('1 aligned');
+        });
 });
 
