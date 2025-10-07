@@ -13,6 +13,7 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
     
     const baseInputDir = join((flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), file_subpath) as string;
     const baseOutputDir = join((flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), file_subpath) as string;
+    const ignoreUserPerm = (flags.ignoreuserperm === 'true' || settings['ignore-user-permissions'] || false) as boolean;
     const inputFiles = (flags.input) as string;
 
     if (!fs.existsSync(baseInputDir)) {
@@ -42,7 +43,7 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
         const outputDir = join(baseOutputDir, fileName);
 
         for (const tag_section in file_items) {
-            if(flags.ignoreuserperm === 'true' && tag_section == PROFILE_USERPERM_ROOT){
+            if(ignoreUserPerm && tag_section == PROFILE_USERPERM_ROOT){
                 xmlFileContent[file_root_tag][tag_section] = null;
                 continue;
             } 

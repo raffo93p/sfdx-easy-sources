@@ -12,7 +12,8 @@ export function initSettings() {
     const settings = {
         "salesforce-xml-path": DEFAULT_SFXML_PATH,
         "easysources-csv-path": DEFAULT_ESCSV_PATH,
-        "easysources-log-path": DEFAULT_LOG_PATH
+        "easysources-log-path": DEFAULT_LOG_PATH,
+        "ignore-user-permissions": true
     }
     return settings;
 }
