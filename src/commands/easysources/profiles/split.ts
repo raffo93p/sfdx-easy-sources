@@ -53,9 +53,20 @@ export default class Split extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        var result = await split(this.flags, PROFILES_SUBPATH, PROFILES_EXTENSION, PROFILES_ROOT_TAG, PROFILE_ITEMS);
+        var result = await profileSplit(this.flags);
 
         Performance.getInstance().end();
         return result;
     }
+}
+
+/**
+ * Profile-specific split function that encapsulates all profile constants
+ * This function can be used programmatically without needing to pass profile constants
+ * 
+ * @param options - Profile split options (paths will be resolved automatically if not provided)
+ * @returns Promise with split operation result
+ */
+export async function profileSplit(options: any): Promise<any> {
+    return await split(options, PROFILES_SUBPATH, PROFILES_EXTENSION, PROFILES_ROOT_TAG, PROFILE_ITEMS);
 }

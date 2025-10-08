@@ -1,5 +1,17 @@
 # Release Notes
 
+## Version 0.8.0
+- **Major Enhancement: Complete Programmatic API** - Added comprehensive programmatic API support with automatic path resolution! You can now use all 9 profile operations directly in your Node.js scripts:
+  - **Core Operations**: `profiles.split()`, `profiles.upsert()`, `profiles.merge()`
+  - **Maintenance Operations**: `profiles.clearEmpty()`, `profiles.minify()`, `profiles.clean()`
+  - **Advanced Operations**: `profiles.delete()`, `profiles.updateKey()`, `profiles.areAligned()`
+  - **Automatic Path Resolution**: All methods auto-resolve paths from `easysources-settings.json` - specify only what you need to override
+  - **Unified Architecture**: Commands now export functions for API use while maintaining CLI compatibility
+  - **Zero Code Duplication**: CLI commands delegate to API functions for single source of truth
+  - **Complete TypeScript Support**: Full type definitions with `ProfileOptions` interface
+  - **Settings Integration**: Seamless integration with existing `easysources-settings.json` configuration
+  - See [API.md](./API.md) for complete documentation and examples
+
 ## Version 0.7.5
 - **Enhancement: Refactored `arealigned` command** - Performed comprehensive refactoring of the `arealigned` command to improve code readability and reduce code duplication. The merge logic has been extracted into reusable functions that are shared between the `merge` and `arealigned` commands, ensuring consistency and better maintainability while preserving all existing functionality.
 - **Enhancement: Automatic split execution in upsert commands** - Enhanced upsert commands to automatically run the split command when the destination CSV directory or part.xml file doesn't exist. This improvement creates a seamless workflow where users don't need to manually run split before upsert.
