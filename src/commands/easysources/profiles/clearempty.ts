@@ -46,7 +46,7 @@ export default class ClearEmpty extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
         
-        const result = await clearEmpty(this.flags, PROFILES_SUBPATH, PROFILE_ITEMS);
+        const result = await profileClearEmpty(this.flags);
 
         Performance.getInstance().end();
         return {
@@ -55,4 +55,9 @@ export default class ClearEmpty extends SfdxCommand {
             deletedFolders: result.deletedFolders
         };
     }
+}
+
+// Export a profile-specific clearEmpty function that encapsulates profile constants
+export async function profileClearEmpty(options: any): Promise<any> {
+    return await clearEmpty(options, PROFILES_SUBPATH, PROFILE_ITEMS);
 }

@@ -1,5 +1,17 @@
 # Release Notes
 
+## Version 0.8.0
+- **Major Enhancement: Complete Programmatic API** - Added comprehensive programmatic API support with automatic path resolution! You can now use all 9 profile operations directly in your Node.js scripts:
+  - **Core Operations**: `profiles.split()`, `profiles.upsert()`, `profiles.merge()`
+  - **Maintenance Operations**: `profiles.clearEmpty()`, `profiles.minify()`, `profiles.clean()`
+  - **Advanced Operations**: `profiles.delete()`, `profiles.updateKey()`, `profiles.areAligned()`
+  - **Automatic Path Resolution**: All methods auto-resolve paths from `easysources-settings.json` - specify only what you need to override
+  - **Unified Architecture**: Commands now export functions for API use while maintaining CLI compatibility
+  - **Zero Code Duplication**: CLI commands delegate to API functions for single source of truth
+  - **Complete TypeScript Support**: Full type definitions with `ProfileOptions` interface
+  - **Settings Integration**: Seamless integration with existing `easysources-settings.json` configuration
+  - See [API.md](./API.md) for complete documentation and examples
+
 ## Version 0.7.1
 - **Enhanced: `ignoreuserperm` flag support for profile splitting** - Extended the `--ignoreuserperm` flag to work with the `profiles:split` command, providing consistent behavior across both split and upsert operations. When enabled, user permissions are excluded from CSV generation during the splitting process.
 - **New Feature: Default configuration support** - Added support for default configuration values in the `easysources-settings.json` file. You can now set `"ignore-user-permissions": true` in your settings file to avoid specifying the flag on every command execution.

@@ -55,10 +55,15 @@ export default class Merge extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        var result = await merge(this.flags, PROFILES_SUBPATH, PROFILES_EXTENSION, PROFILES_ROOT_TAG, PROFILE_ITEMS);
+        var result = await profileMerge(this.flags);
 
         Performance.getInstance().end();
         return result;
 
     }
+}
+
+// Export a profile-specific merge function that encapsulates profile constants
+export async function profileMerge(options: any): Promise<any> {
+    return await merge(options, PROFILES_SUBPATH, PROFILES_EXTENSION, PROFILES_ROOT_TAG, PROFILE_ITEMS);
 }

@@ -48,9 +48,14 @@ export default class UpdateKey extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        var result = await updatekey(this.flags, PROFILES_SUBPATH, PROFILE_ITEMS);
+        var result = await profileUpdateKey(this.flags);
 
         Performance.getInstance().end();
         return result;
     }
+}
+
+// Export a profile-specific updatekey function that encapsulates profile constants
+export async function profileUpdateKey(options: any): Promise<any> {
+    return await updatekey(options, PROFILES_SUBPATH, PROFILE_ITEMS);
 }

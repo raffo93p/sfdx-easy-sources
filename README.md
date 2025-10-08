@@ -25,18 +25,18 @@ With this plugin you can:
 
 ## Supported metadata types
 
-| Metadata Label| Metadata api | Available commands    |
-| :---:    | :---:  | :---: | 
-| All Meta | allmeta   | split, upsert, merge, minify, retrieve   |
-| Profiles | profiles | split, upsert, merge, minify, updatekey, delete, clean, clearempty, arealigned |
-| Permission Sets | permissionsets | split, upsert, merge, minify, updatekey, delete, clean, clearempty, arealigned |
-| Record Types | recordtypes | split, upsert, merge, updatekey, delete, clean, arealigned |
-| Labels | labels | split, upsert, merge, updatekey, arealigned |
-| Global Value Sets | globalvaluesets | split, upsert, merge, updatekey, arealigned |
-| Global Value Set Translations | globalvaluesettranslations | split, upsert, merge, updatekey, arealigned |
-| Applications | applications | split, upsert, merge, updatekey, arealigned |
-| Object Translations | objecttranslations | split, upsert, merge, minify, updatekey, clearempty, arealigned |
-| Translations | translations | split, upsert, merge, minify, updatekey, clearempty, arealigned |
+| Metadata Label| Metadata api | Available commands    | Programmatic API |
+| :---:    | :---:  | :---: | :---: |
+| All Meta | allmeta   | split, upsert, merge, minify, retrieve   | ❌ |
+| Profiles | profiles | split, upsert, merge, minify, updatekey, delete, clean, clearempty, arealigned | ✅ **Complete** |
+| Permission Sets | permissionsets | split, upsert, merge, minify, updatekey, delete, clean, clearempty, arealigned | 🔄 **Planned** |
+| Record Types | recordtypes | split, upsert, merge, updatekey, delete, clean, arealigned | 🔄 **Planned** |
+| Labels | labels | split, upsert, merge, updatekey, arealigned | 🔄 **Planned** |
+| Global Value Sets | globalvaluesets | split, upsert, merge, updatekey, arealigned | 🔄 **Planned** |
+| Global Value Set Translations | globalvaluesettranslations | split, upsert, merge, updatekey, arealigned | 🔄 **Planned** |
+| Applications | applications | split, upsert, merge, updatekey, arealigned | 🔄 **Planned** |
+| Object Translations | objecttranslations | split, upsert, merge, minify, updatekey, clearempty, arealigned | 🔄 **Planned** |
+| Translations | translations | split, upsert, merge, minify, updatekey, clearempty, arealigned | 🔄 **Planned** |
 
 
 
@@ -45,7 +45,7 @@ $ npm install -g sfdx-easy-sources
 or
 $ sfdx plugin:install sfdx-easy-sources
 
-GENERAL USAGE
+GENERAL USAGE (CLI)
   $ sfdx easysources:<metadataapi>:<command> [...parameters]
   $ sfdx easysources:<metadataapi>:<command> --help    // to get help, the list of parameters and some examples
 Examples
@@ -53,6 +53,75 @@ Examples
   $ sfdx easysources:labels:upsert
 ...
 ```
+
+## 🚀 Programmatic API Usage
+
+**NEW in v0.8.0**: Complete programmatic API with automatic path resolution! Use all profile operations in your Node.js scripts without CLI overhead:
+
+```javascript
+// JavaScript - with automatic path resolution
+const { profiles } = require('sfdx-easy-sources');
+
+async function automateProfiles() {
+  // Minimal usage - paths auto-resolved from settings file
+  await profiles.split({
+    input: 'Admin,Standard User'  // Paths come from easysources-settings.json
+  });
+  
+  // Complete workflow with all operations
+  await profiles.upsert({ input: 'Admin' });
+  await profiles.minify();
+  await profiles.clearEmpty();
+  await profiles.merge({ input: 'Admin' });
+}
+```
+
+```typescript
+// TypeScript - with full type safety
+import { profiles, ProfileOptions } from 'sfdx-easy-sources';
+
+async function automateProfiles() {
+  // Auto-resolved paths with type safety
+  const result = await profiles.split({
+    input: 'Admin,Standard User',
+    ignoreuserperm: 'true'
+  });
+  
+  // Advanced operations
+  await profiles.clean({
+    orgname: 'myorg',
+    target: 'org'
+  });
+  
+  await profiles.delete({
+    type: 'fieldPermissions',
+    tagid: 'Account.OldField__c'
+  });
+}
+```
+
+See the `examples/` directory for more complete usage examples.
+
+**📚 Full API Documentation:** [API.md](./API.md)
+
+### Key API Features
+
+- **🔧 Automatic Path Resolution**: Use settings file for defaults, override only what you need
+- **📦 Complete Profile API**: All 9 profile operations available programmatically  
+- **🎯 Zero Duplication**: Unified architecture - CLI commands delegate to API functions
+- **⚙️ TypeScript Support**: Full type definitions with `ProfileOptions` interface
+- **🔗 Settings Integration**: Seamless use of existing `easysources-settings.json`
+
+### Available Profile API Methods
+- `profiles.split(options)` - Split XML files into CSV files
+- `profiles.upsert(options)` - Upsert XML data into existing CSV files  
+- `profiles.merge(options)` - Merge CSV files back to XML
+- `profiles.clearEmpty(options)` - Remove empty CSV files
+- `profiles.areAligned(options)` - Check XML/CSV alignment
+- `profiles.updateKey(options)` - Update keys across CSV files
+- `profiles.minify(options)` - Remove entries with only false permissions
+- `profiles.delete(options)` - Delete specific entries from CSV files
+- `profiles.clean(options)` - Remove references to non-existent metadata
 
 
 Based on the source type, this plugin provides the following commands:
