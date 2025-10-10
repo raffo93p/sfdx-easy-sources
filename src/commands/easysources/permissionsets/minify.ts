@@ -12,12 +12,11 @@ const fs = require('fs-extra');
 import { join } from "path";
 import Performance from '../../../utils/performance';
 const { Parser, transforms: { unwind } } = require('json2csv');
-import { PROFILE_ITEMS, PROFILE_TAG_BOOL } from "../../../utils/constants/constants_profiles";
 import { calcCsvFilename, checkDirOrErrorSync, readCsvToJsonArray } from "../../../utils/filesUtils"
 import { sortByKey, toArray } from "../../../utils/utils"
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
 import { loadSettings } from '../../../utils/localSettings';
-import { PERMSETS_SUBPATH } from '../../../utils/constants/constants_permissionsets';
+import { PERMSETS_SUBPATH, PERMSET_ITEMS, PERMSET_TAG_BOOL } from '../../../utils/constants/constants_permissionsets';
 
 const settings = loadSettings();
 
@@ -82,7 +81,7 @@ export default class Clean extends SfdxCommand {
         for (const profileName of profileList) {
             console.log('Minifying on: ' + profileName);
 
-            for (const tag_section in PROFILE_ITEMS) {
+            for (const tag_section in PERMSET_ITEMS) {
                 // tag_section is a profile section (applicationVisibilities, classAccess ecc)
 
                 const csvFilePath = join(csvDir, profileName, calcCsvFilename(profileName, tag_section));
@@ -94,9 +93,9 @@ export default class Clean extends SfdxCommand {
                     
                     resListCsv = resListCsv.filter(function(res) {
                         // return true to persist, false to delete
-                        if(PROFILE_TAG_BOOL[tag_section] == null) return true;
+                        if(PERMSET_TAG_BOOL[tag_section] == null) return true;
 
-                        for(const boolName of toArray(PROFILE_TAG_BOOL[tag_section]) ){
+                        for(const boolName of toArray(PERMSET_TAG_BOOL[tag_section]) ){
                             if(res[boolName] === 'true' || res[boolName] === 'FALSE') return true;
                         }
 
@@ -105,7 +104,7 @@ export default class Clean extends SfdxCommand {
                     
                     
                     // write the cleaned csv
-                    const headers = PROFILE_ITEMS[tag_section].headers;
+                    const headers = PERMSET_ITEMS[tag_section].headers;
                     const transforms = [unwind({ paths: headers })];
                     const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
 

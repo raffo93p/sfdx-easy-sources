@@ -67,7 +67,7 @@ export const PERMSET_ITEMS = {
 }
 
 // used for minify command
-export const PROFILE_TAG_BOOL = {
+export const PERMSET_TAG_BOOL = {
     [PERMSET_APP_ROOT]:  ['default', 'visible'],
     [PERMSET_CLASS_ROOT]: ['enabled'],
     [PERMSET_CMDT_ROOT]: ['enabled'],

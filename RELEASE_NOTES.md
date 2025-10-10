@@ -1,5 +1,8 @@
 # Release Notes
 
+## Version 0.7.3
+- **Bug Fix: Permission Sets minify command configuration** - Fixed a critical bug in the `permissionsets:minify` command where it was incorrectly using Profile constants instead of Permission Set constants. The command now properly uses `PERMSET_ITEMS` and `PERMSET_TAG_BOOL` configurations, ensuring correct handling of Permission Set-specific fields including `viewAllFields` in the minification process.
+
 ## Version 0.7.2
 - **New Feature: Permission Sets `viewAllFields` support for API version 63+** - Added support for the new `viewAllFields` tag in object permissions section of Permission Sets, introduced in Salesforce API version 63. When splitting or upserting Permission Sets, the `viewAllFields` column will be automatically included in CSV files. For XML files that don't contain this tag, the CSV column will be created with empty values. The merge operation is fully backward compatible: if the tag exists but is empty in the CSV, it will not be included in the generated XML file.
 - **Bug Fix: `ignore-user-permissions` setting scope correction** - Fixed a bug where the `ignore-user-permissions` setting in `easysources-settings.json` was incorrectly applied to Permission Sets in addition to Profiles. The setting now correctly works only on Profiles, as intended. Permission Sets maintain their user permissions handling due to their different functionality compared to Profiles.
