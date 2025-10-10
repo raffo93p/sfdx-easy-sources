@@ -31,7 +31,7 @@ export const PERMSET_FIELD_KEY = 'field';
 // export const PERMSET_LAYOUT_KEY = PERMSET_LAYOUT_HEADER;
 
 export const PERMSET_OBJECT_ROOT = 'objectPermissions';
-export const PERMSET_OBJECT_HEADER = ['allowCreate', 'allowDelete', 'allowEdit', 'allowRead', 'modifyAllRecords', 'object', 'viewAllRecords'];
+export const PERMSET_OBJECT_HEADER = ['allowCreate', 'allowDelete', 'allowEdit', 'allowRead', 'modifyAllRecords', 'object', 'viewAllFields', 'viewAllRecords'];
 export const PERMSET_OBJECT_KEY = 'object';
 
 export const PERMSET_PAGE_ROOT = 'pageAccesses';
@@ -75,7 +75,7 @@ export const PROFILE_TAG_BOOL = {
     [PERMSET_CSET_ROOT]: ['enabled'], // ?? 
     [PERMSET_FIELD_ROOT]: ['editable', 'readable'],
     // [PERMSET_LAYOUT_ROOT]: [],
-    [PERMSET_OBJECT_ROOT]: ['allowCreate', 'allowDelete', 'allowEdit', 'allowRead', 'modifyAllRecords', 'viewAllRecords'],
+    [PERMSET_OBJECT_ROOT]: ['allowCreate', 'allowDelete', 'allowEdit', 'allowRead', 'modifyAllRecords', 'viewAllFields', 'viewAllRecords'],
     [PERMSET_PAGE_ROOT]: ['enabled'],
     [PERMSET_RECTYPE_ROOT]: ['default', 'personAccountDefault', 'visible'],
     // [PERMSET_TAB_ROOT]: ['visibility'],

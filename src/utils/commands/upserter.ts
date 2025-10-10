@@ -3,7 +3,7 @@ import { sortByKey, generateTagId } from "../utils"
 const { Parser, transforms: { unwind } } = require('json2csv');
 import { join } from "path";
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../constants/constants';
-import { PROFILE_USERPERM_ROOT } from '../constants/constants_profiles';
+import { PROFILE_USERPERM_ROOT, PROFILES_SUBPATH } from '../constants/constants_profiles';
 import { loadSettings } from '../localSettings';
 const fs = require('fs-extra');
 
@@ -13,7 +13,7 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
     
     const baseInputDir = join((flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), file_subpath) as string;
     const baseOutputDir = join((flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), file_subpath) as string;
-    const ignoreUserPerm = (flags.ignoreuserperm === 'true' || settings['ignore-user-permissions'] || false) as boolean;
+    const ignoreUserPerm = (file_subpath === PROFILES_SUBPATH && (flags.ignoreuserperm === 'true' || settings['ignore-user-permissions']) || false) as boolean;
     const inputFiles = (flags.input) as string;
 
     if (!fs.existsSync(baseInputDir)) {
