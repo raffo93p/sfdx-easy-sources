@@ -1,5 +1,8 @@
 # Release Notes
 
+## Version 0.7.4
+- **Enhancement: Improved merge behavior for empty tags** - Modified the merge operation to handle empty tags more intelligently. When a `part.xml` file contains an empty tag and the corresponding CSV file does not exist, the empty tag will no longer be included in the merged output file. This results in cleaner, more optimized XML files by eliminating unnecessary empty sections.
+
 ## Version 0.7.3
 - **Bug Fix: Permission Sets minify command configuration** - Fixed a critical bug in the `permissionsets:minify` command where it was incorrectly using Profile constants instead of Permission Set constants. The command now properly uses `PERMSET_ITEMS` and `PERMSET_TAG_BOOL` configurations, ensuring correct handling of Permission Set-specific fields including `viewAllFields` in the minification process.
 

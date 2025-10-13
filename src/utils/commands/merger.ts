@@ -64,6 +64,8 @@ export async function merge(flags, file_subpath, file_extension, file_root_tag, 
 
                 jsonArray = flatToArray(jsonArray)
                 mergedXml[file_root_tag][tag_section] = sortByKey(jsonArray);
+            } else {
+                delete mergedXml[file_root_tag][tag_section];
             }
         }
 
