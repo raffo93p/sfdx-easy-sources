@@ -17,6 +17,7 @@ import { join } from "path";
 import { RECORDTYPES_EXTENSION, RECORDTYPES_ROOT_TAG, RECORDTYPES_SUBPATH, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
 import { transformXMLtoCSV } from '../../../utils/utils_recordtypes';
 import { loadSettings } from '../../../utils/localSettings';
+import { executeCommand } from '../../../utils/commands/utils';
 const fs = require('fs-extra');
 
 const settings = loadSettings();
@@ -104,14 +105,26 @@ export default class Upsert extends SfdxCommand {
                 console.log('Upserting: ' + filename);
 
                 const inputFile = join(baseInputDir, obj, 'recordTypes', fullFilename);
+                const recordtypeName = removeExtension(fullFilename);
 
+                const outputDir = join(baseOutputDir, obj, 'recordTypes', recordtypeName);
+                const inputFilePart = join(baseOutputDir, obj, 'recordTypes', recordtypeName, recordtypeName + XML_PART_EXTENSION);
+
+                // If outputDir or inputFilePart doesn't exist, run split command instead
+                if (!fs.existsSync(outputDir) || !fs.existsSync(inputFilePart)) {
+                    console.log('⚠️ Output csv directory or -part.xml file not found. Running split command for object: ' + obj + ', recordtype: ' + filename);
+                    // Create flags for split command with just the current object and recordtype
+                    const splitFlags = {
+                        ...this.flags,
+                        object: obj,
+                        recordtype: filename
+                    };
+                    await executeCommand(splitFlags, 'split', 'recordtypes');
+                    continue;
+                }
 
                 const xmlFileContent = (await readXmlFromFile(inputFile)) ?? {};
                 const recordtypeProperties = xmlFileContent[RECORDTYPES_ROOT_TAG] ?? {};
-
-                const recordtypeName = removeExtension(fullFilename);
-                const outputDir = join(baseOutputDir, obj, 'recordTypes', recordtypeName);
-
                 for (const tag_section in RECORDTYPE_ITEMS) {
 
                     var jsonArray = recordtypeProperties[tag_section];
@@ -163,7 +176,6 @@ export default class Upsert extends SfdxCommand {
                     xmlFileContent[RECORDTYPES_ROOT_TAG][tag_section] = null;
 
                 }
-                const inputFilePart = join(baseOutputDir, obj, 'recordTypes', recordtypeName, recordtypeName + XML_PART_EXTENSION);
 
                 if (fs.existsSync(inputFilePart)) {
                     const xmlFileContentPart = (await readXmlFromFile(inputFilePart)) ?? {};

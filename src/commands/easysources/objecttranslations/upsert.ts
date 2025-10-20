@@ -17,6 +17,7 @@ import { join } from "path";
 import { loadSettings } from '../../../utils/localSettings';
 import { OBJTRANSL_CFIELDTRANSL_ROOT, OBJTRANSL_CFIELDTRANSL_ROOT_TAG, OBJTRANSL_EXTENSION, OBJTRANSL_ITEMS, OBJTRANSL_LAYOUT_ROOT, OBJTRANSL_ROOT_TAG, OBJTRANSL_SUBPATH } from '../../../utils/constants/constants_objecttranslations';
 import { getFieldTranslationFiles, transformFieldXMLtoCSV, transformLayoutXMLtoCSV } from '../../../utils/utils_objtransl';
+import { executeCommand } from '../../../utils/commands/utils';
 const fs = require('fs-extra');
 
 const settings = loadSettings();
@@ -88,11 +89,25 @@ export default class Upsert extends SfdxCommand {
 
             console.log('Upserting: ' + objTrName);
 
+            const outputDir = join(baseOutputDir, objTrName, 'csv');
+            const inputFilePart = join(baseOutputDir, objTrName, 'csv', objTrName + XML_PART_EXTENSION);
+
+            // If outputDir or inputFilePart doesn't exist, run split command instead
+            if (!fs.existsSync(outputDir) || !fs.existsSync(inputFilePart)) {
+                console.log('⚠️ Output csv directory or -part.xml file not found. Running split command for: ' + objTrName);
+                // Create flags for split command with just the current object
+                const splitFlags = {
+                    ...this.flags,
+                    input: objTrName
+                };
+                await executeCommand(splitFlags, 'split', 'objecttranslations');
+                continue;
+            }
 
             const xmlFileContent = (await readXmlFromFile(inputFile)) ?? {};
             const objTranslProperties = xmlFileContent[OBJTRANSL_ROOT_TAG] ?? {};
 
-            const outputDir = join(baseOutputDir, objTrName, 'csv');
+            
 
 
 
@@ -166,7 +181,6 @@ export default class Upsert extends SfdxCommand {
                 if(tag_section !== OBJTRANSL_CFIELDTRANSL_ROOT) xmlFileContent[OBJTRANSL_ROOT_TAG][tag_section] = null;
 
             }
-            const inputFilePart = join(baseOutputDir, objTrName, 'csv', objTrName + XML_PART_EXTENSION);
 
             if (fs.existsSync(inputFilePart)) {
                 const xmlFileContentPart = (await readXmlFromFile(inputFilePart)) ?? {};

@@ -1,5 +1,6 @@
 import { readXmlFromFile, readCsvToJsonMap, jsonArrayCsvToMap, removeExtension, writeXmlToFile, calcCsvFilename } from '../filesUtils'
 import { sortByKey, generateTagId } from "../utils"
+import { split } from './splitter'
 const { Parser, transforms: { unwind } } = require('json2csv');
 import { join } from "path";
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../constants/constants';
@@ -34,13 +35,25 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
         const fullFilename = filename.endsWith(file_extension) ? filename : filename + file_extension;
         console.log('Upserting: ' + fullFilename);
 
-        const inputFile = join(baseInputDir, fullFilename);
-
-        const xmlFileContent = (await readXmlFromFile(inputFile)) ?? {};
-        const fileProperties = xmlFileContent[file_root_tag] ?? {};
-
         const fileName = removeExtension(fullFilename);
         const outputDir = join(baseOutputDir, fileName);
+        const inputFilePart = join(baseOutputDir, fileName, fileName + XML_PART_EXTENSION);
+
+        // If outputDir or inputFilePart doesn't exist, run split command instead
+        if (!fs.existsSync(outputDir) || !fs.existsSync(inputFilePart)) {
+            console.log('⚠️ Output csv directory or -part.xml file not found. Running split command for: ' + fullFilename);
+            // Create flags object with just the current file
+            const splitFlags = {
+                ...flags,
+                input: fullFilename
+            };
+            await split(splitFlags, file_subpath, file_extension, file_root_tag, file_items);
+            continue;
+        }
+
+        const inputFile = join(baseInputDir, fullFilename);
+        const xmlFileContent = (await readXmlFromFile(inputFile)) ?? {};
+        const fileProperties = xmlFileContent[file_root_tag] ?? {};
 
         for (const tag_section in file_items) {
             if(ignoreUserPerm && tag_section == PROFILE_USERPERM_ROOT){
@@ -94,7 +107,6 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
             
         }
 
-        const inputFilePart = join(baseOutputDir, fileName, fileName + XML_PART_EXTENSION);
         if (fs.existsSync(inputFilePart)) {
             const xmlFileContentPart = (await readXmlFromFile(inputFilePart)) ?? {};
             const filePropertiesPart = xmlFileContentPart[file_root_tag] ?? {};
