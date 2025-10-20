@@ -15,28 +15,25 @@ import {
     OBJTRANSL_SUBPATH,
     OBJTRANSL_CFIELDTRANSL_ROOT,
     OBJTRANSL_CFIELDTRANSL_ROOT_TAG,
-    OBJTRANSL_FIELDTRANSL_EXTENSION,
-    OBJTRANSL_LAYOUT_ROOT
+    OBJTRANSL_FIELDTRANSL_EXTENSION
 } from '../../../utils/constants/constants_objecttranslations';
 import Performance from '../../../utils/performance';
-import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../../../utils/constants/constants';
+import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
 const fs = require('fs-extra');
 import { join } from "path";
 import { 
     readXmlFromFile, 
-    readCsvToJsonArrayWithNulls, 
-    calcCsvFilename, 
     writeXmlToFile, 
     readStringFromFile 
 } from "../../../utils/filesUtils";
 import { loadSettings } from "../../../utils/localSettings";
-import { sortByKey } from "../../../utils/utils";
 import { tmpdir } from "os";
-import { flatToArray } from "../../../utils/flatArrayUtils";
 import { 
-    getFieldTranslationFiles, 
-    removeEmpyOptionalTags, 
-    transformFieldCSVtoXMLs 
+    mergeObjectTranslationFromCsv,
+    getFieldTranslationsFromCsv
+} from './merge';
+import { 
+    getFieldTranslationFiles
 } from '../../../utils/utils_objtransl';
 
 const settings = loadSettings();
@@ -219,53 +216,9 @@ export default class AreAligned extends SfdxCommand {
                 };
             }
 
-            // Reconstruct XML from CSV
-            const inputXML = join(objectCsvDir, objectName) + XML_PART_EXTENSION;
-            if (!fs.existsSync(inputXML)) {
-                return {
-                    itemName: objectName,
-                    isAligned: false,
-                    differences: [`Base XML part not found: ${inputXML}`],
-                    isWarning: true
-                };
-            }
-
-            const reconstructedXml = (await readXmlFromFile(inputXML)) ?? {};
+            // Reconstruct XML from CSV using shared merge logic
+            const reconstructedXml = await mergeObjectTranslationFromCsv(objectName, objectCsvDir, this.flags);
             
-            // Read and merge CSV data (excluding fieldTranslations which are handled separately)
-            for (const sectionName in OBJTRANSL_ITEMS) {
-                if (sectionName === OBJTRANSL_CFIELDTRANSL_ROOT) continue; // Skip fieldTranslations, handled separately
-                
-                const csvFilePath = join(objectCsvDir, calcCsvFilename(objectName, sectionName));
-                if (fs.existsSync(csvFilePath)) {
-                    var jsonArray = await readCsvToJsonArrayWithNulls(csvFilePath);
-
-                    if (this.flags.sort === 'true') {
-                        jsonArray = sortByKey(jsonArray);
-                    }
-
-                    // Remove _tagid for comparison
-                    for (var i in jsonArray) {
-                        delete jsonArray[i]['_tagid'];
-                    }
-
-                    if (jsonArray.length == 0) {
-                        delete reconstructedXml[OBJTRANSL_ROOT_TAG][sectionName];
-                        continue;
-                    }
-
-                    // Pre-process for empty optional tags
-                    removeEmpyOptionalTags(jsonArray, sectionName);
-
-                    // Pre-process for layout flatToArray
-                    if (sectionName === OBJTRANSL_LAYOUT_ROOT) {
-                        jsonArray = flatToArray(jsonArray);
-                    }
-
-                    reconstructedXml[OBJTRANSL_ROOT_TAG][sectionName] = jsonArray;
-                }
-            }
-
             // Compare main object translation structures
             const originalData = originalXml[OBJTRANSL_ROOT_TAG] || {};
             const reconstructedData = reconstructedXml[OBJTRANSL_ROOT_TAG] || {};
@@ -334,54 +287,46 @@ export default class AreAligned extends SfdxCommand {
             const objectXmlDir = join(xmlDir, objectName);
             const fieldTranslationFiles = getFieldTranslationFiles(objectXmlDir);
             
-            // Read CSV for fieldTranslations
-            const csvFilePath = join(csvDir, calcCsvFilename(objectName, OBJTRANSL_CFIELDTRANSL_ROOT));
-            
-            if (fs.existsSync(csvFilePath)) {
-                const jsonArray = await readCsvToJsonArrayWithNulls(csvFilePath);
-                const fieldXmlArray = transformFieldCSVtoXMLs(jsonArray);
+            // Use shared logic to get field translations from CSV
+            const fieldXmlArray = await getFieldTranslationsFromCsv(objectName, csvDir);
 
-                // Compare counts
-                if (fieldTranslationFiles.length !== fieldXmlArray.length) {
-                    differences.push(`fieldTranslations: File count mismatch (XML: ${fieldTranslationFiles.length}, CSV: ${fieldXmlArray.length})`);
-                }
-
-                // Validate each field translation
-                for (const fieldEntry of fieldXmlArray) {
-                    const expectedFileName = fieldEntry.name + OBJTRANSL_FIELDTRANSL_EXTENSION;
-                    const expectedFilePath = join(objectXmlDir, expectedFileName);
-                    
-                    if (!fs.existsSync(expectedFilePath)) {
-                        differences.push(`fieldTranslations: Missing XML file for ${fieldEntry.name}`);
-                        continue;
-                    }
-
-                    // Compare content
-                    const originalXml = await readXmlFromFile(expectedFilePath);
-                    const reconstructedXml = { [OBJTRANSL_CFIELDTRANSL_ROOT_TAG]: fieldEntry };
-                    
-                    const originalStr = JSON.stringify(originalXml);
-                    const reconstructedStr = JSON.stringify(reconstructedXml);
-                    
-                    if (originalStr !== reconstructedStr) {
-                        differences.push(`fieldTranslations: Content mismatch for ${fieldEntry.name}`);
-                    }
-                }
-
-                // Check for XML files not represented in CSV
-                for (const xmlFile of fieldTranslationFiles) {
-                    const fieldName = xmlFile.replace(OBJTRANSL_FIELDTRANSL_EXTENSION, '');
-                    const foundInCsv = fieldXmlArray.some(entry => entry.name === fieldName);
-                    
-                    if (!foundInCsv) {
-                        differences.push(`fieldTranslations: XML file ${xmlFile} not represented in CSV`);
-                    }
-                }
-                
-            } else if (fieldTranslationFiles.length > 0) {
-                differences.push(`fieldTranslations: CSV file missing but ${fieldTranslationFiles.length} XML files exist`);
+            // Compare counts
+            if (fieldTranslationFiles.length !== fieldXmlArray.length) {
+                differences.push(`fieldTranslations: File count mismatch (XML: ${fieldTranslationFiles.length}, CSV: ${fieldXmlArray.length})`);
             }
 
+            // Validate each field translation
+            for (const fieldEntry of fieldXmlArray) {
+                const expectedFileName = fieldEntry.name + OBJTRANSL_FIELDTRANSL_EXTENSION;
+                const expectedFilePath = join(objectXmlDir, expectedFileName);
+                
+                if (!fs.existsSync(expectedFilePath)) {
+                    differences.push(`fieldTranslations: Missing XML file for ${fieldEntry.name}`);
+                    continue;
+                }
+
+                // Compare content
+                const originalXml = await readXmlFromFile(expectedFilePath);
+                const reconstructedXml = { [OBJTRANSL_CFIELDTRANSL_ROOT_TAG]: fieldEntry };
+                
+                const originalStr = JSON.stringify(originalXml);
+                const reconstructedStr = JSON.stringify(reconstructedXml);
+                
+                if (originalStr !== reconstructedStr) {
+                    differences.push(`fieldTranslations: Content mismatch for ${fieldEntry.name}`);
+                }
+            }
+
+            // Check for XML files not represented in CSV
+            for (const xmlFile of fieldTranslationFiles) {
+                const fieldName = xmlFile.replace(OBJTRANSL_FIELDTRANSL_EXTENSION, '');
+                const foundInCsv = fieldXmlArray.some(entry => entry.name === fieldName);
+                
+                if (!foundInCsv) {
+                    differences.push(`fieldTranslations: XML file ${xmlFile} not represented in CSV`);
+                }
+            }
+                
         } catch (error) {
             differences.push(`fieldTranslations validation error: ${error.message}`);
         }
@@ -484,49 +429,8 @@ export default class AreAligned extends SfdxCommand {
                 };
             }
 
-            // Reconstruct XML from CSV following the same logic as merge
-            const inputXML = join(objectCsvDir, objectName) + XML_PART_EXTENSION;
-            if (!fs.existsSync(inputXML)) {
-                return {
-                    itemName: objectName,
-                    isAligned: false,
-                    differences: [`Base XML part not found: ${inputXML}`],
-                    isWarning: true
-                };
-            }
-
-            const mergedXml = (await readXmlFromFile(inputXML)) ?? {};
-
-            // Process CSV files
-            for (const sectionName in OBJTRANSL_ITEMS) {
-                if (sectionName === OBJTRANSL_CFIELDTRANSL_ROOT) continue; // Skip fieldTranslations
-                
-                const csvFilePath = join(objectCsvDir, calcCsvFilename(objectName, sectionName));
-                if (fs.existsSync(csvFilePath)) {
-                    var jsonArray = await readCsvToJsonArrayWithNulls(csvFilePath);
-
-                    if (this.flags.sort === 'true') {
-                        jsonArray = sortByKey(jsonArray);
-                    }
-
-                    for (var i in jsonArray) {
-                        delete jsonArray[i]['_tagid'];
-                    }
-
-                    if (jsonArray.length == 0) {
-                        delete mergedXml[OBJTRANSL_ROOT_TAG][sectionName];
-                        continue;
-                    }
-
-                    removeEmpyOptionalTags(jsonArray, sectionName);
-
-                    if (sectionName === OBJTRANSL_LAYOUT_ROOT) {
-                        jsonArray = flatToArray(jsonArray);
-                    }
-
-                    mergedXml[OBJTRANSL_ROOT_TAG][sectionName] = jsonArray;
-                }
-            }
+            // Reconstruct XML from CSV using shared merge logic
+            const mergedXml = await mergeObjectTranslationFromCsv(objectName, objectCsvDir, this.flags);
 
             // Write reconstructed XML to temp file
             const tempDir = tmpdir();
@@ -579,42 +483,40 @@ export default class AreAligned extends SfdxCommand {
             const objectXmlDir = join(xmlDir, objectName);
             const fieldTranslationFiles = getFieldTranslationFiles(objectXmlDir);
             
-            const csvFilePath = join(csvDir, calcCsvFilename(objectName, OBJTRANSL_CFIELDTRANSL_ROOT));
-            
-            if (fs.existsSync(csvFilePath)) {
-                const jsonArray = await readCsvToJsonArrayWithNulls(csvFilePath);
-                const fieldXmlArray = transformFieldCSVtoXMLs(jsonArray);
+            // Use shared logic to get field translations from CSV
+            const fieldXmlArray = await getFieldTranslationsFromCsv(objectName, csvDir);
 
-                // For each expected field translation file, reconstruct and compare
-                for (const fieldEntry of fieldXmlArray) {
-                    const expectedFilePath = join(objectXmlDir, fieldEntry.name + OBJTRANSL_FIELDTRANSL_EXTENSION);
-                    
-                    if (fs.existsSync(expectedFilePath)) {
-                        const originalString = await readStringFromFile(expectedFilePath);
-                        
-                        // Create temp file for reconstructed content
-                        const tempDir = tmpdir();
-                        const tempFile = join(tempDir, `temp_field_${fieldEntry.name}_${Date.now()}.xml`);
-                        
-                        await writeXmlToFile(tempFile, { [OBJTRANSL_CFIELDTRANSL_ROOT_TAG]: fieldEntry });
-                        const reconstructedString = await readStringFromFile(tempFile);
-                        
-                        // Clean up
-                        try {
-                            fs.unlinkSync(tempFile);
-                        } catch (error) {
-                            // Ignore cleanup errors
-                        }
-                        
-                        if (originalString.trim() !== reconstructedString.trim()) {
-                            differences.push(`fieldTranslations: Content differs for ${fieldEntry.name}`);
-                        }
-                    } else {
-                        differences.push(`fieldTranslations: Missing XML file for ${fieldEntry.name}`);
-                    }
-                }
+            // For each expected field translation file, reconstruct and compare
+            for (const fieldEntry of fieldXmlArray) {
+                const expectedFilePath = join(objectXmlDir, fieldEntry.name + OBJTRANSL_FIELDTRANSL_EXTENSION);
                 
-            } else if (fieldTranslationFiles.length > 0) {
+                if (fs.existsSync(expectedFilePath)) {
+                    const originalString = await readStringFromFile(expectedFilePath);
+                    
+                    // Create temp file for reconstructed content
+                    const tempDir = tmpdir();
+                    const tempFile = join(tempDir, `temp_field_${fieldEntry.name}_${Date.now()}.xml`);
+                    
+                    await writeXmlToFile(tempFile, { [OBJTRANSL_CFIELDTRANSL_ROOT_TAG]: fieldEntry });
+                    const reconstructedString = await readStringFromFile(tempFile);
+                    
+                    // Clean up
+                    try {
+                        fs.unlinkSync(tempFile);
+                    } catch (error) {
+                        // Ignore cleanup errors
+                    }
+                    
+                    if (originalString.trim() !== reconstructedString.trim()) {
+                        differences.push(`fieldTranslations: Content differs for ${fieldEntry.name}`);
+                    }
+                } else {
+                    differences.push(`fieldTranslations: Missing XML file for ${fieldEntry.name}`);
+                }
+            }
+            
+            // Check if there are field translation files but no CSV
+            if (fieldXmlArray.length === 0 && fieldTranslationFiles.length > 0) {
                 differences.push(`fieldTranslations: CSV file missing but ${fieldTranslationFiles.length} XML files exist`);
             }
 

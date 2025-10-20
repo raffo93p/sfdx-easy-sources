@@ -8,6 +8,53 @@ import { flatToArray } from "../flatArrayUtils";
 
 const settings = loadSettings();
 
+/**
+ * Core merge logic that creates merged XML from CSV files in memory
+ * @param itemName - name of the item to merge
+ * @param csvDirPath - path to the CSV directory
+ * @param file_root_tag - root XML tag
+ * @param file_items - configuration for file items
+ * @param flags - command flags
+ * @returns merged XML object
+ */
+export async function mergeItemFromCsv(itemName: string, csvDirPath: string, file_root_tag: string, file_items: any, flags: any): Promise<any> {
+    const inputXML = join(csvDirPath, itemName) + XML_PART_EXTENSION;
+    
+    if (!fs.existsSync(inputXML)) {
+        throw new Error(`${inputXML} not found`);
+    }
+
+    const mergedXml = (await readXmlFromFile(inputXML)) ?? {};
+
+    // tag_section is each file section (applicationVisibilities, classAccess ecc)
+    for (const tag_section in file_items) {
+        const csvFilePath = join(csvDirPath, calcCsvFilename(itemName, tag_section));
+        if (fs.existsSync(csvFilePath)) {
+            var jsonArray = await readCsvToJsonArray(csvFilePath)
+
+            if (flags.sort !== 'false') { // Default to true
+                jsonArray = sortByKey(jsonArray);
+            }
+
+            for (var i in jsonArray) {
+                delete jsonArray[i]['_tagid']
+            }
+
+            if(jsonArray.length == 0){
+                delete mergedXml[file_root_tag][tag_section];
+                continue;
+            }
+
+            jsonArray = flatToArray(jsonArray)
+            mergedXml[file_root_tag][tag_section] = sortByKey(jsonArray);
+        } else {
+            delete mergedXml[file_root_tag][tag_section];
+        }
+    }
+
+    return mergedXml;
+}
+
 export async function merge(flags, file_subpath, file_extension, file_root_tag, file_items) {
     const baseInputDir = join((flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), file_subpath) as string;
     const baseOutputDir = join((flags["sf-xml"] || settings['salesforce-xml-path'] ||  DEFAULT_SFXML_PATH), file_subpath) as string;
@@ -33,45 +80,16 @@ export async function merge(flags, file_subpath, file_extension, file_root_tag, 
     // dir is the file name without the extension
     for (const dir of dirList) {
         console.log('Merging: ' + dir);
-        const inputXML = join(baseInputDir, dir, dir) + XML_PART_EXTENSION;
+        const csvDirPath = join(baseInputDir, dir);
         
-        if (!fs.existsSync(inputXML)) {
-            console.log(inputXML + ' not found. Skipping...');
+        try {
+            const mergedXml = await mergeItemFromCsv(dir, csvDirPath, file_root_tag, file_items, flags);
+            const outputFile = join(baseOutputDir, dir + file_extension);
+            writeXmlToFile(outputFile, mergedXml);
+        } catch (error) {
+            console.log(`Error merging ${dir}: ${error.message}. Skipping...`);
             continue;
         }
-
-        const mergedXml = (await readXmlFromFile(inputXML)) ?? {};
-
-
-        // tag_section is each file section (applicationVisibilities, classAccess ecc)
-        for (const tag_section in file_items) {
-            const csvFilePath = join(baseInputDir, dir, calcCsvFilename(dir, tag_section));
-            if (fs.existsSync(csvFilePath)) {
-                var jsonArray = await readCsvToJsonArray(csvFilePath)
-
-                if (flags.sort === 'true') {
-                    jsonArray = sortByKey(jsonArray);
-                }
-
-                for (var i in jsonArray) {
-                    delete jsonArray[i]['_tagid']
-                }
-
-                if(jsonArray.length == 0){
-                    delete mergedXml[file_root_tag][tag_section];
-                    continue;
-                }
-
-                jsonArray = flatToArray(jsonArray)
-                mergedXml[file_root_tag][tag_section] = sortByKey(jsonArray);
-            } else {
-                delete mergedXml[file_root_tag][tag_section];
-            }
-        }
-
-        const outputFile = join(baseOutputDir, dir + file_extension);
-
-        writeXmlToFile(outputFile, mergedXml);
     }
     var result = 'OK';
     return { result }

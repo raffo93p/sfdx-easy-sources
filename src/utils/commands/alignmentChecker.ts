@@ -1,11 +1,10 @@
 const fs = require('fs-extra');
 import { join } from "path";
-import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from "../constants/constants";
-import { readXmlFromFile, readCsvToJsonArray, calcCsvFilename, writeXmlToFile, areFilesEqual } from "../filesUtils";
+import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from "../constants/constants";
+import { readXmlFromFile, writeXmlToFile, areFilesEqual } from "../filesUtils";
 import { loadSettings } from "../localSettings";
-import { flatToArray } from "../flatArrayUtils";
-import { sortByKey } from "../utils";
 import { tmpdir } from "os";
+import { mergeItemFromCsv } from "./merger";
 
 const settings = loadSettings();
 
@@ -151,42 +150,15 @@ async function validateSingleItem(
 }
 
 async function reconstructItemFromCsv(itemName: string, csvDirPath: string, file_root_tag: string, file_items: any): Promise<any> {
-    // Start with the main XML part if it exists
-    const mainXmlPath = join(csvDirPath, itemName + XML_PART_EXTENSION);
-    if (!fs.existsSync(mainXmlPath)) {
+    // Use the shared merge logic from merger.ts with default flags (sort enabled)
+    const flags = { sort: 'true' };
+    try {
+        const mergedXml = await mergeItemFromCsv(itemName, csvDirPath, file_root_tag, file_items, flags);
+        return mergedXml[file_root_tag] ?? mergedXml;
+    } catch (error) {
+        // If main XML part doesn't exist, return empty object
         return {};
     }
-
-    const reconstructed = (await readXmlFromFile(mainXmlPath))[file_root_tag] ?? {};
-    // Process each CSV section - same logic as merger.ts
-    for (const tag_section in file_items) {
-        const csvFilePath = join(csvDirPath, calcCsvFilename(itemName, tag_section));
-        
-        if (fs.existsSync(csvFilePath)) {
-            var jsonArray = await readCsvToJsonArray(csvFilePath);
-            if (jsonArray && jsonArray.length > 0) {
-                // Same logic as merger: sort first
-                jsonArray = sortByKey(jsonArray);
-                
-                // Remove _tagid like in merger
-                for (var i in jsonArray) {
-                    delete jsonArray[i]['_tagid'];
-                }
-                // If empty after processing, remove the section
-                if (jsonArray.length == 0) {
-                    // Don't add empty sections
-                    continue;
-                }
-
-                // Apply flatToArray transformation like in merger
-                jsonArray = flatToArray(jsonArray);
-
-                // Add to reconstructed item with final sort
-                reconstructed[tag_section] = sortByKey(jsonArray);
-            }
-        }
-    }
-    return reconstructed;
 }
 
 function compareItems(original: any, reconstructed: any, file_items: any): string[] {
@@ -427,42 +399,9 @@ async function createMergedXmlFromCsv(
     file_items: any,
     flags: any
 ): Promise<void> {
-    // Start with the main XML part
-    const mainXmlPath = join(csvDirPath, itemName + XML_PART_EXTENSION);
-    if (!fs.existsSync(mainXmlPath)) {
-        throw new Error(`Main XML part not found: ${mainXmlPath}`);
-    }
-
-    const mergedXml = (await readXmlFromFile(mainXmlPath)) ?? {};
-
-    // Process each CSV section - exact same logic as merger.ts
-    for (const tag_section in file_items) {
-        const csvFilePath = join(csvDirPath, calcCsvFilename(itemName, tag_section));
-        
-        if (fs.existsSync(csvFilePath)) {
-            var jsonArray = await readCsvToJsonArray(csvFilePath);
-
-            if (flags.sort !== 'false') {  // Default to true like in merger
-                jsonArray = sortByKey(jsonArray);
-            }
-
-            // Remove _tagid like in merger
-            for (var i in jsonArray) {
-                delete jsonArray[i]['_tagid'];
-            }
-
-            // If empty, remove section
-            if (jsonArray.length == 0) {
-                delete mergedXml[file_root_tag][tag_section];
-                continue;
-            }
-
-            // Apply flatToArray and final sort like in merger
-            jsonArray = flatToArray(jsonArray);
-            mergedXml[file_root_tag][tag_section] = sortByKey(jsonArray);
-        }
-    }
-
+    // Use the shared merge logic from merger.ts
+    const mergedXml = await mergeItemFromCsv(itemName, csvDirPath, file_root_tag, file_items, flags);
+    
     // Write the merged XML to file
     await writeXmlToFile(outputPath, mergedXml);
 }

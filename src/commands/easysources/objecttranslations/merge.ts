@@ -89,63 +89,26 @@ export default class Merge extends SfdxCommand {
 
             console.log('Merging: ' + obj);
 
-
-            const mergedXml = (await readXmlFromFile(inputXML)) ?? {};
+            // Use the exported merge function
+            const mergedXml = await mergeObjectTranslationFromCsv(obj, join(baseInputDir, obj, 'csv'), this.flags);
             const outputDir = join(baseOutputDir, obj);
-
-            for (const tag_section in OBJTRANSL_ITEMS) {
-                if(tag_section === OBJTRANSL_CFIELDTRANSL_ROOT) continue;
-                const csvFilePath = join(baseInputDir, obj, 'csv', calcCsvFilename(obj, tag_section));
-                if (fs.existsSync(csvFilePath)) {
-                    var jsonArray = await readCsvToJsonArrayWithNulls(csvFilePath)
-
-                    if (this.flags.sort === 'true') {
-                        jsonArray = sortByKey(jsonArray);
-                    }
-
-                    for (var i in jsonArray) {
-                        delete jsonArray[i]['_tagid']
-                    }
-
-                    if(jsonArray.length == 0){
-                        delete mergedXml[OBJTRANSL_ROOT_TAG][tag_section];
-                        continue;
-                    }
-
-                    // pre-process for empty optional tags
-                    removeEmpyOptionalTags(jsonArray, tag_section);
-
-                    // pre-process for layout flatToArray
-                    if(tag_section === OBJTRANSL_LAYOUT_ROOT){
-                        jsonArray = flatToArray(jsonArray);
-                        // jsonArray = transformLayoutCSVtoXML(jsonArray);
-                    }
-
-                    mergedXml[OBJTRANSL_ROOT_TAG][tag_section] = jsonArray;
-                }
-
-            }
             const outputFile = join(outputDir, obj + OBJTRANSL_EXTENSION);
+            
             if (!fs.existsSync(outputDir)) {
                 fs.mkdirSync(outputDir);
             }
             await writeXmlToFile(outputFile, mergedXml);
 
+            // Handle fieldTranslations using the exported function
+            const fieldXmlArray = await getFieldTranslationsFromCsv(obj, join(baseInputDir, obj, 'csv'));
             
-            // only for ObjectTranslations, recreate all the fieldTranslation xml files
-            const csvFilePath = join(baseInputDir, obj, 'csv', calcCsvFilename(obj, OBJTRANSL_CFIELDTRANSL_ROOT));
-            if (fs.existsSync(csvFilePath)) {
-                var jsonArray = await readCsvToJsonArrayWithNulls(csvFilePath);
-
-                const fieldXmlArray = transformFieldCSVtoXMLs(jsonArray);
-
+            if (fieldXmlArray.length > 0) {
                 deleteFieldTranslationsXmls(baseOutputDir, obj);
 
-                for(const entry of fieldXmlArray){
-                     await writeXmlToFile(join(baseOutputDir, obj, entry.name + OBJTRANSL_FIELDTRANSL_EXTENSION), 
-                     {[OBJTRANSL_CFIELDTRANSL_ROOT_TAG]: entry}
-                     );
-
+                for (const entry of fieldXmlArray) {
+                    await writeXmlToFile(join(baseOutputDir, obj, entry.name + OBJTRANSL_FIELDTRANSL_EXTENSION), 
+                        { [OBJTRANSL_CFIELDTRANSL_ROOT_TAG]: entry }
+                    );
                 }
             }
             
@@ -157,6 +120,80 @@ export default class Merge extends SfdxCommand {
         return { outputString };
 
     }
+}
+
+/**
+ * Core merge logic for object translations that creates merged XML from CSV files in memory
+ * Handles main object translation (excluding fieldTranslations which are handled separately)
+ * @param objectName - name of the object translation to merge
+ * @param csvDirPath - path to the CSV directory
+ * @param flags - command flags including sort option
+ * @returns merged XML object
+ */
+export async function mergeObjectTranslationFromCsv(objectName: string, csvDirPath: string, flags: any): Promise<any> {
+    const inputXML = join(csvDirPath, objectName) + XML_PART_EXTENSION;
+    
+    if (!fs.existsSync(inputXML)) {
+        throw new Error(`${inputXML} not found`);
+    }
+
+    const mergedXml = (await readXmlFromFile(inputXML)) ?? {};
+
+    // Process each section except fieldTranslations (handled separately)
+    for (const tag_section in OBJTRANSL_ITEMS) {
+        if (tag_section === OBJTRANSL_CFIELDTRANSL_ROOT) continue; // Skip fieldTranslations
+        
+        const csvFilePath = join(csvDirPath, calcCsvFilename(objectName, tag_section));
+        if (fs.existsSync(csvFilePath)) {
+            var jsonArray = await readCsvToJsonArrayWithNulls(csvFilePath);
+
+            if (flags.sort === 'true' || flags.sort === true || flags.sort === undefined) {
+                jsonArray = sortByKey(jsonArray);
+            }
+
+            // Remove _tagid for merging
+            for (var i in jsonArray) {
+                delete jsonArray[i]['_tagid'];
+            }
+
+            if (jsonArray.length == 0) {
+                delete mergedXml[OBJTRANSL_ROOT_TAG][tag_section];
+                continue;
+            }
+
+            // Pre-process for empty optional tags
+            removeEmpyOptionalTags(jsonArray, tag_section);
+
+            // Pre-process for layout flatToArray
+            if (tag_section === OBJTRANSL_LAYOUT_ROOT) {
+                jsonArray = flatToArray(jsonArray);
+            }
+
+            mergedXml[OBJTRANSL_ROOT_TAG][tag_section] = jsonArray;
+        } else {
+            // Remove section if CSV doesn't exist
+            delete mergedXml[OBJTRANSL_ROOT_TAG][tag_section];
+        }
+    }
+
+    return mergedXml;
+}
+
+/**
+ * Processes field translations CSV and returns array of field XML objects
+ * @param objectName - name of the object translation
+ * @param csvDirPath - path to the CSV directory containing field translations CSV
+ * @returns array of field XML objects ready for writing to individual files
+ */
+export async function getFieldTranslationsFromCsv(objectName: string, csvDirPath: string): Promise<any[]> {
+    const csvFilePath = join(csvDirPath, calcCsvFilename(objectName, OBJTRANSL_CFIELDTRANSL_ROOT));
+    
+    if (!fs.existsSync(csvFilePath)) {
+        return [];
+    }
+
+    const jsonArray = await readCsvToJsonArrayWithNulls(csvFilePath);
+    return transformFieldCSVtoXMLs(jsonArray);
 }
 
 export function deleteFieldTranslationsXmls(baseInputDir, objTrName){

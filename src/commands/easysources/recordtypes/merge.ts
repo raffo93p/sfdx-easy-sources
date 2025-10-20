@@ -20,7 +20,6 @@ import {
 
 import {
     RECORDTYPES_EXTENSION,
-    RECORDTYPES_PICKVAL_ROOT,
     RECORDTYPES_ROOT_TAG,
     RECORDTYPES_SUBPATH,
     RECORDTYPE_ITEMS
@@ -112,36 +111,15 @@ export default class Merge extends SfdxCommand {
             for (const dir of recordTypeList) {
                 console.log('Merging: ' + join(obj, dir));
 
-                const inputXML = join(baseInputDir, obj, 'recordTypes', dir, dir) + XML_PART_EXTENSION;
-                const mergedXml = (await readXmlFromFile(inputXML)) ?? {};
+                // Use the exported merge function
+                const mergedXml = await mergeRecordTypeFromCsv(dir, join(baseInputDir, obj, 'recordTypes', dir), this.flags);
                 const outputDir = join(baseOutputDir, obj, 'recordTypes');
-
-                for (const tag_section in RECORDTYPE_ITEMS) {
-                    const csvFilePath = join(baseInputDir, obj, 'recordTypes', dir, calcCsvFilename(dir, tag_section));
-                    if (fs.existsSync(csvFilePath)) {
-                        var jsonArray = await readCsvToJsonArray(csvFilePath)
-
-                        if (this.flags.sort === 'true') {
-                            jsonArray = sortByKey(jsonArray);
-                        }
-
-                        for (var i in jsonArray) {
-                            delete jsonArray[i]['_tagid']
-                        }
-
-                        var jsonArrayForXML = transformCSVtoXML(jsonArray);
-
-
-                        mergedXml[RECORDTYPES_ROOT_TAG][RECORDTYPES_PICKVAL_ROOT] = jsonArrayForXML;
-                    }
-
-                }
                 const outputFile = join(outputDir, dir + RECORDTYPES_EXTENSION);
+                
                 if (!fs.existsSync(outputDir)) {
-                    fs.mkdirSync(outputDir);
+                    fs.mkdirSync(outputDir, { recursive: true });
                 }
                 writeXmlToFile(outputFile, mergedXml);
-
             }
         }
 
@@ -154,4 +132,49 @@ export default class Merge extends SfdxCommand {
         var outputString = 'OK'
         return { outputString };
     }
+}
+
+/**
+ * Core merge logic for record types that creates merged XML from CSV files in memory
+ * @param recordTypeName - name of the record type to merge
+ * @param csvDirPath - path to the CSV directory containing the record type CSV files
+ * @param flags - command flags including sort option
+ * @returns merged XML object
+ */
+export async function mergeRecordTypeFromCsv(recordTypeName: string, csvDirPath: string, flags: any): Promise<any> {
+    const inputXML = join(csvDirPath, recordTypeName) + XML_PART_EXTENSION;
+    
+    if (!fs.existsSync(inputXML)) {
+        throw new Error(`${inputXML} not found`);
+    }
+
+    const mergedXml = (await readXmlFromFile(inputXML)) ?? {};
+
+    // Process each section
+    for (const tag_section in RECORDTYPE_ITEMS) {
+        const csvFilePath = join(csvDirPath, calcCsvFilename(recordTypeName, tag_section));
+        if (fs.existsSync(csvFilePath)) {
+            var jsonArray = await readCsvToJsonArray(csvFilePath);
+
+            if (flags.sort === 'true' || flags.sort === true || flags.sort === undefined) {
+                jsonArray = sortByKey(jsonArray);
+            }
+
+            // Remove _tagid for merging
+            for (var i in jsonArray) {
+                delete jsonArray[i]['_tagid'];
+            }
+
+            var jsonArrayForXML = transformCSVtoXML(jsonArray);
+            
+            if (jsonArrayForXML && jsonArrayForXML.length > 0) {
+                mergedXml[RECORDTYPES_ROOT_TAG][tag_section] = jsonArrayForXML;
+            }
+        } else {
+            // Remove section if CSV doesn't exist
+            delete mergedXml[RECORDTYPES_ROOT_TAG][tag_section];
+        }
+    }
+
+    return mergedXml;
 }

@@ -10,14 +10,13 @@ import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import { RECORDTYPE_ITEMS, RECORDTYPES_EXTENSION, RECORDTYPES_ROOT_TAG, RECORDTYPES_SUBPATH } from '../../../utils/constants/constants_recordtypes';
 import Performance from '../../../utils/performance';
-import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../../../utils/constants/constants';
+import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
 const fs = require('fs-extra');
 import { join } from "path";
-import { readXmlFromFile, readCsvToJsonArray, calcCsvFilename, writeXmlToFile, readStringFromFile } from "../../../utils/filesUtils";
+import { readXmlFromFile, writeXmlToFile, readStringFromFile } from "../../../utils/filesUtils";
 import { loadSettings } from "../../../utils/localSettings";
-import { sortByKey } from "../../../utils/utils";
 import { tmpdir } from "os";
-import { transformCSVtoXML } from '../../../utils/utils_recordtypes';
+import { mergeRecordTypeFromCsv } from './merge';
 
 const settings = loadSettings();
 
@@ -239,30 +238,8 @@ export default class AreAligned extends SfdxCommand {
                 };
             }
 
-            // Reconstruct XML from CSV
-            const reconstructedXml = { [RECORDTYPES_ROOT_TAG]: {} };
-            
-            // Read and merge CSV data
-            for (const sectionName in RECORDTYPE_ITEMS) {
-                const csvFilePath = join(recordTypeCsvDir, calcCsvFilename(recordTypeName, sectionName));
-                if (fs.existsSync(csvFilePath)) {
-                    var jsonArray = await readCsvToJsonArray(csvFilePath);
-
-                    if (this.flags.sort === 'true') {
-                        jsonArray = sortByKey(jsonArray);
-                    }
-
-                    // Remove _tagid for comparison
-                    for (var i in jsonArray) {
-                        delete jsonArray[i]['_tagid'];
-                    }
-
-                    var jsonArrayForXML = transformCSVtoXML(jsonArray);
-                    if (jsonArrayForXML && jsonArrayForXML.length > 0) {
-                        reconstructedXml[RECORDTYPES_ROOT_TAG][sectionName] = jsonArrayForXML;
-                    }
-                }
-            }
+            // Reconstruct XML from CSV using shared merge logic
+            const reconstructedXml = await mergeRecordTypeFromCsv(recordTypeName, recordTypeCsvDir, this.flags);
 
             // Compare structures
             const originalData = originalXml[RECORDTYPES_ROOT_TAG] || {};
@@ -439,27 +416,8 @@ export default class AreAligned extends SfdxCommand {
                 };
             }
 
-            // Reconstruct XML from CSV and merge
-            const inputXML = join(recordTypeCsvDir, recordTypeName) + XML_PART_EXTENSION;
-            const mergedXml = (await readXmlFromFile(inputXML)) ?? {};
-
-            for (const sectionName in RECORDTYPE_ITEMS) {
-                const csvFilePath = join(recordTypeCsvDir, calcCsvFilename(recordTypeName, sectionName));
-                if (fs.existsSync(csvFilePath)) {
-                    var jsonArray = await readCsvToJsonArray(csvFilePath);
-
-                    if (this.flags.sort === 'true') {
-                        jsonArray = sortByKey(jsonArray);
-                    }
-
-                    for (var i in jsonArray) {
-                        delete jsonArray[i]['_tagid'];
-                    }
-
-                    var jsonArrayForXML = transformCSVtoXML(jsonArray);
-                    mergedXml[RECORDTYPES_ROOT_TAG][sectionName] = jsonArrayForXML;
-                }
-            }
+            // Reconstruct XML from CSV using shared merge logic
+            const mergedXml = await mergeRecordTypeFromCsv(recordTypeName, recordTypeCsvDir, this.flags);
 
             // Write reconstructed XML to temp file
             const tempDir = tmpdir();
