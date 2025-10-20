@@ -94,6 +94,11 @@ export default class Split extends SfdxCommand {
 
             const outputDir = join(baseOutputDir, objTrName, 'csv');
 
+            // Delete outputDir if it exists to ensure a clean split
+            if (fs.existsSync(outputDir)) {
+                fs.removeSync(outputDir);
+            }
+
             for (const tag_section in OBJTRANSL_ITEMS) {
                 var myjson = objTranslProperties[tag_section];
 

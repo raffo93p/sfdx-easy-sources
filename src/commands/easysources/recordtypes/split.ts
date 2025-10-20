@@ -110,6 +110,11 @@ export default class Split extends SfdxCommand {
                 const recordTypeName = removeExtension(fullFilename);
                 const outputDir = join(baseOutputDir, obj, 'recordTypes', recordTypeName);
 
+                // Delete outputDir if it exists to ensure a clean split
+                if (fs.existsSync(outputDir)) {
+                    fs.removeSync(outputDir);
+                }
+
                 for (const tag_section in RECORDTYPE_ITEMS) {
                     var myjson = recordtypeProperties[RECORDTYPES_PICKVAL_ROOT];
                     if (myjson == undefined) continue;

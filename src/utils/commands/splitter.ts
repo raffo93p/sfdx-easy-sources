@@ -43,6 +43,11 @@ export async function split(flags, file_subpath, file_extension, file_root_tag, 
         const fileName = removeExtension(fullFilename);
         const outputDir = join(baseOutputDir, fileName);
 
+        // Delete outputDir if it exists to ensure a clean split
+        if (fs.existsSync(outputDir)) {
+            fs.removeSync(outputDir);
+        }
+
         for (const tag_section in file_items) {
             if(ignoreUserPerm && tag_section == PROFILE_USERPERM_ROOT){
                 xmlFileContent[file_root_tag][tag_section] = null;
