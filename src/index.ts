@@ -46,6 +46,17 @@ export {
     labelUpdateKey
 } from './api/labels';
 
+// Export all application functionality
+export {
+    applications,
+    ApplicationOptions,
+    applicationSplit,
+    applicationUpsert,
+    applicationMerge,
+    applicationAreAligned,
+    applicationUpdateKey
+} from './api/applications';
+
 // Export all path functionality
 export {
     PathOptions,
@@ -55,5 +66,6 @@ export {
 export default {
     profiles: require('./api/profiles').profiles,
     permissionsets: require('./api/permissionsets').permissionsets,
-    labels: require('./api/labels').labels
+    labels: require('./api/labels').labels,
+    applications: require('./api/applications').applications
 };

@@ -65,3 +65,18 @@ export default class ApplicationsAreAligned extends SfdxCommand {
     return result;
   }
 }
+
+// Export function for programmatic API
+export async function applicationAreAligned(options: any = {}): Promise<AnyJson> {
+  Performance.getInstance().start();
+  
+  let result;
+  if (options.mode === 'string') {
+    result = await areAligned(options, APPLICATIONS_SUBPATH, APPLICATIONS_EXTENSION, APPLICATIONS_ROOT_TAG, APPLICATION_ITEMS);
+  } else {
+    result = await validateAlignment(options, APPLICATIONS_SUBPATH, APPLICATIONS_EXTENSION, APPLICATIONS_ROOT_TAG, APPLICATION_ITEMS);
+  }
+  
+  Performance.getInstance().end();
+  return result;
+}

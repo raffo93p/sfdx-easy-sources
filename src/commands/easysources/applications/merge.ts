@@ -61,3 +61,14 @@ export default class Merge extends SfdxCommand {
         return result;
     }
 }
+
+// Export function for programmatic API
+export async function applicationMerge(options: any = {}): Promise<AnyJson> {
+    Performance.getInstance().start();
+    
+    const result = await merge(options, APPLICATIONS_SUBPATH, APPLICATIONS_EXTENSION, APPLICATIONS_ROOT_TAG, APPLICATION_ITEMS);
+    
+    Performance.getInstance().end();
+    
+    return result;
+}

@@ -56,11 +56,11 @@ Examples
 
 ## 🚀 Programmatic API Usage
 
-**NEW in v0.8.0**: Complete programmatic API with automatic path resolution! Use all profile and permission set operations in your Node.js scripts without CLI overhead:
+**NEW in v0.8.0**: Complete programmatic API with automatic path resolution! Use all profile, permission set, label, and application operations in your Node.js scripts without CLI overhead:
 
 ```javascript
 // JavaScript - with automatic path resolution
-const { profiles, permissionsets, labels } = require('sfdx-easy-sources');
+const { profiles, permissionsets, labels, applications } = require('sfdx-easy-sources');
 
 async function automateMetadata() {
   // Profile operations - paths auto-resolved from settings file
@@ -76,28 +76,34 @@ async function automateMetadata() {
   // Custom labels operations - simplified workflow
   await labels.split();  // No input needed for labels
   
+  // Application operations - consistent API pattern  
+  await applications.split(); // Split applications into manageable CSVs
+  await applications.upsert(); // Update from CSV changes
+  
   // Complete workflow with all operations
   await profiles.upsert({ input: 'Admin' });
   await permissionsets.upsert();
   await labels.upsert();
+  await applications.upsert();
   
   await profiles.minify();
   await permissionsets.minify();
-  // Labels don't have minify - they use updateKey for maintenance
+  // Labels and applications use updateKey for maintenance
   
   await profiles.clearEmpty();
   await permissionsets.clearEmpty();
-  // Labels don't need clearEmpty - simpler structure
+  // Labels and applications have simpler structure
   
   await profiles.merge({ input: 'Admin' });
   await permissionsets.merge();
   await labels.merge();
+  await applications.merge();
 }
 ```
 
 ```typescript
 // TypeScript - with full type safety
-import { profiles, permissionsets, labels, ProfileOptions, PermissionsetOptions, LabelOptions } from 'sfdx-easy-sources';
+import { profiles, permissionsets, labels, applications, ProfileOptions, PermissionsetOptions, LabelOptions, ApplicationOptions } from 'sfdx-easy-sources';
 
 async function automateMetadata() {
   // Auto-resolved paths with type safety
@@ -176,7 +182,13 @@ See the `examples/` directory for more complete usage examples.
 - `labels.merge(options)` - Merge CSV files back to XML
 - `labels.areAligned(options)` - Check XML/CSV alignment
 - `labels.updateKey(options)` - Update keys across CSV files
-- `permissionsets.clean(options)` - Remove references to non-existent metadata
+
+### Available Applications API Methods
+- `applications.split(options)` - Split Salesforce application XML files into CSV files
+- `applications.upsert(options)` - Upsert XML data into existing CSV files
+- `applications.merge(options)` - Merge CSV files back to XML
+- `applications.areAligned(options)` - Check XML/CSV alignment
+- `applications.updateKey(options)` - Update keys across CSV files
 
 
 Based on the source type, this plugin provides the following commands:
