@@ -54,93 +54,7 @@ export default class Split extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        var result = await split(this.flags, TRANSLATIONS_SUBPATH, TRANSLATIONS_EXTENSION, TRANSLATIONS_ROOT_TAG, TRANSLATION_ITEMS);
-
-        // const baseInputDir = join((flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), TRANSLATIONS_SUBPATH) as string;
-        // const baseOutputDir = join((flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), TRANSLATIONS_SUBPATH) as string;
-
-        // const inputFiles = (this.flags.input) as string;
-
-        // if (!fs.existsSync(baseInputDir)) {
-        //     console.log('Input folder ' + baseInputDir + ' does not exist!');
-        //     return;
-        // }
-
-        // var fileList = [];
-        // if (inputFiles) {
-        //     fileList = inputFiles.split(',');
-        // } else {
-        //     fileList = fs.readdirSync(baseInputDir, { withFileTypes: true })
-        //         .filter(item => !item.isDirectory() && item.name.endsWith(TRANSLATIONS_EXTENSION))
-        //         .map(item => item.name)
-        // }
-
-        // for (const filename of fileList) {
-        //     const fullFilename = filename.endsWith(TRANSLATIONS_EXTENSION) ? filename : filename + TRANSLATIONS_EXTENSION;
-        //     console.log('Splitting: ' + fullFilename);
-
-        //     const inputFile = join(baseInputDir, fullFilename);
-        //     const xmlFileContent = (await readXmlFromFile(inputFile)) ?? {};
-        //     const fileProperties = xmlFileContent[TRANSLATIONS_ROOT_TAG] ?? {};
-
-        //     const fileName = removeExtension(fullFilename);
-        //     const outputDir = join(baseOutputDir, fileName);
-
-        //     for (const tag_section in TRANSLATION_ITEMS) {
-
-        //         var myjson = fileProperties[tag_section];
-
-        //         // skip when tag is not found in the xml
-        //         if (myjson == undefined) continue;
-        //         // fixes scenarios when the tag is one, since it would be read as object and not array
-        //         if (!Array.isArray(myjson)) myjson = [myjson];
-
-        //         // if(tag_section === TRANSLAT_REPTYPE_ROOT) myjson = transformXMLtoCSV(myjson);
-        //         if(tag_section === TRANSLAT_REPTYPE_ROOT) {
-        //             console.log(JSON.stringify(myjson))
-        //             myjson = arrayToFlat(myjson);
-        //             if(filename === 'es_CO.translation-meta.xml'){
-        //                 // console.log(myjson)
-        //             }
-        //         }
-
-        //         // generate _tagId column
-        //         generateTagId(myjson, TRANSLATION_ITEMS[tag_section].key, TRANSLATION_ITEMS[tag_section].headers);
-        //         // sorts array by _tagid. sorting is made as string
-        //         if (this.flags.sort === 'true') {
-        //             myjson = sortByKey(myjson);
-        //         }
-
-        //         const headers = TRANSLATION_ITEMS[tag_section].headers;
-        //         const transforms = [unwind({ paths: headers })];
-        //         var fields = [...headers, '_tagid'];
-
-        //         const parser = new Parser({ fields: fields, transforms });
-        //         const csv = parser.parse(myjson);
-
-                
-
-        //         const outputFileCSV = join(outputDir, calcCsvFilename(fileName, tag_section));
-
-        //         if (!fs.existsSync(outputDir)) {
-        //             fs.mkdirSync(outputDir, { recursive: true });
-        //         }
-
-        //         try {
-        //             fs.writeFileSync(outputFileCSV, csv.replaceAll("&#xD;", ""), { flag: 'w+' });
-        //             // file written successfully
-        //         } catch (err) {
-        //             console.error(err);
-        //         }
-
-        //         xmlFileContent[TRANSLATIONS_ROOT_TAG][tag_section] = null;
-
-        //     }
-        //     if (fs.existsSync(outputDir)) {
-        //         const outputFileXML = join(outputDir, fileName + XML_PART_EXTENSION);
-        //         writeXmlToFile(outputFileXML, xmlFileContent);
-        //     }
-        // }
+        const result = await split(this.flags, TRANSLATIONS_SUBPATH, TRANSLATIONS_EXTENSION, TRANSLATIONS_ROOT_TAG, TRANSLATION_ITEMS);
 
         Performance.getInstance().end();
         return result;
@@ -149,13 +63,7 @@ export default class Split extends SfdxCommand {
 
 // Export function for programmatic API
 export async function translationSplit(options: any = {}): Promise<AnyJson> {
-    Performance.getInstance().start();
-    
-    const result = await split(options, TRANSLATIONS_SUBPATH, TRANSLATIONS_EXTENSION, TRANSLATIONS_ROOT_TAG, TRANSLATION_ITEMS);
-    
-    Performance.getInstance().end();
-    
-    return result;
+    return await split(options, TRANSLATIONS_SUBPATH, TRANSLATIONS_EXTENSION, TRANSLATIONS_ROOT_TAG, TRANSLATION_ITEMS);
 }
 
 

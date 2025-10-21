@@ -74,7 +74,6 @@ export default class Split extends SfdxCommand {
 
 // Export function for programmatic API
 export async function recordTypeSplit(options: any = {}): Promise<AnyJson> {
-    Performance.getInstance().start();
 
     const baseInputDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), RECORDTYPES_SUBPATH) as string;
     const baseOutputDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
@@ -161,10 +160,7 @@ export async function recordTypeSplit(options: any = {}): Promise<AnyJson> {
             }
         }
     }
-
-    Performance.getInstance().end();
-
-    var outputString = 'OK'
-    return { outputString };
+    
+    return { outputString: 'OK' };
 }
 

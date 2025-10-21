@@ -54,12 +54,7 @@ export default class ApplicationsAreAligned extends SfdxCommand {
   public async run(): Promise<AnyJson> {
     Performance.getInstance().start();
 
-    let result;
-    if (this.flags.mode === 'string') {
-      result = await areAligned(this.flags, APPLICATIONS_SUBPATH, APPLICATIONS_EXTENSION, APPLICATIONS_ROOT_TAG, APPLICATION_ITEMS);
-    } else {
-      result = await validateAlignment(this.flags, APPLICATIONS_SUBPATH, APPLICATIONS_EXTENSION, APPLICATIONS_ROOT_TAG, APPLICATION_ITEMS);
-    }
+    const result = await applicationAreAligned(this.flags);
 
     Performance.getInstance().end();
     return result;
@@ -68,7 +63,6 @@ export default class ApplicationsAreAligned extends SfdxCommand {
 
 // Export function for programmatic API
 export async function applicationAreAligned(options: any = {}): Promise<AnyJson> {
-  Performance.getInstance().start();
   
   let result;
   if (options.mode === 'string') {
@@ -77,6 +71,5 @@ export async function applicationAreAligned(options: any = {}): Promise<AnyJson>
     result = await validateAlignment(options, APPLICATIONS_SUBPATH, APPLICATIONS_EXTENSION, APPLICATIONS_ROOT_TAG, APPLICATION_ITEMS);
   }
   
-  Performance.getInstance().end();
   return result;
 }

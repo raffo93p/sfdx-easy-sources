@@ -59,77 +59,11 @@ export default class Clean extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
         
-        const csvDir = join((this.flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), TRANSLATIONS_SUBPATH) as string;
-        const xmlDir = join((flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH)) as string;
+        const result = await translationMinify(this.flags);
 
-        const inputTranslation = (this.flags.input) as string;
-
-        checkDirOrErrorSync(csvDir);
-        checkDirOrErrorSync(xmlDir);
-
-        var transationList = [];
-        if (inputTranslation) {
-            transationList = inputTranslation.split(',');
-        } else {
-            transationList = fs.readdirSync(csvDir, { withFileTypes: true })
-                .filter(item => item.isDirectory())
-                .map(item => item.name)
-        }
-
-
-        // translationName is the profile name without the extension
-        for (const translationName of transationList) {
-            console.log('Minifying on: ' + translationName);
-
-            for (const tag_section in TRANSLATION_ITEMS) {
-                // tag_section is a profile section (applicationVisibilities, classAccess ecc)
-
-                const csvFilePath = join(csvDir, translationName, calcCsvFilename(translationName, tag_section));
-                if (fs.existsSync(csvFilePath)) {
-
-                    // get the list of resources on the csv. eg. the list of apex classes
-                    var resListCsv = await readCsvToJsonArray(csvFilePath)
-
-                    
-                    resListCsv = resListCsv.filter(function(res) {
-                        // return true to persist, false to delete
-                        if(TRANSLAT_TAG_BOOL[tag_section] == null) return true;
-
-                        for(const boolName of toArray(TRANSLAT_TAG_BOOL[tag_section]) ){
-                            if(!isBlank(res[boolName])) return true;
-                        }
-
-                        return false;
-                    });
-                    
-                    
-                    // write the cleaned csv
-                    const headers = TRANSLATION_ITEMS[tag_section].headers;
-                    const transforms = [unwind({ paths: headers })];
-                    const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
-
-                    if (this.flags.sort === 'true') {
-                        resListCsv = sortByKey(resListCsv);
-                    }
-
-                    const csv = parser.parse(resListCsv);
-                    try {
-                        fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
-                        // file written successfully
-                    } catch (err) {
-                        console.error(err);
-                    }
-                    
-                }
-            }
-
-        }
-
-        
         Performance.getInstance().end();
 
-        var outputString = 'OK'
-        return { outputString };
+        return result;
     }
     
 }
@@ -194,7 +128,7 @@ export async function translationMinify(options: any = {}): Promise<AnyJson> {
     
     Performance.getInstance().end();
 
-    var outputString = 'OK'
-    return { outputString };
+    
+    return { outputString: 'OK' };
 }
 

@@ -68,7 +68,7 @@ export default class UpdateKey extends SfdxCommand {
 
 // Export function for API usage
 export async function recordTypeUpdateKey(options: any = {}): Promise<AnyJson> {
-    Performance.getInstance().start();
+
     const baseInputDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
     const inputObject = (options.object) as string;
     const inputRecordType = (options.recordtype) as string;
@@ -128,6 +128,5 @@ export async function recordTypeUpdateKey(options: any = {}): Promise<AnyJson> {
         }
     }
 
-    Performance.getInstance().end();
     return { outputString: 'OK' };
 }

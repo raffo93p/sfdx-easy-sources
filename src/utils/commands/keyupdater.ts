@@ -62,7 +62,5 @@ export async function updatekey(flags, file_subpath, file_items) {
 
     }
 
-    var outputString = 'OK'
-    return { outputString };
-
+    return { outputString: 'OK' };
 }

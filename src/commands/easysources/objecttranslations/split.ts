@@ -174,6 +174,6 @@ export async function objectTranslationSplit(options: any = {}): Promise<AnyJson
             
         }
 
-        var outputString = 'OK'
-        return { outputString };
+        
+        return { outputString: 'OK' };
 }

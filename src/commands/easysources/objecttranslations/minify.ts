@@ -59,84 +59,16 @@ export default class Clean extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
         
-        const csvDir = join((this.flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), OBJTRANSL_SUBPATH) as string;
-        const xmlDir = join((flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH)) as string;
-
-        const inputObject = (this.flags.input) as string;
-
-        checkDirOrErrorSync(csvDir);
-        checkDirOrErrorSync(xmlDir);
-
-        var objTrList = [];
-        if (inputObject) {
-            objTrList = inputObject.split(',');
-        } else {
-            objTrList = fs.readdirSync(csvDir, { withFileTypes: true })
-                .filter(item => item.isDirectory())
-                .map(item => item.name)
-        }
-
-
-        // objTrName is the object translation name
-        for (const objTrName of objTrList) {
-            console.log('Minifying on: ' + objTrName);
-
-            for (const tag_section in OBJTRANSL_ITEMS) {
-                // tag_section is a profile section (applicationVisibilities, classAccess ecc)
-
-                const csvFilePath = join(csvDir, objTrName, 'csv', calcCsvFilename(objTrName, tag_section));
-
-                if (fs.existsSync(csvFilePath)) {
-
-                    // get the list of resources on the csv. eg. the list of apex classes
-                    var resListCsv = await readCsvToJsonArrayWithNulls(csvFilePath)
-
-                    
-                    resListCsv = resListCsv.filter(function(res) {
-                        // return true to persist, false to delete
-                        if(OBJTRANSL_TAG_BOOL[tag_section] == null) return true;
-
-                        for(const boolName of toArray(OBJTRANSL_TAG_BOOL[tag_section]) ){
-                            if(!isBlank(res[boolName])) return true;
-                        }
-
-                        return false;
-                    });
-                    
-                    
-                    // write the cleaned csv
-                    const headers = OBJTRANSL_ITEMS[tag_section].headers;
-                    const transforms = [unwind({ paths: headers })];
-                    const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
-
-                    if (this.flags.sort === 'true') {
-                        resListCsv = sortByKey(resListCsv);
-                    }
-
-                    const csv = parser.parse(resListCsv);
-                    try {
-                        fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
-                        // file written successfully
-                    } catch (err) {
-                        console.error(err);
-                    }
-                    
-                }
-            }
-
-        }
-
+        const result = await objectTranslationMinify(this.flags);
         
         Performance.getInstance().end();
 
-        var outputString = 'OK'
-        return { outputString };
+        return result;
     }
 }
 
 // Export object translation-specific minify function for programmatic API
 export async function objectTranslationMinify(options: any = {}): Promise<{ outputString: string }> {
-    Performance.getInstance().start();
     
     const csvDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), OBJTRANSL_SUBPATH) as string;
     const xmlDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH)) as string;
@@ -199,10 +131,7 @@ export async function objectTranslationMinify(options: any = {}): Promise<{ outp
             }
         }
     }
-
-    Performance.getInstance().end();
-
-    var outputString = 'OK'
-    return { outputString };
+    
+    return { outputString: 'OK' };
 }
 

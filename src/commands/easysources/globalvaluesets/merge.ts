@@ -54,7 +54,7 @@ export default class Merge extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        var result = await merge(this.flags, GVSETS_SUBPATH, GVSETS_EXTENSION, GVSETS_ROOT_TAG, GVSET_ITEMS);
+        const result = await merge(this.flags, GVSETS_SUBPATH, GVSETS_EXTENSION, GVSETS_ROOT_TAG, GVSET_ITEMS);
 
         Performance.getInstance().end();
         return result;
@@ -64,11 +64,5 @@ export default class Merge extends SfdxCommand {
 
 // Export function for programmatic API
 export async function globalValueSetMerge(options: any = {}): Promise<AnyJson> {
-    Performance.getInstance().start();
-    
-    const result = await merge(options, GVSETS_SUBPATH, GVSETS_EXTENSION, GVSETS_ROOT_TAG, GVSET_ITEMS);
-    
-    Performance.getInstance().end();
-    
-    return result;
+    return await merge(options, GVSETS_SUBPATH, GVSETS_EXTENSION, GVSETS_ROOT_TAG, GVSET_ITEMS);
 }

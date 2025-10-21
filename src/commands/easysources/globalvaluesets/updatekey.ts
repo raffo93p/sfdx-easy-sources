@@ -57,11 +57,5 @@ export default class UpdateKey extends SfdxCommand {
 
 // Export function for programmatic API
 export async function globalValueSetUpdateKey(options: any = {}): Promise<AnyJson> {
-    Performance.getInstance().start();
-    
-    const result = await updatekey(options, GVSETS_SUBPATH, GVSET_ITEMS);
-    
-    Performance.getInstance().end();
-    
-    return result;
+    return await updatekey(options, GVSETS_SUBPATH, GVSET_ITEMS);
 }

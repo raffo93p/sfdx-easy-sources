@@ -97,7 +97,6 @@ export default class AreAligned extends SfdxCommand {
 
 // Export function for API usage
 export async function recordTypeAreAligned(options: any = {}): Promise<AnyJson> {
-    Performance.getInstance().start();
 
     const baseXmlDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), RECORDTYPES_SUBPATH) as string;
     const baseCsvDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
@@ -196,7 +195,6 @@ export async function recordTypeAreAligned(options: any = {}): Promise<AnyJson> 
         summary.misalignedItems
     ]));
 
-    Performance.getInstance().end();
     return summary;
 }
 

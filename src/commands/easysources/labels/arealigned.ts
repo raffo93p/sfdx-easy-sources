@@ -53,7 +53,7 @@ export default class LabelsAreAligned extends SfdxCommand {
   public async run(): Promise<AnyJson> {
     Performance.getInstance().start();
 
-    let result = await labelAreAligned(this.flags);
+    const result = await labelAreAligned(this.flags);
 
     Performance.getInstance().end();
     return result;

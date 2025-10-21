@@ -54,7 +54,7 @@ export default class Upsert extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        var result = await upsert(this.flags, APPLICATIONS_SUBPATH, APPLICATIONS_EXTENSION, APPLICATIONS_ROOT_TAG, APPLICATION_ITEMS);
+        const result = await upsert(this.flags, APPLICATIONS_SUBPATH, APPLICATIONS_EXTENSION, APPLICATIONS_ROOT_TAG, APPLICATION_ITEMS);
 
         Performance.getInstance().end();
 
@@ -63,12 +63,6 @@ export default class Upsert extends SfdxCommand {
 }
 
 // Export function for programmatic API
-export async function applicationUpsert(options: any = {}): Promise<AnyJson> {
-    Performance.getInstance().start();
-    
-    const result = await upsert(options, APPLICATIONS_SUBPATH, APPLICATIONS_EXTENSION, APPLICATIONS_ROOT_TAG, APPLICATION_ITEMS);
-    
-    Performance.getInstance().end();
-    
-    return result;
+export async function applicationUpsert(options: any = {}): Promise<AnyJson> {    
+    return await upsert(options, APPLICATIONS_SUBPATH, APPLICATIONS_EXTENSION, APPLICATIONS_ROOT_TAG, APPLICATION_ITEMS);
 }

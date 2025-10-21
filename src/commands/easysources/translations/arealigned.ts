@@ -56,12 +56,7 @@ export default class AreAligned extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        let result;
-        if (this.flags.mode === 'string') {
-            result = await areAligned(this.flags, TRANSLATIONS_SUBPATH, TRANSLATIONS_EXTENSION, TRANSLATIONS_ROOT_TAG, TRANSLATION_ITEMS);
-        } else {
-            result = await validateAlignment(this.flags, TRANSLATIONS_SUBPATH, TRANSLATIONS_EXTENSION, TRANSLATIONS_ROOT_TAG, TRANSLATION_ITEMS);
-        }
+        const result = await translationAreAligned(this.flags);
 
         Performance.getInstance().end();
         return result;
@@ -70,15 +65,13 @@ export default class AreAligned extends SfdxCommand {
 
 // Export function for programmatic API
 export async function translationAreAligned(options: any = {}): Promise<AnyJson> {
-  Performance.getInstance().start();
-  
-  let result;
-  if (options.mode === 'string') {
-    result = await areAligned(options, TRANSLATIONS_SUBPATH, TRANSLATIONS_EXTENSION, TRANSLATIONS_ROOT_TAG, TRANSLATION_ITEMS);
-  } else {
-    result = await validateAlignment(options, TRANSLATIONS_SUBPATH, TRANSLATIONS_EXTENSION, TRANSLATIONS_ROOT_TAG, TRANSLATION_ITEMS);
-  }
-  
-  Performance.getInstance().end();
-  return result;
+
+    let result;
+    if (options.mode === 'string') {
+        result = await areAligned(options, TRANSLATIONS_SUBPATH, TRANSLATIONS_EXTENSION, TRANSLATIONS_ROOT_TAG, TRANSLATION_ITEMS);
+    } else {
+        result = await validateAlignment(options, TRANSLATIONS_SUBPATH, TRANSLATIONS_EXTENSION, TRANSLATIONS_ROOT_TAG, TRANSLATION_ITEMS);
+    }
+    
+    return result;
 }

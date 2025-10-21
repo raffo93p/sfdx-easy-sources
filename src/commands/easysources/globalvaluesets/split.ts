@@ -64,11 +64,5 @@ export default class Split extends SfdxCommand {
 
 // Export function for programmatic API
 export async function globalValueSetSplit(options: any = {}): Promise<AnyJson> {
-    Performance.getInstance().start();
-    
-    const result = await split(options, GVSETS_SUBPATH, GVSETS_EXTENSION, GVSETS_ROOT_TAG, GVSET_ITEMS);
-    
-    Performance.getInstance().end();
-    
-    return result;
+    return await split(options, GVSETS_SUBPATH, GVSETS_EXTENSION, GVSETS_ROOT_TAG, GVSET_ITEMS);
 }

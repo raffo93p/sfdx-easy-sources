@@ -51,86 +51,10 @@ export default class ClearEmpty extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
         
-        const csvDir = join((this.flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), OBJTRANSL_SUBPATH) as string;
-        const xmlDir = join((flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH)) as string;
-
-        const inputObject = (this.flags.input) as string;
-
-        checkDirOrErrorSync(csvDir);
-        checkDirOrErrorSync(xmlDir);
-
-        var objTrList = [];
-        if (inputObject) {
-            objTrList = inputObject.split(',');
-        } else {
-            objTrList = fs.readdirSync(csvDir, { withFileTypes: true })
-                .filter(item => item.isDirectory())
-                .map(item => item.name)
-        }
-
-        let deletedFiles = 0;
-        let deletedFolders = 0;
-
-        // objTrName is the object translation name
-        for (const objTrName of objTrList) {
-            console.log('Clearing empty CSVs for: ' + objTrName);
-
-            const objTrFolder = join(csvDir, objTrName);
-            const csvSubFolder = join(objTrFolder, 'csv');
-            let hasPopulatedCsvs = false;
-
-            for (const tag_section in OBJTRANSL_ITEMS) {
-                // tag_section is an object translation section
-
-                const csvFilePath = join(csvDir, objTrName, 'csv', calcCsvFilename(objTrName, tag_section));
-
-                if (fs.existsSync(csvFilePath)) {
-                    // get the list of resources on the csv
-                    var resListCsv = await readCsvToJsonArrayWithNulls(csvFilePath);
-
-                    // if CSV has no records (only headers), delete it
-                    if (resListCsv.length === 0) {
-                        console.log(`  Deleting empty CSV: ${csvFilePath}`);
-                        fs.unlinkSync(csvFilePath);
-                        deletedFiles++;
-                    } else {
-                        hasPopulatedCsvs = true;
-                    }
-                }
-            }
-
-            // Check if csv subfolder exists and clean up .part files and empty folders
-            if (fs.existsSync(csvSubFolder)) {
-                const remainingFiles = fs.readdirSync(csvSubFolder);
-                
-                // Remove -part.xml files only if there are no populated CSVs
-                if (!hasPopulatedCsvs) {
-                    const partFiles = remainingFiles.filter(file => file.endsWith('-part.xml'));
-                    for (const partFile of partFiles) {
-                        const partFilePath = join(csvSubFolder, partFile);
-                        console.log(`  Deleting -part.xml file: ${partFilePath}`);
-                        fs.unlinkSync(partFilePath);
-                        deletedFiles++;
-                    }
-                }
-
-                // Check again for remaining files after cleanup
-                const finalRemainingFiles = fs.readdirSync(csvSubFolder);
-                
-                // If no files remain in csv subfolder, delete the entire object translation folder
-                if (finalRemainingFiles.length === 0) {
-                    console.log(`  Deleting empty folder: ${objTrFolder}`);
-                    fs.removeSync(objTrFolder);
-                    deletedFolders++;
-                }
-            }
-        }
-
-        const outputString = `Deleted ${deletedFiles} empty CSV files and ${deletedFolders} empty folders`;
-        console.log(outputString);
+        const result = await objectTranslationClearEmpty(this.flags);
         
         Performance.getInstance().end();
-        return { outputString, deletedFiles, deletedFolders };
+        return result;
     }
 }
 

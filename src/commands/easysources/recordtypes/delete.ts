@@ -81,7 +81,6 @@ export default class Delete extends SfdxCommand {
 
 // Export function for programmatic API
 export async function recordTypeDelete(options: any = {}): Promise<AnyJson> {
-    Performance.getInstance().start();
 
     const picklist = options.picklist;
     const apiname = (options.apiname) as string;
@@ -158,9 +157,6 @@ export async function recordTypeDelete(options: any = {}): Promise<AnyJson> {
             }
         }
     }
-
-    Performance.getInstance().end();
-
-    var outputString = 'OK'
-    return { outputString };
+    
+    return { outputString: 'OK' };
 }

@@ -108,7 +108,6 @@ export default class Clean extends SfdxCommand {
 
 // Export function for API usage  
 export async function recordTypeClean(options: any = {}): Promise<AnyJson> {
-    Performance.getInstance().start();
     
     const logdir = options['log-dir'] || settings['easysources-log-path'] || DEFAULT_LOG_PATH;
     const csvDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
@@ -230,7 +229,6 @@ export async function recordTypeClean(options: any = {}): Promise<AnyJson> {
         fs.writeFileSync(join(logdir, 'recordtypes-clean.log'), logList.join('\n'), { flag: 'w+' });
     }
     
-    Performance.getInstance().end();
     return { outputString: 'OK' };
 }
 

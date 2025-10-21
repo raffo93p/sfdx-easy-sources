@@ -56,7 +56,7 @@ export default class AreAligned extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        let result = await permissionsetAreAligned(this.flags);
+        const result = await permissionsetAreAligned(this.flags);
 
         Performance.getInstance().end();
         return result;

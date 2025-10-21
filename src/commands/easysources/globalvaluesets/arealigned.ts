@@ -53,12 +53,7 @@ export default class GlobalValueSetsAreAligned extends SfdxCommand {
   public async run(): Promise<AnyJson> {
     Performance.getInstance().start();
 
-    let result;
-    if (this.flags.mode === 'string') {
-      result = await areAligned(this.flags, GVSETS_SUBPATH, GVSETS_EXTENSION, GVSETS_ROOT_TAG, GVSET_ITEMS);
-    } else {
-      result = await validateAlignment(this.flags, GVSETS_SUBPATH, GVSETS_EXTENSION, GVSETS_ROOT_TAG, GVSET_ITEMS);
-    }
+    const result = await globalValueSetAreAligned(this.flags);
 
     Performance.getInstance().end();
     return result;
@@ -67,7 +62,6 @@ export default class GlobalValueSetsAreAligned extends SfdxCommand {
 
 // Export function for programmatic API
 export async function globalValueSetAreAligned(options: any = {}): Promise<AnyJson> {
-  Performance.getInstance().start();
   
   let result;
   if (options.mode === 'string') {
@@ -76,6 +70,5 @@ export async function globalValueSetAreAligned(options: any = {}): Promise<AnyJs
     result = await validateAlignment(options, GVSETS_SUBPATH, GVSETS_EXTENSION, GVSETS_ROOT_TAG, GVSET_ITEMS);
   }
   
-  Performance.getInstance().end();
   return result;
 }
