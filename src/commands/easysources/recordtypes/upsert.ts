@@ -119,8 +119,10 @@ export async function recordTypeUpsert(options: any = {}): Promise<AnyJson> {
             const outputDir = join(baseOutputDir, obj, 'recordTypes', recordtypeName);
             const inputFilePart = join(baseOutputDir, obj, 'recordTypes', recordtypeName, recordtypeName + XML_PART_EXTENSION);
 
+                // If outputDir or inputFilePart doesn't exist, run split command instead
             if (!fs.existsSync(outputDir) || !fs.existsSync(inputFilePart)) {
                 console.log('⚠️ Output csv directory or -part.xml file not found. Running split command for object: ' + obj + ', recordtype: ' + filename);
+                    // Create flags for split command with just the current object and recordtype
                 const splitFlags = {
                     ...options,
                     object: obj,

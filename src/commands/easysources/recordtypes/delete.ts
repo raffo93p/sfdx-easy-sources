@@ -115,6 +115,7 @@ export async function recordTypeDelete(options: any = {}): Promise<AnyJson> {
                 .map(item => item.name)
         }
 
+            // dir is the recordtype name without the extension
         for (const dir of recordTypeList) {
             console.log('Deleting on: ' + join(obj, dir));
 

@@ -100,9 +100,11 @@ export async function recordTypeUpdateKey(options: any = {}): Promise<AnyJson> {
                 .map(item => item.name)
         }
 
+            // dir is the record type name without the extension
         for (const dir of recordTypeList) {
             console.log('UpdateKey: ' + dir);
 
+                // key is each profile section (applicationVisibilities, classAccess ecc)
             for (const tag_section in RECORDTYPE_ITEMS) {
                 const csvFilePath = join(baseInputDir, obj, 'recordTypes', dir, calcCsvFilename(dir, tag_section));
                 if (fs.existsSync(csvFilePath)) {

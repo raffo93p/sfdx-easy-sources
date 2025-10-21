@@ -119,6 +119,7 @@ export async function recordTypeSplit(options: any = {}): Promise<AnyJson> {
             const recordTypeName = removeExtension(fullFilename);
             const outputDir = join(baseOutputDir, obj, 'recordTypes', recordTypeName);
 
+                // Delete outputDir if it exists to ensure a clean split
             if (fs.existsSync(outputDir)) {
                 fs.removeSync(outputDir);
             }
@@ -130,6 +131,7 @@ export async function recordTypeSplit(options: any = {}): Promise<AnyJson> {
 
                 var jsforcsv = transformXMLtoCSV(myjson);
 
+                    // generate _tagId column
                 generateTagId(jsforcsv, RECORDTYPE_ITEMS[tag_section].key, RECORDTYPE_ITEMS[tag_section].headers);
                 if (options.sort === 'true') {
                     jsforcsv = sortByKey(jsforcsv);

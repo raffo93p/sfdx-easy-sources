@@ -145,6 +145,7 @@ export async function recordTypeClean(options: any = {}): Promise<AnyJson> {
         if (target === 'local' || target === 'both') {
             retrievePromises.push(retrieveAllMetadataPackageLocal(xmlDir, manifestDir));
         }
+            // create org manifest and src manifest
         await Promise.all(retrievePromises);
     }
 
@@ -170,19 +171,26 @@ export async function recordTypeClean(options: any = {}): Promise<AnyJson> {
                 .map(item => item.name)
         }
 
+            // recType is the recordtype name without the extension
         for (const recType of recordTypeList) {
             console.log('Cleaning on: ' + join(obj, recType));
             
             const csvFilePath = join(csvDir, obj, 'recordTypes', recType, calcCsvFilename(recType, RECORDTYPES_PICKVAL_ROOT));
             if (fs.existsSync(csvFilePath)) {
                 var resListCsv = await readCsvToJsonArray(csvFilePath);
+                    // get the list of resources on the csv. eg. the list of apex classes
+                    // for each tagsection, get:
+                    // the typename on package. eg. ApexClass
+                    // the key that contains the name on the csv. eg. apexClass
                 var typename = 'CustomField';
                 var key = 'picklist'; 
 
+                    // res is a single resource on a given csv
                 resListCsv = resListCsv.filter(function(res) {
                     if (res[key] == null) return true;
                     if (skipStandardFields && typename === "CustomField" && !res[key].endsWith("__c")) return true;
 
+                        // perform some manipulation on the item for recordTypes
                     var item = obj + '.' + res[key];
                     item = manipulateItem(item, typename);
 
