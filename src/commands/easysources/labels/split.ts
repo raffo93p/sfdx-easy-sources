@@ -49,9 +49,20 @@ export default class Split extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        var result = await split(this.flags, LABELS_SUBPATH, LABELS_EXTENSION, LABELS_ROOT_TAG, LABEL_ITEMS);
+        var result = await labelSplit(this.flags);
 
         Performance.getInstance().end();
         return result;
     }
+}
+
+/**
+ * Label-specific split function that encapsulates all label constants
+ * This function can be used programmatically without needing to pass label constants
+ * 
+ * @param options - Label split options (paths will be resolved automatically if not provided)
+ * @returns Promise with split operation result
+ */
+export async function labelSplit(options: any): Promise<any> {
+    return await split(options, LABELS_SUBPATH, LABELS_EXTENSION, LABELS_ROOT_TAG, LABEL_ITEMS);
 }

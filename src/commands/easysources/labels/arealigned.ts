@@ -53,14 +53,26 @@ export default class LabelsAreAligned extends SfdxCommand {
   public async run(): Promise<AnyJson> {
     Performance.getInstance().start();
 
-    let result;
-    if (this.flags.mode === 'string') {
-      result = await areAligned(this.flags, LABELS_SUBPATH, LABELS_EXTENSION, LABELS_ROOT_TAG, LABEL_ITEMS);
-    } else {
-      result = await validateAlignment(this.flags, LABELS_SUBPATH, LABELS_EXTENSION, LABELS_ROOT_TAG, LABEL_ITEMS);
-    }
+    let result = await labelAreAligned(this.flags);
 
     Performance.getInstance().end();
     return result;
   }
+}
+
+/**
+ * Label-specific are aligned function that encapsulates all label constants
+ * This function can be used programmatically without needing to pass label constants
+ * 
+ * @param options - Label are aligned options (paths will be resolved automatically if not provided)
+ * @returns Promise with are aligned operation result
+ */
+export async function labelAreAligned(options: any): Promise<any> {
+    let result;
+    if (options.mode === 'string') {
+      result = await areAligned(options, LABELS_SUBPATH, LABELS_EXTENSION, LABELS_ROOT_TAG, LABEL_ITEMS);
+    } else {
+      result = await validateAlignment(options, LABELS_SUBPATH, LABELS_EXTENSION, LABELS_ROOT_TAG, LABEL_ITEMS);
+    }
+    return result;
 }

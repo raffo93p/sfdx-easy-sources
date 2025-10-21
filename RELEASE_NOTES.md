@@ -1,16 +1,17 @@
 # Release Notes
 
 ## Version 0.8.0
-- **Major Enhancement: Complete Programmatic API** - Added comprehensive programmatic API support with automatic path resolution! You can now use all 9 operations for both profiles AND permission sets directly in your Node.js scripts:
-  - **Core Operations**: `profiles.split()`, `profiles.upsert()`, `profiles.merge()` + `permissionsets.split()`, `permissionsets.upsert()`, `permissionsets.merge()`
-  - **Maintenance Operations**: `profiles.clearEmpty()`, `profiles.minify()`, `profiles.clean()` + `permissionsets.clearEmpty()`, `permissionsets.minify()`, `permissionsets.clean()`
+- **Major Enhancement: Complete Programmatic API** - Added comprehensive programmatic API support with automatic path resolution! You can now use all operations for profiles, permission sets, AND custom labels directly in your Node.js scripts:
+  - **Core Operations**: `profiles.split()`, `profiles.upsert()`, `profiles.merge()` + `permissionsets.split()`, `permissionsets.upsert()`, `permissionsets.merge()` + `labels.split()`, `labels.upsert()`, `labels.merge()`
+  - **Maintenance Operations**: `profiles.clearEmpty()`, `profiles.minify()`, `profiles.clean()` + `permissionsets.clearEmpty()`, `permissionsets.minify()`, `permissionsets.clean()` + `labels.updateKey()`, `labels.areAligned()`
   - **Advanced Operations**: `profiles.delete()`, `profiles.updateKey()`, `profiles.areAligned()` + `permissionsets.delete()`, `permissionsets.updateKey()`, `permissionsets.areAligned()`
+  - **Multi-Metadata Support**: Profiles (9 operations), Permission Sets (9 operations), Custom Labels (5 operations)
   - **Automatic Path Resolution**: All methods auto-resolve paths from `easysources-settings.json` - specify only what you need to override
   - **Unified Architecture**: Commands now export functions for API use while maintaining CLI compatibility
   - **Zero Code Duplication**: CLI commands delegate to API functions for single source of truth
-  - **Complete TypeScript Support**: Full type definitions with `ProfileOptions` and `PermissionsetOptions` interfaces
+  - **Complete TypeScript Support**: Full type definitions with `ProfileOptions`, `PermissionsetOptions`, and `LabelOptions` interfaces
   - **Settings Integration**: Seamless integration with existing `easysources-settings.json` configuration
-  - **Consistent API Pattern**: Identical API structure for both profiles and permission sets
+  - **Consistent API Pattern**: Identical API structure across all supported metadata types
   - See [API.md](./API.md) for complete documentation and examples
 
 ## Version 0.7.5

@@ -5,10 +5,10 @@
  * with automatic path resolution from easysources-settings.json.
  */
 
-// Import the profiles and permissionsets API namespaces and individual functions
+// Import the profiles, permissionsets, and labels API namespaces and individual functions
 // When using as an installed package, use: require('sfdx-easy-sources')
 // When running from the project directory, use the relative path:
-const { profiles, permissionsets } = require('../lib/index.js');
+const { profiles, permissionsets, labels } = require('../lib/index.js');
 
 // You can also import individual functions directly for more flexibility:
 const { 
@@ -29,7 +29,12 @@ const {
     permissionsetClean,
     permissionsetClearEmpty,
     permissionsetAreAligned,
-    permissionsetUpdateKey 
+    permissionsetUpdateKey,
+    labelSplit,
+    labelUpsert,
+    labelMerge,
+    labelAreAligned,
+    labelUpdateKey
 } = require('../lib/index.js');
 
 async function main() {
@@ -271,14 +276,77 @@ async function managePermissionSets() {
 }
         `);
 
+        // === Label Operations ===
+        console.log('\n=== 🏷️  Custom Labels API Examples ===');
+        
+        // Example: Label operations using namespace API
+        console.log('12. Custom label operations with namespace API...');
+        try {
+            // Split custom labels (simpler than profiles/permission sets)
+            const labelSplitResult = await labels.split();
+            console.log('✅ Labels split result:', labelSplitResult.outputString);
+        } catch (error) {
+            console.log('⚠ Expected error (no labels directory):', error.message || 'Input folder does not exist');
+            console.log('  → In a real project, this would split your custom label XML files into CSV files');
+        }
+
+        // Example: Direct function import for labels
+        console.log('13. Label operations with direct function imports...');
+        try {
+            const labelUpsertResult = await labelUpsert();
+            console.log('✅ Label upsert result:', labelUpsertResult.outputString);
+        } catch (error) {
+            console.log('⚠ Expected error (no labels directory):', error.message || 'Input folder does not exist');
+            console.log('  → In a real project, this would upsert new labels into existing CSV files');
+        }
+
+        // Example: Label validation operations
+        console.log('14. Label validation and key updates...');
+        try {
+            // Check alignment between XML and CSV
+            const alignedResult = await labels.areAligned({ mode: 'string' });
+            console.log('✅ Labels alignment check completed');
+            
+            // Update keys if needed
+            // await labels.updateKey({ sort: 'true' });
+            console.log('✅ Label key updates would be applied here');
+            
+        } catch (error) {
+            console.log('⚠ Expected validation error:', error.message || 'No labels to process');
+            console.log('  → In a real project, these would validate and maintain your label CSV files');
+        }
+
+        console.log('\n📋 Complete Custom Labels Workflow Example:');
+        console.log(`
+// Complete custom labels management workflow
+async function manageCustomLabels() {
+    // 1. Split XML into manageable CSV files  
+    await labels.split();
+    
+    // 2. Add new labels from org retrieval
+    await labels.upsert();
+    
+    // 3. Update keys if label names changed
+    await labels.updateKey({ sort: 'true' });
+    
+    // 4. Merge back to XML for deployment
+    await labels.merge();
+    
+    // 5. Verify everything is aligned
+    const aligned = await labels.areAligned();
+    console.log(\`Labels alignment: \${aligned.alignedItems}/\${aligned.totalItems}\`);
+}
+        `);
+
         console.log('\n=== All API demonstrations completed ===');
         console.log('\n💡 Key Benefits:');
         console.log('  • Automatic path resolution from easysources-settings.json');
-        console.log('  • Complete profiles AND permission sets lifecycle management');
-        console.log('  • Both namespace (profiles.method, permissionsets.method) and direct function imports');
+        console.log('  • Complete profiles, permission sets, AND custom labels lifecycle management');
+        console.log('  • Consistent namespace APIs: profiles.method, permissionsets.method, labels.method');
+        console.log('  • Direct function imports for all metadata types');
         console.log('  • Minimal configuration required');
         console.log('  • Full TypeScript support available');
-        console.log('  • Identical API patterns for both profiles and permission sets');
+        console.log('  • Identical API patterns across all metadata types');
         
     } catch (error) {
         console.error('Unexpected error:', error.message);

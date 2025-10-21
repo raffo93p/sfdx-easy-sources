@@ -60,7 +60,7 @@ Examples
 
 ```javascript
 // JavaScript - with automatic path resolution
-const { profiles, permissionsets } = require('sfdx-easy-sources');
+const { profiles, permissionsets, labels } = require('sfdx-easy-sources');
 
 async function automateMetadata() {
   // Profile operations - paths auto-resolved from settings file
@@ -73,24 +73,31 @@ async function automateMetadata() {
     input: 'MyCustomPermSet,AnotherPermSet'
   });
   
+  // Custom labels operations - simplified workflow
+  await labels.split();  // No input needed for labels
+  
   // Complete workflow with all operations
   await profiles.upsert({ input: 'Admin' });
   await permissionsets.upsert();
+  await labels.upsert();
   
   await profiles.minify();
   await permissionsets.minify();
+  // Labels don't have minify - they use updateKey for maintenance
   
   await profiles.clearEmpty();
   await permissionsets.clearEmpty();
+  // Labels don't need clearEmpty - simpler structure
   
   await profiles.merge({ input: 'Admin' });
   await permissionsets.merge();
+  await labels.merge();
 }
 ```
 
 ```typescript
 // TypeScript - with full type safety
-import { profiles, permissionsets, ProfileOptions, PermissionsetOptions } from 'sfdx-easy-sources';
+import { profiles, permissionsets, labels, ProfileOptions, PermissionsetOptions, LabelOptions } from 'sfdx-easy-sources';
 
 async function automateMetadata() {
   // Auto-resolved paths with type safety
@@ -103,7 +110,9 @@ async function automateMetadata() {
     input: 'MyCustomPermSet'
   });
   
-  // Advanced operations - same for both profiles and permission sets
+  const labelResult = await labels.split();
+  
+  // Advanced operations - same patterns across all metadata types
   await profiles.clean({
     orgname: 'myorg',
     target: 'org'
@@ -133,11 +142,11 @@ See the `examples/` directory for more complete usage examples.
 ### Key API Features
 
 - **🔧 Automatic Path Resolution**: Use settings file for defaults, override only what you need
-- **📦 Complete Profile & Permission Set APIs**: All 9 operations available programmatically for both metadata types
+- **📦 Complete Multi-Metadata APIs**: Profiles (9 ops), Permission Sets (9 ops), Custom Labels (5 ops) - all available programmatically
 - **🎯 Zero Duplication**: Unified architecture - CLI commands delegate to API functions
-- **⚙️ TypeScript Support**: Full type definitions with `ProfileOptions` and `PermissionsetOptions` interfaces
+- **⚙️ TypeScript Support**: Full type definitions with `ProfileOptions`, `PermissionsetOptions`, and `LabelOptions` interfaces
 - **🔗 Settings Integration**: Seamless use of existing `easysources-settings.json`
-- **🔄 Consistent API**: Identical patterns for both profiles and permission sets
+- **🔄 Consistent API**: Identical patterns across all metadata types
 
 ### Available Profile API Methods
 - `profiles.split(options)` - Split XML files into CSV files
@@ -159,6 +168,14 @@ See the `examples/` directory for more complete usage examples.
 - `permissionsets.updateKey(options)` - Update keys across CSV files
 - `permissionsets.minify(options)` - Remove entries with only false permissions
 - `permissionsets.delete(options)` - Delete specific entries from CSV files
+- `permissionsets.clean(options)` - Remove references to non-existent metadata
+
+### Available Custom Labels API Methods
+- `labels.split(options)` - Split custom label XML files into CSV files
+- `labels.upsert(options)` - Upsert XML data into existing CSV files  
+- `labels.merge(options)` - Merge CSV files back to XML
+- `labels.areAligned(options)` - Check XML/CSV alignment
+- `labels.updateKey(options)` - Update keys across CSV files
 - `permissionsets.clean(options)` - Remove references to non-existent metadata
 
 

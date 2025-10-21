@@ -35,6 +35,17 @@ export {
     permissionsetClean
 } from './api/permissionsets';
 
+// Export all label functionality
+export {
+    labels,
+    LabelOptions,
+    labelSplit,
+    labelUpsert,
+    labelMerge,
+    labelAreAligned,
+    labelUpdateKey
+} from './api/labels';
+
 // Export all path functionality
 export {
     PathOptions,
@@ -43,5 +54,6 @@ export {
 
 export default {
     profiles: require('./api/profiles').profiles,
-    permissionsets: require('./api/permissionsets').permissionsets
+    permissionsets: require('./api/permissionsets').permissionsets,
+    labels: require('./api/labels').labels
 };

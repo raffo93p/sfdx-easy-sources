@@ -44,9 +44,20 @@ export default class UpdateKey extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        var result = await updatekey(this.flags, LABELS_SUBPATH, LABEL_ITEMS);
+        var result = await labelUpdateKey(this.flags);
 
         Performance.getInstance().end();
         return result;
     }
+}
+
+/**
+ * Label-specific update key function that encapsulates all label constants
+ * This function can be used programmatically without needing to pass label constants
+ * 
+ * @param options - Label update key options (paths will be resolved automatically if not provided)
+ * @returns Promise with update key operation result
+ */
+export async function labelUpdateKey(options: any): Promise<any> {
+    return await updatekey(options, LABELS_SUBPATH, LABEL_ITEMS);
 }
