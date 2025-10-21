@@ -54,9 +54,20 @@ export default class Upsert extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        var result = await upsert(this.flags, PERMSETS_SUBPATH, PERMSETS_EXTENSION, PERMSETS_ROOT_TAG, PERMSET_ITEMS);
+        var result = await permissionsetUpsert(this.flags);
 
         Performance.getInstance().end();
         return result;
     }
+}
+
+/**
+ * Permission set-specific upsert function that encapsulates all permission set constants
+ * This function can be used programmatically without needing to pass permission set constants
+ * 
+ * @param options - Permission set upsert options (paths will be resolved automatically if not provided)
+ * @returns Promise with upsert operation result
+ */
+export async function permissionsetUpsert(options: any): Promise<any> {
+    return await upsert(options, PERMSETS_SUBPATH, PERMSETS_EXTENSION, PERMSETS_ROOT_TAG, PERMSET_ITEMS);
 }

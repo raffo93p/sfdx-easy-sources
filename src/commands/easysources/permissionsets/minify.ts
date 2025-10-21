@@ -59,78 +59,85 @@ export default class Clean extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
         
-        const csvDir = join((this.flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), PERMSETS_SUBPATH) as string;
-        const xmlDir = join((flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH)) as string;
-
-        const inputProfile = (this.flags.input) as string;
-
-        checkDirOrErrorSync(csvDir);
-        checkDirOrErrorSync(xmlDir);
-
-        var profileList = [];
-        if (inputProfile) {
-            profileList = inputProfile.split(',');
-        } else {
-            profileList = fs.readdirSync(csvDir, { withFileTypes: true })
-                .filter(item => item.isDirectory())
-                .map(item => item.name)
-        }
-
-
-        // profileName is the profile name without the extension
-        for (const profileName of profileList) {
-            console.log('Minifying on: ' + profileName);
-
-            for (const tag_section in PERMSET_ITEMS) {
-                // tag_section is a profile section (applicationVisibilities, classAccess ecc)
-
-                const csvFilePath = join(csvDir, profileName, calcCsvFilename(profileName, tag_section));
-                if (fs.existsSync(csvFilePath)) {
-
-                    // get the list of resources on the csv. eg. the list of apex classes
-                    var resListCsv = await readCsvToJsonArray(csvFilePath)
-
-                    
-                    resListCsv = resListCsv.filter(function(res) {
-                        // return true to persist, false to delete
-                        if(PERMSET_TAG_BOOL[tag_section] == null) return true;
-
-                        for(const boolName of toArray(PERMSET_TAG_BOOL[tag_section]) ){
-                            if(res[boolName] === 'true' || res[boolName] === 'FALSE') return true;
-                        }
-
-                        return false;
-                    });
-                    
-                    
-                    // write the cleaned csv
-                    const headers = PERMSET_ITEMS[tag_section].headers;
-                    const transforms = [unwind({ paths: headers })];
-                    const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
-
-                    if (this.flags.sort === 'true') {
-                        resListCsv = sortByKey(resListCsv);
-                    }
-
-                    const csv = parser.parse(resListCsv);
-                    try {
-                        fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
-                        // file written successfully
-                    } catch (err) {
-                        console.error(err);
-                    }
-                    
-                }
-            }
-
-        }
-
+        var result = await permissionsetMinify(this.flags);
         
         Performance.getInstance().end();
 
-        var outputString = 'OK'
-        return { outputString };
+        return result;
     }
-    
 }
 
+/**
+ * Permission set-specific minify function that encapsulates all permission set constants
+ * This function can be used programmatically without needing to pass permission set constants
+ * 
+ * @param options - Permission set minify options (paths will be resolved automatically if not provided)
+ * @returns Promise with minify operation result
+ */
+export async function permissionsetMinify(options: any): Promise<any> {
+    const csvDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), PERMSETS_SUBPATH) as string;
+    const xmlDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH)) as string;
+    
+    const inputProfile = options.input as string;
+
+    checkDirOrErrorSync(csvDir);
+    checkDirOrErrorSync(xmlDir);
+
+    var profileList = [];
+    if (inputProfile) {
+        profileList = inputProfile.split(',');
+    } else {
+        profileList = fs.readdirSync(csvDir, { withFileTypes: true })
+            .filter(item => item.isDirectory())
+            .map(item => item.name)
+    }
+
+    // profileName is the profile name without the extension
+    for (const profileName of profileList) {
+        console.log('Minifying on: ' + profileName);
+
+        for (const tag_section in PERMSET_ITEMS) {
+            // tag_section is a profile section (applicationVisibilities, classAccess ecc)
+
+            const csvFilePath = join(csvDir, profileName, calcCsvFilename(profileName, tag_section));
+            if (fs.existsSync(csvFilePath)) {
+
+                // get the list of resources on the csv. eg. the list of apex classes
+                var resListCsv = await readCsvToJsonArray(csvFilePath)
+
+                
+                resListCsv = resListCsv.filter(function(res) {
+                    // return true to persist, false to delete
+                    if(PERMSET_TAG_BOOL[tag_section] == null) return true;
+
+                    for(const boolName of toArray(PERMSET_TAG_BOOL[tag_section]) ){
+                        if(res[boolName] === 'true' || res[boolName] === 'FALSE') return true;
+                    }
+
+                    return false;
+                });
+                
+                
+                // write the cleaned csv
+                const headers = PERMSET_ITEMS[tag_section].headers;
+                const transforms = [unwind({ paths: headers })];
+                const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
+
+                if (options.sort === 'true') {
+                    resListCsv = sortByKey(resListCsv);
+                }
+
+                const csv = parser.parse(resListCsv);
+                try {
+                    fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
+                    // file written successfully
+                } catch (err) {
+                    console.error(err);
+                }
+                
+            }
+        }
+    }
+
+    return { outputString: 'OK' };
+}

@@ -56,46 +56,72 @@ Examples
 
 ## 🚀 Programmatic API Usage
 
-**NEW in v0.8.0**: Complete programmatic API with automatic path resolution! Use all profile operations in your Node.js scripts without CLI overhead:
+**NEW in v0.8.0**: Complete programmatic API with automatic path resolution! Use all profile and permission set operations in your Node.js scripts without CLI overhead:
 
 ```javascript
 // JavaScript - with automatic path resolution
-const { profiles } = require('sfdx-easy-sources');
+const { profiles, permissionsets } = require('sfdx-easy-sources');
 
-async function automateProfiles() {
-  // Minimal usage - paths auto-resolved from settings file
+async function automateMetadata() {
+  // Profile operations - paths auto-resolved from settings file
   await profiles.split({
     input: 'Admin,Standard User'  // Paths come from easysources-settings.json
   });
   
+  // Permission set operations - same API pattern
+  await permissionsets.split({
+    input: 'MyCustomPermSet,AnotherPermSet'
+  });
+  
   // Complete workflow with all operations
   await profiles.upsert({ input: 'Admin' });
+  await permissionsets.upsert();
+  
   await profiles.minify();
+  await permissionsets.minify();
+  
   await profiles.clearEmpty();
+  await permissionsets.clearEmpty();
+  
   await profiles.merge({ input: 'Admin' });
+  await permissionsets.merge();
 }
 ```
 
 ```typescript
 // TypeScript - with full type safety
-import { profiles, ProfileOptions } from 'sfdx-easy-sources';
+import { profiles, permissionsets, ProfileOptions, PermissionsetOptions } from 'sfdx-easy-sources';
 
-async function automateProfiles() {
+async function automateMetadata() {
   // Auto-resolved paths with type safety
-  const result = await profiles.split({
+  const profileResult = await profiles.split({
     input: 'Admin,Standard User',
     ignoreuserperm: 'true'
   });
   
-  // Advanced operations
+  const permsetResult = await permissionsets.split({
+    input: 'MyCustomPermSet'
+  });
+  
+  // Advanced operations - same for both profiles and permission sets
   await profiles.clean({
     orgname: 'myorg',
+    target: 'org'
+  });
+  
+  await permissionsets.clean({
+    orgname: 'myorg', 
     target: 'org'
   });
   
   await profiles.delete({
     type: 'fieldPermissions',
     tagid: 'Account.OldField__c'
+  });
+  
+  await permissionsets.delete({
+    type: 'objectPermissions',
+    tagid: 'MyCustomObject__c'
   });
 }
 ```
@@ -107,10 +133,11 @@ See the `examples/` directory for more complete usage examples.
 ### Key API Features
 
 - **🔧 Automatic Path Resolution**: Use settings file for defaults, override only what you need
-- **📦 Complete Profile API**: All 9 profile operations available programmatically  
+- **📦 Complete Profile & Permission Set APIs**: All 9 operations available programmatically for both metadata types
 - **🎯 Zero Duplication**: Unified architecture - CLI commands delegate to API functions
-- **⚙️ TypeScript Support**: Full type definitions with `ProfileOptions` interface
+- **⚙️ TypeScript Support**: Full type definitions with `ProfileOptions` and `PermissionsetOptions` interfaces
 - **🔗 Settings Integration**: Seamless use of existing `easysources-settings.json`
+- **🔄 Consistent API**: Identical patterns for both profiles and permission sets
 
 ### Available Profile API Methods
 - `profiles.split(options)` - Split XML files into CSV files
@@ -122,6 +149,17 @@ See the `examples/` directory for more complete usage examples.
 - `profiles.minify(options)` - Remove entries with only false permissions
 - `profiles.delete(options)` - Delete specific entries from CSV files
 - `profiles.clean(options)` - Remove references to non-existent metadata
+
+### Available Permission Set API Methods
+- `permissionsets.split(options)` - Split permission set XML files into CSV files
+- `permissionsets.upsert(options)` - Upsert XML data into existing CSV files  
+- `permissionsets.merge(options)` - Merge CSV files back to XML
+- `permissionsets.clearEmpty(options)` - Remove empty CSV files
+- `permissionsets.areAligned(options)` - Check XML/CSV alignment
+- `permissionsets.updateKey(options)` - Update keys across CSV files
+- `permissionsets.minify(options)` - Remove entries with only false permissions
+- `permissionsets.delete(options)` - Delete specific entries from CSV files
+- `permissionsets.clean(options)` - Remove references to non-existent metadata
 
 
 Based on the source type, this plugin provides the following commands:

@@ -17,18 +17,23 @@ export {
     profileUpdateKey,
     profileMinify,
     profileDelete,
-    profileClean,
-    // Also export with shorter aliases for convenience
-    profileSplit as split,
-    profileUpsert as upsert,
-    profileMerge as merge,
-    profileClearEmpty as clearEmpty,
-    profileAreAligned as areAligned,
-    profileUpdateKey as updateKey,
-    profileMinify as minify,
-    profileDelete as delete,
-    profileClean as clean
+    profileClean
 } from './api/profiles';
+
+// Export all permission set functionality
+export {
+    permissionsets,
+    PermissionsetOptions,
+    permissionsetSplit,
+    permissionsetUpsert,
+    permissionsetMerge,
+    permissionsetClearEmpty,
+    permissionsetAreAligned,
+    permissionsetUpdateKey,
+    permissionsetMinify,
+    permissionsetDelete,
+    permissionsetClean
+} from './api/permissionsets';
 
 // Export all path functionality
 export {
@@ -37,5 +42,6 @@ export {
 } from './api/paths';
 
 export default {
-    profiles: require('./api/profiles').profiles
+    profiles: require('./api/profiles').profiles,
+    permissionsets: require('./api/permissionsets').permissionsets
 };

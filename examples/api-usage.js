@@ -5,10 +5,10 @@
  * with automatic path resolution from easysources-settings.json.
  */
 
-// Import the profiles API namespace and individual functions
+// Import the profiles and permissionsets API namespaces and individual functions
 // When using as an installed package, use: require('sfdx-easy-sources')
 // When running from the project directory, use the relative path:
-const { profiles } = require('../lib/index.js');
+const { profiles, permissionsets } = require('../lib/index.js');
 
 // You can also import individual functions directly for more flexibility:
 const { 
@@ -20,7 +20,16 @@ const {
     profileClean,
     profileClearEmpty,
     profileAreAligned,
-    profileUpdateKey 
+    profileUpdateKey,
+    permissionsetSplit,
+    permissionsetUpsert,
+    permissionsetMerge,
+    permissionsetMinify,
+    permissionsetDelete,
+    permissionsetClean,
+    permissionsetClearEmpty,
+    permissionsetAreAligned,
+    permissionsetUpdateKey 
 } = require('../lib/index.js');
 
 async function main() {
@@ -182,13 +191,94 @@ async function automateProfileManagement() {
 }
         `);
 
+        // === Permission Set Operations ===
+        console.log('\n=== 🔐 Permission Set API Examples ===');
+        
+        // Example: Permission set operations using namespace API
+        console.log('9. Permission set operations with namespace API...');
+        try {
+            // Split permission sets (similar to profiles but for permission sets)
+            const permsetSplitResult = await permissionsets.split({
+                input: 'MyCustomPermissionSet'
+            });
+            console.log('✓ Permission set split result:', permsetSplitResult.outputString);
+        } catch (error) {
+            console.log('⚠ Expected error (no permission sets directory):', error.message || 'Input folder does not exist');
+            console.log('  → In a real project, this would split your permission set XML files into CSV files');
+        }
+
+        // Example: Direct function import for permission sets
+        console.log('10. Permission set operations with direct function imports...');
+        try {
+            const permsetUpsertResult = await permissionsetUpsert();
+            console.log('✓ Permission set upsert result:', permsetUpsertResult.outputString);
+        } catch (error) {
+            console.log('⚠ Expected error (no permission sets directory):', error.message || 'Input folder does not exist');
+            console.log('  → In a real project, this would upsert new permissions into existing CSV files');
+        }
+
+        // Example: Permission set maintenance operations
+        console.log('11. Permission set maintenance operations...');
+        try {
+            await permissionsets.minify({ input: 'MyCustomPermissionSet' });
+            console.log('✓ Permission sets minified - removed entries with only false permissions');
+            
+            const clearResult = await permissionsets.clearEmpty();
+            console.log('✓ Permission set cleanup result:', clearResult.outputString);
+            
+            // Advanced: Permission set cleaning against org metadata
+            // await permissionsets.clean({
+            //     orgname: 'myDevOrg',
+            //     target: 'org',
+            //     mode: 'log'  // Log issues without making changes
+            // });
+            
+        } catch (error) {
+            console.log('⚠ Expected maintenance error:', error.message || 'No permission sets to process');
+            console.log('  → In a real project, these would maintain your permission set CSV files');
+        }
+
+        console.log('\n📋 Complete Permission Set Workflow Example:');
+        console.log(`
+// Complete permission set management workflow
+async function managePermissionSets() {
+    // 1. Split XML into manageable CSV files  
+    await permissionsets.split({
+        input: 'MyPermSet,AnotherPermSet'
+    });
+    
+    // 2. Add new metadata from org retrieval
+    await permissionsets.upsert();
+    
+    // 3. Remove unnecessary false permissions
+    await permissionsets.minify();
+    
+    // 4. Clean up empty files
+    await permissionsets.clearEmpty();
+    
+    // 5. Remove references to non-existent metadata
+    await permissionsets.clean({
+        orgname: 'production',
+        target: 'org'
+    });
+    
+    // 6. Merge back to XML for deployment
+    await permissionsets.merge();
+    
+    // 7. Verify everything is aligned
+    const aligned = await permissionsets.areAligned();
+    console.log(\`\${aligned.alignedItems}/\${aligned.totalItems} permission sets aligned\`);
+}
+        `);
+
         console.log('\n=== All API demonstrations completed ===');
         console.log('\n💡 Key Benefits:');
         console.log('  • Automatic path resolution from easysources-settings.json');
-        console.log('  • Complete profile lifecycle management');
-        console.log('  • Both namespace (profiles.method) and direct function imports');
+        console.log('  • Complete profiles AND permission sets lifecycle management');
+        console.log('  • Both namespace (profiles.method, permissionsets.method) and direct function imports');
         console.log('  • Minimal configuration required');
         console.log('  • Full TypeScript support available');
+        console.log('  • Identical API patterns for both profiles and permission sets');
         
     } catch (error) {
         console.error('Unexpected error:', error.message);

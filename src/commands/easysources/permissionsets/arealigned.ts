@@ -56,14 +56,26 @@ export default class AreAligned extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        let result;
-        if (this.flags.mode === 'string') {
-            result = await areAligned(this.flags, PERMSETS_SUBPATH, PERMSETS_EXTENSION, PERMSETS_ROOT_TAG, PERMSET_ITEMS);
-        } else {
-            result = await validateAlignment(this.flags, PERMSETS_SUBPATH, PERMSETS_EXTENSION, PERMSETS_ROOT_TAG, PERMSET_ITEMS);
-        }
+        let result = await permissionsetAreAligned(this.flags);
 
         Performance.getInstance().end();
         return result;
     }
+}
+
+/**
+ * Permission set-specific are aligned function that encapsulates all permission set constants
+ * This function can be used programmatically without needing to pass permission set constants
+ * 
+ * @param options - Permission set are aligned options (paths will be resolved automatically if not provided)
+ * @returns Promise with are aligned operation result
+ */
+export async function permissionsetAreAligned(options: any): Promise<any> {
+    let result;
+    if (options.mode === 'string') {
+        result = await areAligned(options, PERMSETS_SUBPATH, PERMSETS_EXTENSION, PERMSETS_ROOT_TAG, PERMSET_ITEMS);
+    } else {
+        result = await validateAlignment(options, PERMSETS_SUBPATH, PERMSETS_EXTENSION, PERMSETS_ROOT_TAG, PERMSET_ITEMS);
+    }
+    return result;
 }

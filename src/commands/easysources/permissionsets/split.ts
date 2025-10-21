@@ -53,9 +53,20 @@ export default class Split extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        var result = await split(this.flags, PERMSETS_SUBPATH, PERMSETS_EXTENSION, PERMSETS_ROOT_TAG, PERMSET_ITEMS );
+        var result = await permissionsetSplit(this.flags);
 
         Performance.getInstance().end();
         return result;
     }
+}
+
+/**
+ * Permission set-specific split function that encapsulates all permission set constants
+ * This function can be used programmatically without needing to pass permission set constants
+ * 
+ * @param options - Permission set split options (paths will be resolved automatically if not provided)
+ * @returns Promise with split operation result
+ */
+export async function permissionsetSplit(options: any): Promise<any> {
+    return await split(options, PERMSETS_SUBPATH, PERMSETS_EXTENSION, PERMSETS_ROOT_TAG, PERMSET_ITEMS);
 }
