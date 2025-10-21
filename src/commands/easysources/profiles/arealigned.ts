@@ -10,7 +10,7 @@ import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import { PROFILE_ITEMS, PROFILES_EXTENSION, PROFILES_ROOT_TAG, PROFILES_SUBPATH } from '../../../utils/constants/constants_profiles';
 import Performance from '../../../utils/performance';
-import { areAligned, validateAlignment } from '../../../utils/commands/alignmentChecker';
+import { areAligned } from '../../../utils/commands/alignmentChecker';
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
 
 // Initialize Messages with the current plugin directory
@@ -65,11 +65,5 @@ export default class AreAligned extends SfdxCommand {
 
 // Export a profile-specific areAligned function that encapsulates profile constants
 export async function profileAreAligned(options: any): Promise<any> {
-    let result;
-    if (options.mode === 'logic') {
-        result = await validateAlignment(options, PROFILES_SUBPATH, PROFILES_EXTENSION, PROFILES_ROOT_TAG, PROFILE_ITEMS);
-    } else {
-        result = await areAligned(options, PROFILES_SUBPATH, PROFILES_EXTENSION, PROFILES_ROOT_TAG, PROFILE_ITEMS);
-    }
-    return result;
+    return await areAligned(options, PROFILES_SUBPATH, PROFILES_EXTENSION, PROFILES_ROOT_TAG, PROFILE_ITEMS);
 }

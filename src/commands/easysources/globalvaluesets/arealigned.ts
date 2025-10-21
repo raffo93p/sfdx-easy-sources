@@ -4,7 +4,7 @@ import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import { GVSET_ITEMS, GVSETS_EXTENSION, GVSETS_ROOT_TAG, GVSETS_SUBPATH } from '../../../utils/constants/constants_globalvaluesets';
 import Performance from '../../../utils/performance';
-import { areAligned, validateAlignment } from '../../../utils/commands/alignmentChecker';
+import { areAligned } from '../../../utils/commands/alignmentChecker';
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
 
 // Initialize Messages with the current plugin directory
@@ -62,13 +62,5 @@ export default class GlobalValueSetsAreAligned extends SfdxCommand {
 
 // Export function for programmatic API
 export async function globalValueSetAreAligned(options: any = {}): Promise<AnyJson> {
-  
-  let result;
-  if (options.mode === 'string') {
-    result = await areAligned(options, GVSETS_SUBPATH, GVSETS_EXTENSION, GVSETS_ROOT_TAG, GVSET_ITEMS);
-  } else {
-    result = await validateAlignment(options, GVSETS_SUBPATH, GVSETS_EXTENSION, GVSETS_ROOT_TAG, GVSET_ITEMS);
-  }
-  
-  return result;
+  return await areAligned(options, GVSETS_SUBPATH, GVSETS_EXTENSION, GVSETS_ROOT_TAG, GVSET_ITEMS);
 }

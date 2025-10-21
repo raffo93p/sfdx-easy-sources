@@ -24,10 +24,25 @@ export interface ValidationSummary {
     [key: string]: any;
 }
 
-export async function validateAlignment(flags, file_subpath, file_extension, file_root_tag, file_items): Promise<ValidationSummary> {
-    const baseXmlDir = join((flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), file_subpath) as string;
-    const baseCsvDir = join((flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), file_subpath) as string;
-    const inputItems = (flags.input) as string;
+/**
+ * Common validation logic that handles both string and logic validation modes
+ */
+export async function areAligned(
+    options: any,
+    file_subpath: string,
+    file_extension: string,
+    file_root_tag: string,
+    file_items: any
+): Promise<ValidationSummary> {
+    const baseXmlDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), file_subpath) as string;
+    const baseCsvDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), file_subpath) as string;
+    const inputItems = (options.input) as string;
+    const mode = options.mode || 'string'; // default to string mode
+
+    // Validate mode parameter
+    if (mode !== 'string' && mode !== 'logic') {
+        throw new Error(`Invalid mode '${mode}'. Mode must be either 'string' or 'logic'.`);
+    }
 
     if (!fs.existsSync(baseXmlDir)) {
         console.log('XML folder ' + baseXmlDir + ' does not exist!');
@@ -52,30 +67,57 @@ export async function validateAlignment(flags, file_subpath, file_extension, fil
     let alignedCount = 0;
     let warningCount = 0;
 
-    for (const itemName of itemList) {
-        // console.log('Validating: ' + itemName);
-        
-        const result = await validateSingleItem(
-            itemName, 
-            baseXmlDir, 
-            baseCsvDir, 
-            file_extension, 
-            file_root_tag, 
-            file_items
-        );
-        
-        results.push(result);
-        
-        if (result.isAligned) {
-            alignedCount++;
-            console.log(`✅ Item '${itemName}' is properly aligned`);
-        } else if (result.isWarning) {
-            warningCount++;
-            console.log(`⚠️  Item '${itemName}' has warnings:`);
-            result.differences.forEach(diff => console.log(`   - ${diff}`));
-        } else {
-            console.log(`❌ Item '${itemName}' has misalignment:`);
-            result.differences.forEach(diff => console.log(`   - ${diff}`));
+    // Setup for string mode
+    let tempDir: string | null = null;
+    if (mode === 'string') {
+        tempDir = join(tmpdir(), 'easysources-validation', Date.now().toString());
+        fs.mkdirSync(tempDir, { recursive: true });
+    }
+
+    try {
+        for (const itemName of itemList) {
+            let result: ValidationResult;
+            
+            if (mode === 'string') {
+                result = await validateSingleItemWithStringComparison(
+                    itemName,
+                    baseXmlDir,
+                    baseCsvDir,
+                    tempDir!,
+                    file_extension,
+                    file_root_tag,
+                    file_items,
+                    options
+                );
+            } else if (mode === 'logic') {
+                result = await validateSingleItem(
+                    itemName,
+                    baseXmlDir,
+                    baseCsvDir,
+                    file_extension,
+                    file_root_tag,
+                    file_items
+                );
+            }
+            
+            results.push(result);
+            
+            if (result.isAligned) {
+                alignedCount++;
+                console.log(`✅ Item '${itemName}' is properly aligned`);
+            } else if (result.isWarning) {
+                warningCount++;
+                console.log(`⚠️  Item '${itemName}' has warnings:`);
+                result.differences.forEach(diff => console.log(`   - ${diff}`));
+            } else {
+                console.log(`❌ Item '${itemName}' has misalignment:`);
+                result.differences.forEach(diff => console.log(`   - ${diff}`));
+            }
+        }
+    } finally {
+        // Clean up temporary directory if used
+        if (tempDir && fs.existsSync(tempDir)) {
+            fs.removeSync(tempDir);
         }
     }
 
@@ -87,7 +129,8 @@ export async function validateAlignment(flags, file_subpath, file_extension, fil
         results: results
     };
 
-    console.log(`\nValidation Summary: ${summary.totalItems} items validated, ${summary.alignedItems} aligned, ${summary.misalignedItems} misaligned, ${summary.warningItems} warnings`);
+    const modeLabel = mode === 'string' ? ' (String Comparison)' : '';
+    console.log(`\nValidation Summary${modeLabel}: ${summary.totalItems} items validated, ${summary.alignedItems} aligned, ${summary.misalignedItems} misaligned, ${summary.warningItems} warnings`);
     
     return summary;
 }
@@ -150,10 +193,10 @@ async function validateSingleItem(
 }
 
 async function reconstructItemFromCsv(itemName: string, csvDirPath: string, file_root_tag: string, file_items: any): Promise<any> {
-    // Use the shared merge logic from merger.ts with default flags (sort enabled)
-    const flags = { sort: 'true' };
+    // Use the shared merge logic from merger.ts with default options (sort enabled)
+    const options = { sort: 'true' };
     try {
-        const mergedXml = await mergeItemFromCsv(itemName, csvDirPath, file_root_tag, file_items, flags);
+        const mergedXml = await mergeItemFromCsv(itemName, csvDirPath, file_root_tag, file_items, options);
         return mergedXml[file_root_tag] ?? mergedXml;
     } catch (error) {
         // If main XML part doesn't exist, return empty object
@@ -248,92 +291,6 @@ function deepEqual(obj1: any, obj2: any): boolean {
     return false;
 }
 
-/**
- * Validates alignment by performing a full string comparison between original XML item
- * and a new merged XML item created from CSV files.
- * This approach creates temporary files and performs exact string comparison.
- */
-export async function areAligned(flags, file_subpath, file_extension, file_root_tag, file_items): Promise<ValidationSummary> {
-    const baseXmlDir = join((flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), file_subpath) as string;
-    const baseCsvDir = join((flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), file_subpath) as string;
-    const inputItems = (flags.input) as string;
-
-    if (!fs.existsSync(baseXmlDir)) {
-        console.log('XML folder ' + baseXmlDir + ' does not exist!');
-        return { totalItems: 0, alignedItems: 0, misalignedItems: 0, warningItems: 0, results: [] };
-    }
-
-    if (!fs.existsSync(baseCsvDir)) {
-        console.log('CSV folder ' + baseCsvDir + ' does not exist!');
-        return { totalItems: 0, alignedItems: 0, misalignedItems: 0, warningItems: 0, results: [] };
-    }
-
-    var itemList = [];
-    if (inputItems) {
-        itemList = inputItems.split(',');
-    } else {
-        itemList = fs.readdirSync(baseXmlDir, { withFileTypes: true })
-            .filter(item => !item.isDirectory() && item.name.endsWith(file_extension))
-            .map(item => item.name.replace(file_extension, ''));
-    }
-
-    const results: ValidationResult[] = [];
-    let alignedCount = 0;
-    let warningCount = 0;
-
-    // Create temporary directory for merged files
-    const tempDir = join(tmpdir(), 'easysources-validation', Date.now().toString());
-    fs.mkdirSync(tempDir, { recursive: true });
-
-    try {
-        for (const itemName of itemList) {
-            // console.log('Validating (string comparison): ' + itemName);
-            
-            const result = await validateSingleItemWithStringComparison(
-                itemName,
-                baseXmlDir,
-                baseCsvDir,
-                tempDir,
-                file_extension,
-                file_root_tag,
-                file_items,
-                flags
-            );
-            
-            results.push(result);
-            
-            if (result.isAligned) {
-                alignedCount++;
-                console.log(`✅ Item '${itemName}' is properly aligned (string match)`);
-            } else if (result.isWarning) {
-                warningCount++;
-                console.log(`⚠️  Item '${itemName}' has warnings (string comparison):`);
-                result.differences.forEach(diff => console.log(`   - ${diff}`));
-            } else {
-                console.log(`❌ Item '${itemName}' has misalignment (string comparison)`);
-                result.differences.forEach(diff => console.log(`   - ${diff}`));
-            }
-        }
-    } finally {
-        // Clean up temporary directory
-        if (fs.existsSync(tempDir)) {
-            fs.removeSync(tempDir);
-        }
-    }
-
-    const summary: ValidationSummary = {
-        totalItems: results.length,
-        alignedItems: alignedCount,
-        misalignedItems: results.length - alignedCount - warningCount,
-        warningItems: warningCount,
-        results: results
-    };
-
-    console.log(`\nValidation Summary (String Comparison): ${summary.totalItems} items validated, ${summary.alignedItems} aligned, ${summary.misalignedItems} misaligned, ${summary.warningItems} warnings`);
-    
-    return summary;
-}
-
 async function validateSingleItemWithStringComparison(
     itemName: string,
     baseXmlDir: string,
@@ -342,7 +299,7 @@ async function validateSingleItemWithStringComparison(
     file_extension: string,
     file_root_tag: string,
     file_items: any,
-    flags: any
+    options: any
 ): Promise<ValidationResult> {
     
     const originalXmlPath = join(baseXmlDir, itemName + file_extension);
@@ -370,7 +327,7 @@ async function validateSingleItemWithStringComparison(
     try {
         // Create merged XML from CSV files using the same logic as merger.ts
         const mergedXmlPath = join(tempDir, itemName + '_merged' + file_extension);
-        await createMergedXmlFromCsv(itemName, csvDirPath, mergedXmlPath, file_root_tag, file_items, flags);
+        await createMergedXmlFromCsv(itemName, csvDirPath, mergedXmlPath, file_root_tag, file_items, options);
 
         // Use the normalized file comparison utility
         const isAligned = await areFilesEqual(originalXmlPath, mergedXmlPath);
@@ -397,10 +354,10 @@ async function createMergedXmlFromCsv(
     outputPath: string,
     file_root_tag: string,
     file_items: any,
-    flags: any
+    options: any
 ): Promise<void> {
     // Use the shared merge logic from merger.ts
-    const mergedXml = await mergeItemFromCsv(itemName, csvDirPath, file_root_tag, file_items, flags);
+    const mergedXml = await mergeItemFromCsv(itemName, csvDirPath, file_root_tag, file_items, options);
     
     // Write the merged XML to file
     await writeXmlToFile(outputPath, mergedXml);

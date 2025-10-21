@@ -4,7 +4,7 @@ import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import { APPLICATION_ITEMS, APPLICATIONS_EXTENSION, APPLICATIONS_ROOT_TAG, APPLICATIONS_SUBPATH } from '../../../utils/constants/constants_applications';
 import Performance from '../../../utils/performance';
-import { areAligned, validateAlignment } from '../../../utils/commands/alignmentChecker';
+import { areAligned } from '../../../utils/commands/alignmentChecker';
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
 
 // Initialize Messages with the current plugin directory
@@ -63,13 +63,5 @@ export default class ApplicationsAreAligned extends SfdxCommand {
 
 // Export function for programmatic API
 export async function applicationAreAligned(options: any = {}): Promise<AnyJson> {
-  
-  let result;
-  if (options.mode === 'string') {
-    result = await areAligned(options, APPLICATIONS_SUBPATH, APPLICATIONS_EXTENSION, APPLICATIONS_ROOT_TAG, APPLICATION_ITEMS);
-  } else {
-    result = await validateAlignment(options, APPLICATIONS_SUBPATH, APPLICATIONS_EXTENSION, APPLICATIONS_ROOT_TAG, APPLICATION_ITEMS);
-  }
-  
-  return result;
+  return await areAligned(options, APPLICATIONS_SUBPATH, APPLICATIONS_EXTENSION, APPLICATIONS_ROOT_TAG, APPLICATION_ITEMS);
 }
