@@ -71,92 +71,96 @@ export default class Delete extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        const picklist = this.flags.picklist;
-        const apiname = (this.flags.apiname) as string;
-        if (!picklist) throw new SfError(messages.getMessage('errorNoPicklistFlag'));
+        const result = await recordTypeDelete(this.flags);
 
-        const baseInputDir = join((this.flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
-        const inputObject = (this.flags.object) as string;
-        const inputRecordType = (this.flags.recordtype) as string;
+        Performance.getInstance().end();
 
-        if (!fs.existsSync(baseInputDir)) {
-            console.log('Input folder ' + baseInputDir + ' does not exist!');
-            return;
-        }
+        return result;
+    }
+}
 
-        var objectList = [];
-        if (inputObject) {
-            objectList = inputObject.split(',');
+// Export function for programmatic API
+export async function recordTypeDelete(options: any = {}): Promise<AnyJson> {
+    Performance.getInstance().start();
+
+    const picklist = options.picklist;
+    const apiname = (options.apiname) as string;
+    if (!picklist) throw new SfError(messages.getMessage('errorNoPicklistFlag'));
+
+    const baseInputDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
+    const inputObject = (options.object) as string;
+    const inputRecordType = (options.recordtype) as string;
+
+    if (!fs.existsSync(baseInputDir)) {
+        console.log('Input folder ' + baseInputDir + ' does not exist!');
+        return;
+    }
+
+    var objectList = [];
+    if (inputObject) {
+        objectList = inputObject.split(',');
+    } else {
+        objectList = fs.readdirSync(baseInputDir, { withFileTypes: true })
+            .filter(item => item.isDirectory())
+            .map(item => item.name)
+    }
+
+    for (const obj of objectList) {
+        var recordTypeList = [];
+
+        if (inputRecordType) {
+            recordTypeList = inputRecordType.split(',');
         } else {
-            objectList = fs.readdirSync(baseInputDir, { withFileTypes: true })
+            recordTypeList = fs.readdirSync(join(baseInputDir, obj, 'recordTypes'), { withFileTypes: true })
                 .filter(item => item.isDirectory())
                 .map(item => item.name)
         }
 
-        for (const obj of objectList) {
-            var recordTypeList = [];
+        for (const dir of recordTypeList) {
+            console.log('Deleting on: ' + join(obj, dir));
 
-            if (inputRecordType) {
-                recordTypeList = inputRecordType.split(',');
-            } else {
-                recordTypeList = fs.readdirSync(join(baseInputDir, obj, 'recordTypes'), { withFileTypes: true })
-                    .filter(item => item.isDirectory())
-                    .map(item => item.name)
-            }
+            const csvFilePath = join(baseInputDir, obj, 'recordTypes', dir, calcCsvFilename(dir, RECORDTYPES_PICKVAL_ROOT));
 
+            if (fs.existsSync(csvFilePath)) {
+                var jsonMap = await readCsvToJsonMap(csvFilePath);
 
-            // dir is the recordtype name without the extension
-            for (const dir of recordTypeList) {
-                console.log('Deleting on: ' + join(obj, dir));
-
-                const csvFilePath = join(baseInputDir, obj, 'recordTypes', dir, calcCsvFilename(dir, RECORDTYPES_PICKVAL_ROOT));
-
-                if (fs.existsSync(csvFilePath)) {
-                    var jsonMap = await readCsvToJsonMap(csvFilePath);
-
-                    if (apiname) {
-                        for (var ap of apiname.split(',')) {
-                            var key = picklist + '/' + ap;
-                            jsonMap.delete(key);
-                        }
-
-                    } else {
-                        for(var pick of picklist.split(',')){
-                            for (var key of jsonMap.keys()) {
-                                if (jsonMap.get(key).picklist === pick) {
-                                    jsonMap.delete(key);
-                                }
+                if (apiname) {
+                    for (var ap of apiname.split(',')) {
+                        var key = picklist + '/' + ap;
+                        jsonMap.delete(key);
+                    }
+                } else {
+                    for(var pick of picklist.split(',')){
+                        for (var key of jsonMap.keys()) {
+                            if (jsonMap.get(key).picklist === pick) {
+                                jsonMap.delete(key);
                             }
                         }
                     }
-
-                    var jsonArray = Array.from(jsonMap.values());
-
-                    const headers = RECORDTYPE_ITEMS[RECORDTYPES_PICKVAL_ROOT].headers;
-                    const transforms = [unwind({ paths: headers })];
-                    const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
-
-                    if (this.flags.sort === 'true') {
-                        jsonArray = sortByKey(jsonArray);
-                    }
-
-                    const csv = parser.parse(jsonArray);
-                    try {
-
-                        fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
-                        // file written successfully
-                    } catch (err) {
-                        console.error(err);
-                    }
                 }
 
+                var jsonArray = Array.from(jsonMap.values());
 
+                const headers = RECORDTYPE_ITEMS[RECORDTYPES_PICKVAL_ROOT].headers;
+                const transforms = [unwind({ paths: headers })];
+                const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
+
+                if (options.sort === 'true') {
+                    jsonArray = sortByKey(jsonArray);
+                }
+
+                const csv = parser.parse(jsonArray);
+                try {
+                    fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
+                } catch (err) {
+                    console.error(err);
+                }
             }
         }
-
-        Performance.getInstance().end();
-
-        var outputString = 'OK'
-        return { outputString };
     }
+
+    Performance.getInstance().end();
+
+    var outputString = 'OK'
+    return { outputString };
 }

@@ -57,73 +57,77 @@ export default class UpdateKey extends SfdxCommand {
 
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
-        const baseInputDir = join((this.flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
-        const inputObject = (this.flags.object) as string;
-        const inputRecordType = (this.flags.recordtype) as string;
+        
+        const result = await recordTypeUpdateKey(this.flags);
 
-        if (!fs.existsSync(baseInputDir)) {
-            console.log('Input folder ' + baseInputDir + ' does not exist!');
-            return;
-        }
+        Performance.getInstance().end();
 
-        var objectList = [];
-        if (inputObject) {
-            objectList = inputObject.split(',');
+        return result;
+    }
+}
+
+// Export function for API usage
+export async function recordTypeUpdateKey(options: any = {}): Promise<AnyJson> {
+    Performance.getInstance().start();
+    const baseInputDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
+    const inputObject = (options.object) as string;
+    const inputRecordType = (options.recordtype) as string;
+
+    if (!fs.existsSync(baseInputDir)) {
+        console.log('Input folder ' + baseInputDir + ' does not exist!');
+        return { outputString: 'ERROR: Input folder does not exist' };
+    }
+
+    var objectList = [];
+    if (inputObject) {
+        objectList = inputObject.split(',');
+    } else {
+        objectList = fs.readdirSync(baseInputDir, { withFileTypes: true })
+            .filter(item => item.isDirectory())
+            .map(item => item.name)
+    }
+
+    for (const obj of objectList) {
+        var recordTypeList = [];
+
+        if (inputRecordType) {
+            recordTypeList = inputRecordType.split(',');
         } else {
-            objectList = fs.readdirSync(baseInputDir, { withFileTypes: true })
+            if (!fs.existsSync(join(baseInputDir, obj, 'recordTypes'))) continue;
+
+            recordTypeList = fs.readdirSync(join(baseInputDir, obj, 'recordTypes'), { withFileTypes: true })
                 .filter(item => item.isDirectory())
                 .map(item => item.name)
         }
 
-        for (const obj of objectList) {
-            var recordTypeList = [];
+        for (const dir of recordTypeList) {
+            console.log('UpdateKey: ' + dir);
 
-            if (inputRecordType) {
-                recordTypeList = inputRecordType.split(',');
-            } else {
-                if (!fs.existsSync(join(baseInputDir, obj, 'recordTypes'))) continue;
+            for (const tag_section in RECORDTYPE_ITEMS) {
+                const csvFilePath = join(baseInputDir, obj, 'recordTypes', dir, calcCsvFilename(dir, tag_section));
+                if (fs.existsSync(csvFilePath)) {
+                    var jsonArray = await readCsvToJsonArray(csvFilePath)
+                    generateTagId(jsonArray, RECORDTYPE_ITEMS[tag_section].key, RECORDTYPE_ITEMS[tag_section].headers);
 
-                recordTypeList = fs.readdirSync(join(baseInputDir, obj, 'recordTypes'), { withFileTypes: true })
-                    .filter(item => item.isDirectory())
-                    .map(item => item.name)
-            }
-            // dir is the record type name without the extension
-            for (const dir of recordTypeList) {
+                    if (options.sort === 'true' || options.sort === true || options.sort === undefined) {
+                        jsonArray = sortByKey(jsonArray);
+                    }
 
-                console.log('UpdateKey: ' + dir);
+                    const headers = RECORDTYPE_ITEMS[tag_section].headers;
+                    const transforms = [unwind({ paths: headers })];
+                    const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
+                    const csv = parser.parse(jsonArray);
 
-                // key is each profile section (applicationVisibilities, classAccess ecc)
-                for (const tag_section in RECORDTYPE_ITEMS) {
-
-                    const csvFilePath = join(baseInputDir, obj, 'recordTypes', dir, calcCsvFilename(dir, tag_section));
-                    if (fs.existsSync(csvFilePath)) {
-                        var jsonArray = await readCsvToJsonArray(csvFilePath)
-                        generateTagId(jsonArray, RECORDTYPE_ITEMS[tag_section].key, RECORDTYPE_ITEMS[tag_section].headers);
-
-                        if (this.flags.sort === 'true') {
-                            jsonArray = sortByKey(jsonArray);
-                        }
-
-                        const headers = RECORDTYPE_ITEMS[tag_section].headers;
-                        const transforms = [unwind({ paths: headers })];
-                        const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
-                        const csv = parser.parse(jsonArray);
-
-                        try {
-                            fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
-                            // file written successfully
-                        } catch (err) {
-                            console.error(err);
-                        }
+                    try {
+                        fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
+                    } catch (err) {
+                        console.error(err);
                     }
                 }
-
             }
         }
-
-        Performance.getInstance().end();
-
-        var outputString = 'OK'
-        return { outputString };
     }
+
+    Performance.getInstance().end();
+    return { outputString: 'OK' };
 }

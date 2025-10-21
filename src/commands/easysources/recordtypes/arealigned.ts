@@ -86,372 +86,263 @@ export default class AreAligned extends SfdxCommand {
 
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
-
-        let result;
-        if (this.flags.mode === 'string') {
-            result = await this.areAlignedString();
-        } else {
-            result = await this.validateAlignmentLogic();
-        }
+                
+        const result = await recordTypeAreAligned(this.flags);
 
         Performance.getInstance().end();
         return result;
     }
 
-    private async validateAlignmentLogic(): Promise<ValidationSummary> {
-        const baseXmlDir = join((this.flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), RECORDTYPES_SUBPATH) as string;
-        const baseCsvDir = join((this.flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
-        const inputObjects = (this.flags.object) as string;
-        const inputRecordTypes = (this.flags.recordtype) as string;
+}
 
-        if (!fs.existsSync(baseXmlDir)) {
-            console.log(messages.getMessage('missingXmlFile', [baseXmlDir]));
-            return { totalItems: 0, alignedItems: 0, misalignedItems: 0, warningItems: 0, results: [] };
-        }
+// Export function for API usage
+export async function recordTypeAreAligned(options: any = {}): Promise<AnyJson> {
+    Performance.getInstance().start();
 
-        if (!fs.existsSync(baseCsvDir)) {
-            console.log(messages.getMessage('missingCsvDirectory', [baseCsvDir]));
-            return { totalItems: 0, alignedItems: 0, misalignedItems: 0, warningItems: 0, results: [] };
-        }
+    const baseXmlDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), RECORDTYPES_SUBPATH) as string;
+    const baseCsvDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
+    const inputObjects = (options.object) as string;
+    const inputRecordTypes = (options.recordtype) as string;
+    const mode = options.mode || 'string';
 
-        var objectList = [];
-        if (inputObjects) {
-            objectList = inputObjects.split(',');
-        } else {
-            objectList = fs.readdirSync(baseXmlDir, { withFileTypes: true })
-                .filter(item => item.isDirectory())
-                .map(item => item.name);
-        }
-
-        const results: ValidationResult[] = [];
-        let alignedCount = 0;
-        let warningCount = 0;
-
-        for (const objectName of objectList) {
-            const objectXmlDir = join(baseXmlDir, objectName, 'recordTypes');
-            const objectCsvDir = join(baseCsvDir, objectName, 'recordTypes');
-
-            if (!fs.existsSync(objectXmlDir)) continue;
-            if (!fs.existsSync(objectCsvDir)) {
-                const result: ValidationResult = {
-                    itemName: `${objectName}/*`,
-                    isAligned: false,
-                    differences: [messages.getMessage('missingCsvDirectory', [objectCsvDir])],
-                    isWarning: true
-                };
-                results.push(result);
-                warningCount++;
-                console.log(`⚠️  ${result.itemName} has warnings:`);
-                result.differences.forEach(diff => console.log(`   - ${diff}`));
-                continue;
-            }
-
-            var recordTypeList = [];
-            if (inputRecordTypes) {
-                recordTypeList = inputRecordTypes.split(',');
-            } else {
-                recordTypeList = fs.readdirSync(objectXmlDir, { withFileTypes: true })
-                    .filter(item => !item.isDirectory() && item.name.endsWith(RECORDTYPES_EXTENSION))
-                    .map(item => item.name.replace(RECORDTYPES_EXTENSION, ''));
-            }
-
-            for (const recordTypeName of recordTypeList) {
-                const fullName = `${objectName}.${recordTypeName}`;
-                const result = await this.validateSingleRecordType(
-                    objectName,
-                    recordTypeName,
-                    objectXmlDir,
-                    objectCsvDir
-                );
-                
-                results.push(result);
-                
-                if (result.isAligned) {
-                    alignedCount++;
-                    console.log(messages.getMessage('validationSuccess', [fullName]));
-                } else if (result.isWarning) {
-                    warningCount++;
-                    console.log(`⚠️  Record type '${fullName}' has warnings:`);
-                    result.differences.forEach(diff => console.log(messages.getMessage('differenceFound', [diff])));
-                } else {
-                    console.log(messages.getMessage('validationError', [fullName]));
-                    result.differences.forEach(diff => console.log(messages.getMessage('differenceFound', [diff])));
-                }
-            }
-        }
-
-        const summary: ValidationSummary = {
-            totalItems: results.length,
-            alignedItems: alignedCount,
-            misalignedItems: results.length - alignedCount - warningCount,
-            warningItems: warningCount,
-            results: results
-        };
-
-        console.log(messages.getMessage('validationSummary', [
-            summary.totalItems,
-            summary.alignedItems,
-            summary.misalignedItems
-        ]));
-        
-        return summary;
+    if (!fs.existsSync(baseXmlDir)) {
+        console.log(messages.getMessage('missingXmlFile', [baseXmlDir]));
+        return { totalItems: 0, alignedItems: 0, misalignedItems: 0, warningItems: 0, results: [] };
     }
 
-    private async validateSingleRecordType(
-        objectName: string,
-        recordTypeName: string,
-        xmlDir: string,
-        csvDir: string
-    ): Promise<ValidationResult> {
-        const fullName = `${objectName}.${recordTypeName}`;
-        const differences: string[] = [];
+    if (!fs.existsSync(baseCsvDir)) {
+        console.log(messages.getMessage('missingCsvDirectory', [baseCsvDir]));
+        return { totalItems: 0, alignedItems: 0, misalignedItems: 0, warningItems: 0, results: [] };
+    }
+
+    var objectList = [];
+    if (inputObjects) {
+        objectList = inputObjects.split(',');
+    } else {
+        objectList = fs.readdirSync(baseXmlDir, { withFileTypes: true })
+            .filter(item => item.isDirectory())
+            .map(item => item.name);
+    }
+
+    const results: ValidationResult[] = [];
+    let alignedCount = 0;
+    let warningCount = 0;
+
+    for (const objectName of objectList) {
+        const objectXmlDir = join(baseXmlDir, objectName, 'recordTypes');
+        const objectCsvDir = join(baseCsvDir, objectName, 'recordTypes');
+
+        if (!fs.existsSync(objectXmlDir)) continue;
+        if (!fs.existsSync(objectCsvDir)) {
+            const result: ValidationResult = {
+                itemName: `${objectName}/*`,
+                isAligned: false,
+                differences: [messages.getMessage('missingCsvDirectory', [objectCsvDir])],
+                isWarning: true
+            };
+            results.push(result);
+            warningCount++;
+            console.log(`⚠️  ${result.itemName} has warnings:`);
+            result.differences.forEach(diff => console.log(`   - ${diff}`));
+            continue;
+        }
+
+        var recordTypeList = [];
+        if (inputRecordTypes) {
+            recordTypeList = inputRecordTypes.split(',');
+        } else {
+            recordTypeList = fs.readdirSync(objectXmlDir, { withFileTypes: true })
+                .filter(item => !item.isDirectory() && item.name.endsWith(RECORDTYPES_EXTENSION))
+                .map(item => item.name.replace(RECORDTYPES_EXTENSION, ''));
+        }
+
+        for (const recordTypeName of recordTypeList) {
+            const fullName = `${objectName}.${recordTypeName}`;
+            let result: ValidationResult;
+            
+            if (mode === 'string') {
+                result = await compareStringsForRecord(objectName, recordTypeName, objectXmlDir, objectCsvDir, options);
+            } else {
+                result = await validateSingleRecordTypeForRecord(objectName, recordTypeName, objectXmlDir, objectCsvDir, options);
+            }
+            
+            results.push(result);
+            
+            if (result.isAligned) {
+                alignedCount++;
+                console.log(messages.getMessage('validationSuccess', [fullName]));
+            } else if (result.isWarning) {
+                warningCount++;
+                console.log(`⚠️  Record type '${fullName}' has warnings:`);
+                result.differences.forEach(diff => console.log(messages.getMessage('differenceFound', [diff])));
+            } else {
+                console.log(messages.getMessage('validationError', [fullName]));
+                result.differences.forEach(diff => console.log(messages.getMessage('differenceFound', [diff])));
+            }
+        }
+    }
+
+    const summary: ValidationSummary = {
+        totalItems: results.length,
+        alignedItems: alignedCount,
+        misalignedItems: results.length - alignedCount - warningCount,
+        warningItems: warningCount,
+        results: results
+    };
+
+    console.log(messages.getMessage('validationSummary', [
+        summary.totalItems,
+        summary.alignedItems,
+        summary.misalignedItems
+    ]));
+
+    Performance.getInstance().end();
+    return summary;
+}
+
+async function compareStringsForRecord(
+    objectName: string,
+    recordTypeName: string,
+    xmlDir: string,
+    csvDir: string,
+    options: any
+): Promise<ValidationResult> {
+    const fullName = `${objectName}.${recordTypeName}`;
+
+    try {
+        const originalXmlPath = join(xmlDir, recordTypeName + RECORDTYPES_EXTENSION);
+        if (!fs.existsSync(originalXmlPath)) {
+            return {
+                itemName: fullName,
+                isAligned: false,
+                differences: [`XML file not found: ${originalXmlPath}`],
+                isWarning: true
+            };
+        }
+
+        const originalXmlString = await readStringFromFile(originalXmlPath);
+        const recordTypeCsvDir = join(csvDir, recordTypeName);
+        if (!fs.existsSync(recordTypeCsvDir)) {
+            return {
+                itemName: fullName,
+                isAligned: false,
+                differences: [`CSV directory not found: ${recordTypeCsvDir}`],
+                isWarning: true
+            };
+        }
+
+        const mergedXml = await mergeRecordTypeFromCsv(recordTypeName, recordTypeCsvDir, options);
+        const tempDir = tmpdir();
+        const tempFile = join(tempDir, `temp_${recordTypeName}_${Date.now()}.xml`);
+        writeXmlToFile(tempFile, mergedXml);
+
+        const reconstructedXmlString = await readStringFromFile(tempFile);
 
         try {
-            // Read original XML
-            const xmlFilePath = join(xmlDir, recordTypeName + RECORDTYPES_EXTENSION);
-            if (!fs.existsSync(xmlFilePath)) {
-                return {
-                    itemName: fullName,
-                    isAligned: false,
-                    differences: [`XML file not found: ${xmlFilePath}`],
-                    isWarning: true
-                };
-            }
+            fs.unlinkSync(tempFile);
+        } catch (error) {
+            // Ignore cleanup errors
+        }
 
-            const originalXml = await readXmlFromFile(xmlFilePath);
-            if (!originalXml || !originalXml[RECORDTYPES_ROOT_TAG]) {
-                return {
-                    itemName: fullName,
-                    isAligned: false,
-                    differences: [`Invalid XML structure in: ${xmlFilePath}`]
-                };
-            }
+        const differences: string[] = [];
+        if (originalXmlString.trim() !== reconstructedXmlString.trim()) {
+            differences.push('XML content differs between original and reconstructed from CSV');
+        }
 
-            // Check CSV directory
-            const recordTypeCsvDir = join(csvDir, recordTypeName);
-            if (!fs.existsSync(recordTypeCsvDir)) {
-                return {
-                    itemName: fullName,
-                    isAligned: false,
-                    differences: [`CSV directory not found: ${recordTypeCsvDir}`],
-                    isWarning: true
-                };
-            }
+        return {
+            itemName: fullName,
+            isAligned: differences.length === 0,
+            differences: differences
+        };
 
-            // Reconstruct XML from CSV using shared merge logic
-            const reconstructedXml = await mergeRecordTypeFromCsv(recordTypeName, recordTypeCsvDir, this.flags);
+    } catch (error) {
+        return {
+            itemName: fullName,
+            isAligned: false,
+            differences: [`Error processing: ${error.message}`]
+        };
+    }
+}
 
-            // Compare structures
-            const originalData = originalXml[RECORDTYPES_ROOT_TAG] || {};
-            const reconstructedData = reconstructedXml[RECORDTYPES_ROOT_TAG] || {};
+async function validateSingleRecordTypeForRecord(
+    objectName: string,
+    recordTypeName: string,
+    xmlDir: string,
+    csvDir: string,
+    options: any
+): Promise<ValidationResult> {
+    const fullName = `${objectName}.${recordTypeName}`;
+    const differences: string[] = [];
 
-            // Deep compare the relevant sections
-            for (const sectionName in RECORDTYPE_ITEMS) {
-                const originalSection = originalData[sectionName] || [];
-                const reconstructedSection = reconstructedData[sectionName] || [];
+    try {
+        const xmlFilePath = join(xmlDir, recordTypeName + RECORDTYPES_EXTENSION);
+        if (!fs.existsSync(xmlFilePath)) {
+            return {
+                itemName: fullName,
+                isAligned: false,
+                differences: [`XML file not found: ${xmlFilePath}`],
+                isWarning: true
+            };
+        }
 
-                // Convert to arrays if they're objects
-                const originalArray = Array.isArray(originalSection) ? originalSection : (originalSection ? [originalSection] : []);
-                const reconstructedArray = Array.isArray(reconstructedSection) ? reconstructedSection : (reconstructedSection ? [reconstructedSection] : []);
+        const originalXml = await readXmlFromFile(xmlFilePath);
+        if (!originalXml || !originalXml[RECORDTYPES_ROOT_TAG]) {
+            return {
+                itemName: fullName,
+                isAligned: false,
+                differences: [`Invalid XML structure in: ${xmlFilePath}`]
+            };
+        }
 
-                if (originalArray.length !== reconstructedArray.length) {
-                    differences.push(`${sectionName}: Count mismatch (XML: ${originalArray.length}, CSV: ${reconstructedArray.length})`);
-                } else {
-                    // Sort both arrays for comparison if needed
-                    const sortedOriginal = this.flags.sort === 'true' ? [...originalArray].sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))) : originalArray;
-                    const sortedReconstructed = this.flags.sort === 'true' ? [...reconstructedArray].sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))) : reconstructedArray;
+        const recordTypeCsvDir = join(csvDir, recordTypeName);
+        if (!fs.existsSync(recordTypeCsvDir)) {
+            return {
+                itemName: fullName,
+                isAligned: false,
+                differences: [`CSV directory not found: ${recordTypeCsvDir}`],
+                isWarning: true
+            };
+        }
 
-                    for (let i = 0; i < sortedOriginal.length; i++) {
-                        const originalItem = JSON.stringify(sortedOriginal[i]);
-                        const reconstructedItem = JSON.stringify(sortedReconstructed[i]);
-                        
-                        if (originalItem !== reconstructedItem) {
-                            differences.push(`${sectionName}[${i}]: Structure mismatch`);
-                            // Could add more detailed diff here if needed
-                        }
+        const reconstructedXml = await mergeRecordTypeFromCsv(recordTypeName, recordTypeCsvDir, options);
+        const originalData = originalXml[RECORDTYPES_ROOT_TAG] || {};
+        const reconstructedData = reconstructedXml[RECORDTYPES_ROOT_TAG] || {};
+
+        for (const sectionName in RECORDTYPE_ITEMS) {
+            const originalSection = originalData[sectionName] || [];
+            const reconstructedSection = reconstructedData[sectionName] || [];
+
+            const originalArray = Array.isArray(originalSection) ? originalSection : (originalSection ? [originalSection] : []);
+            const reconstructedArray = Array.isArray(reconstructedSection) ? reconstructedSection : (reconstructedSection ? [reconstructedSection] : []);
+
+            if (originalArray.length !== reconstructedArray.length) {
+                differences.push(`${sectionName}: Count mismatch (XML: ${originalArray.length}, CSV: ${reconstructedArray.length})`);
+            } else {
+                const sortedOriginal = options.sort === 'true' ? [...originalArray].sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))) : originalArray;
+                const sortedReconstructed = options.sort === 'true' ? [...reconstructedArray].sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))) : reconstructedArray;
+
+                for (let i = 0; i < sortedOriginal.length; i++) {
+                    const originalItem = JSON.stringify(sortedOriginal[i]);
+                    const reconstructedItem = JSON.stringify(sortedReconstructed[i]);
+                    
+                    if (originalItem !== reconstructedItem) {
+                        differences.push(`${sectionName}[${i}]: Structure mismatch`);
                     }
                 }
             }
-
-            return {
-                itemName: fullName,
-                isAligned: differences.length === 0,
-                differences: differences
-            };
-
-        } catch (error) {
-            return {
-                itemName: fullName,
-                isAligned: false,
-                differences: [`Error processing: ${error.message}`]
-            };
-        }
-    }
-
-    private async areAlignedString(): Promise<ValidationSummary> {
-        // String comparison mode - compare the actual XML files
-        const baseXmlDir = join((this.flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), RECORDTYPES_SUBPATH) as string;
-        const baseCsvDir = join((this.flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
-        const inputObjects = (this.flags.object) as string;
-        const inputRecordTypes = (this.flags.recordtype) as string;
-
-        if (!fs.existsSync(baseXmlDir)) {
-            console.log(messages.getMessage('missingXmlFile', [baseXmlDir]));
-            return { totalItems: 0, alignedItems: 0, misalignedItems: 0, warningItems: 0, results: [] };
         }
 
-        if (!fs.existsSync(baseCsvDir)) {
-            console.log(messages.getMessage('missingCsvDirectory', [baseCsvDir]));
-            return { totalItems: 0, alignedItems: 0, misalignedItems: 0, warningItems: 0, results: [] };
-        }
-
-        var objectList = [];
-        if (inputObjects) {
-            objectList = inputObjects.split(',');
-        } else {
-            objectList = fs.readdirSync(baseXmlDir, { withFileTypes: true })
-                .filter(item => item.isDirectory())
-                .map(item => item.name);
-        }
-
-        const results: ValidationResult[] = [];
-        let alignedCount = 0;
-        let warningCount = 0;
-
-        for (const objectName of objectList) {
-            const objectXmlDir = join(baseXmlDir, objectName, 'recordTypes');
-            const objectCsvDir = join(baseCsvDir, objectName, 'recordTypes');
-
-            if (!fs.existsSync(objectXmlDir)) continue;
-            if (!fs.existsSync(objectCsvDir)) {
-                const result: ValidationResult = {
-                    itemName: `${objectName}/*`,
-                    isAligned: false,
-                    differences: [messages.getMessage('missingCsvDirectory', [objectCsvDir])],
-                    isWarning: true
-                };
-                results.push(result);
-                warningCount++;
-                console.log(`⚠️  ${result.itemName} has warnings:`);
-                result.differences.forEach(diff => console.log(`   - ${diff}`));
-                continue;
-            }
-
-            var recordTypeList = [];
-            if (inputRecordTypes) {
-                recordTypeList = inputRecordTypes.split(',');
-            } else {
-                recordTypeList = fs.readdirSync(objectXmlDir, { withFileTypes: true })
-                    .filter(item => !item.isDirectory() && item.name.endsWith(RECORDTYPES_EXTENSION))
-                    .map(item => item.name.replace(RECORDTYPES_EXTENSION, ''));
-            }
-
-            for (const recordTypeName of recordTypeList) {
-                const fullName = `${objectName}.${recordTypeName}`;
-                const result = await this.compareStrings(objectName, recordTypeName, objectXmlDir, objectCsvDir);
-                
-                results.push(result);
-                
-                if (result.isAligned) {
-                    alignedCount++;
-                    console.log(messages.getMessage('validationSuccess', [fullName]));
-                } else if (result.isWarning) {
-                    warningCount++;
-                    console.log(`⚠️  Record type '${fullName}' has warnings:`);
-                    result.differences.forEach(diff => console.log(messages.getMessage('differenceFound', [diff])));
-                } else {
-                    console.log(messages.getMessage('validationError', [fullName]));
-                    result.differences.forEach(diff => console.log(messages.getMessage('differenceFound', [diff])));
-                }
-            }
-        }
-
-        const summary: ValidationSummary = {
-            totalItems: results.length,
-            alignedItems: alignedCount,
-            misalignedItems: results.length - alignedCount - warningCount,
-            warningItems: warningCount,
-            results: results
+        return {
+            itemName: fullName,
+            isAligned: differences.length === 0,
+            differences: differences
         };
 
-        console.log(messages.getMessage('validationSummary', [
-            summary.totalItems,
-            summary.alignedItems,
-            summary.misalignedItems
-        ]));
-        
-        return summary;
-    }
-
-    private async compareStrings(
-        objectName: string,
-        recordTypeName: string,
-        xmlDir: string,
-        csvDir: string
-    ): Promise<ValidationResult> {
-        const fullName = `${objectName}.${recordTypeName}`;
-
-        try {
-            // Read original XML file as string
-            const originalXmlPath = join(xmlDir, recordTypeName + RECORDTYPES_EXTENSION);
-            if (!fs.existsSync(originalXmlPath)) {
-                return {
-                    itemName: fullName,
-                    isAligned: false,
-                    differences: [`XML file not found: ${originalXmlPath}`],
-                    isWarning: true
-                };
-            }
-
-            const originalXmlString = await readStringFromFile(originalXmlPath);
-
-            // Check CSV directory
-            const recordTypeCsvDir = join(csvDir, recordTypeName);
-            if (!fs.existsSync(recordTypeCsvDir)) {
-                return {
-                    itemName: fullName,
-                    isAligned: false,
-                    differences: [`CSV directory not found: ${recordTypeCsvDir}`],
-                    isWarning: true
-                };
-            }
-
-            // Reconstruct XML from CSV using shared merge logic
-            const mergedXml = await mergeRecordTypeFromCsv(recordTypeName, recordTypeCsvDir, this.flags);
-
-            // Write reconstructed XML to temp file
-            const tempDir = tmpdir();
-            const tempFile = join(tempDir, `temp_${recordTypeName}_${Date.now()}.xml`);
-            writeXmlToFile(tempFile, mergedXml);
-
-            // Read reconstructed XML as string
-            const reconstructedXmlString = await readStringFromFile(tempFile);
-
-            // Clean up temp file
-            try {
-                fs.unlinkSync(tempFile);
-            } catch (error) {
-                // Ignore cleanup errors
-            }
-
-            // Compare strings
-            const differences: string[] = [];
-            if (originalXmlString.trim() !== reconstructedXmlString.trim()) {
-                differences.push('XML content differs between original and reconstructed from CSV');
-            }
-
-            return {
-                itemName: fullName,
-                isAligned: differences.length === 0,
-                differences: differences
-            };
-
-        } catch (error) {
-            return {
-                itemName: fullName,
-                isAligned: false,
-                differences: [`Error processing: ${error.message}`]
-            };
-        }
+    } catch (error) {
+        return {
+            itemName: fullName,
+            isAligned: false,
+            differences: [`Error processing: ${error.message}`]
+        };
     }
 }

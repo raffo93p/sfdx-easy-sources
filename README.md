@@ -88,6 +88,11 @@ async function automateMetadata() {
   await globalValueSetTranslations.split(); // Split translations
   await globalValueSetTranslations.upsert(); // Update translations from CSV
   
+  // Record Types operations - object configuration management
+  await recordtypes.split({ object: 'Account,Contact' }); // Split record types
+  await recordtypes.upsert(); // Update from CSV changes
+  await recordtypes.clean(); // Validate field references
+  
   // Complete workflow with all operations
   await profiles.upsert({ input: 'Admin' });
   await permissionsets.upsert();
@@ -95,6 +100,7 @@ async function automateMetadata() {
   await applications.upsert();
   await globalValueSets.upsert();
   await globalValueSetTranslations.upsert();
+  await recordtypes.upsert();
   
   await profiles.minify();
   await permissionsets.minify();
@@ -110,15 +116,16 @@ async function automateMetadata() {
   await applications.merge();
   await globalValueSets.merge();
   await globalValueSetTranslations.merge();
+  await recordtypes.merge();
 }
 ```
 
 ```typescript
 // TypeScript - with full type safety
 import { 
-  profiles, permissionsets, labels, applications, globalValueSets, globalValueSetTranslations,
+  profiles, permissionsets, labels, applications, globalValueSets, globalValueSetTranslations, recordtypes,
   ProfileOptions, PermissionsetOptions, LabelOptions, ApplicationOptions, 
-  GlobalValueSetOptions, GlobalValueSetTranslationOptions 
+  GlobalValueSetOptions, GlobalValueSetTranslationOptions, RecordTypeOptions 
 } from 'sfdx-easy-sources';
 
 async function automateMetadata() {
@@ -219,6 +226,16 @@ See the `examples/` directory for more complete usage examples.
 - `globalValueSetTranslations.merge(options)` - Merge CSV files back to XML
 - `globalValueSetTranslations.areAligned(options)` - Check XML/CSV alignment
 - `globalValueSetTranslations.updateKey(options)` - Update keys across CSV files
+
+#### 🧮 Record Types API
+
+- `recordtypes.split(options)` - Split record type XML files into CSV files
+- `recordtypes.upsert(options)` - Upsert XML data into existing CSV files
+- `recordtypes.merge(options)` - Merge CSV files back to XML
+- `recordtypes.areAligned(options)` - Check XML/CSV alignment
+- `recordtypes.updateKey(options)` - Update keys across CSV files
+- `recordtypes.remove(options)` - Delete record types from org
+- `recordtypes.clean(options)` - Clean field references and validate data integrity
 
 
 Based on the source type, this plugin provides the following commands:

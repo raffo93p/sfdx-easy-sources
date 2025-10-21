@@ -91,6 +91,19 @@ export {
     translationClearEmpty
 } from './api/translations';
 
+// Export all record type functionality
+export {
+    recordtypes,
+    RecordTypeOptions,
+    recordTypeSplit,
+    recordTypeUpsert,
+    recordTypeMerge,
+    recordTypeAreAligned,
+    recordTypeUpdateKey,
+    recordTypeDelete,
+    recordTypeClean
+} from './api/recordtypes';
+
 // Export all path functionality
 export {
     PathOptions,
@@ -104,5 +117,6 @@ export default {
     applications: require('./api/applications').applications,
     globalValueSets: require('./api/globalvaluesets').globalValueSets,
     globalValueSetTranslations: require('./api/globalvaluesettranslations').globalValueSetTranslations,
-    translations: require('./api/translations').translations
+    translations: require('./api/translations').translations,
+    recordtypes: require('./api/recordtypes').recordtypes
 };
