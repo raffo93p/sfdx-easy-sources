@@ -54,3 +54,14 @@ export default class UpdateKey extends SfdxCommand {
         return result;
     }
 }
+
+// Export function for programmatic API
+export async function globalValueSetTranslationUpdateKey(options: any = {}): Promise<AnyJson> {
+    Performance.getInstance().start();
+    
+    const result = await updatekey(options, GVSETTRANS_SUBPATH, GVSETTRAN_ITEMS);
+    
+    Performance.getInstance().end();
+    
+    return result;
+}

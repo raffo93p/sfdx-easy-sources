@@ -60,3 +60,14 @@ export default class Merge extends SfdxCommand {
 
     }
 }
+
+// Export function for programmatic API
+export async function globalValueSetTranslationMerge(options: any = {}): Promise<AnyJson> {
+    Performance.getInstance().start();
+    
+    const result = await merge(options, GVSETTRANS_SUBPATH, GVSETTRANS_EXTENSION, GVSETTRANS_ROOT_TAG, GVSETTRAN_ITEMS);
+    
+    Performance.getInstance().end();
+    
+    return result;
+}

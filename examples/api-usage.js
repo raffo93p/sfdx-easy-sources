@@ -5,10 +5,10 @@
  * with automatic path resolution from easysources-settings.json.
  */
 
-// Import the profiles, permissionsets, labels, and applications API namespaces and individual functions
+// Import all API namespaces and individual functions
 // When using as an installed package, use: require('sfdx-easy-sources')
 // When running from the project directory, use the relative path:
-const { profiles, permissionsets, labels, applications } = require('../lib/index.js');
+const { profiles, permissionsets, labels, applications, globalValueSets, globalValueSetTranslations } = require('../lib/index.js');
 
 // You can also import individual functions directly for more flexibility:
 const { 
@@ -375,11 +375,85 @@ async function manageCustomLabels() {
             await applications.updateKey();  // Update keys if needed
         }
 
+        // === 🌐 GLOBAL VALUE SETS API EXAMPLES ===
+        console.log('\n=== 🌐 Global Value Sets API Examples ===');
+        
+        try {
+            // Split global value sets
+            console.log('\n1. Splitting global value sets...');
+            const splitResult = await globalValueSets.split();
+            console.log('✓ Split result:', splitResult || 'No global value sets found');
+            
+            // Upsert global value sets  
+            console.log('\n2. Upserting global value sets from CSV...');
+            const upsertResult = await globalValueSets.upsert();
+            console.log('✓ Upsert result:', upsertResult || 'No CSV changes found');
+            
+            // Check global value sets alignment
+            console.log('\n3. Checking global value sets alignment...');
+            const alignedResult = await globalValueSets.areAligned({
+                mode: 'string'
+            });
+            console.log('✓ Alignment result:', alignedResult || 'No alignment issues');
+            
+        } catch (error) {
+            console.log('⚠ Global value sets operations completed - no files found in project');
+            console.log('  → Global value sets would be processed where files exist');
+        }
+
+        console.log('\n📋 Complete Global Value Sets Workflow Example:');
+        // Complete global value sets management workflow
+        async function completeGlobalValueSetsWorkflow() {
+            // 1. Split → 2. Edit CSVs → 3. Upsert → 4. Validate → 5. Merge
+            await globalValueSets.split();      // Convert XML to CSV
+            await globalValueSets.upsert();     // Update from CSV changes
+            await globalValueSets.areAligned(); // Validate consistency
+            await globalValueSets.merge();      // Back to deployable XML
+            await globalValueSets.updateKey();  // Update keys if needed
+        }
+
+        // === 🌍 GLOBAL VALUE SET TRANSLATIONS API EXAMPLES ===
+        console.log('\n=== 🌍 Global Value Set Translations API Examples ===');
+        
+        try {
+            // Split global value set translations
+            console.log('\n1. Splitting global value set translations...');
+            const splitResult = await globalValueSetTranslations.split();
+            console.log('✓ Split result:', splitResult || 'No global value set translations found');
+            
+            // Upsert global value set translations  
+            console.log('\n2. Upserting global value set translations from CSV...');
+            const upsertResult = await globalValueSetTranslations.upsert();
+            console.log('✓ Upsert result:', upsertResult || 'No CSV changes found');
+            
+            // Check global value set translations alignment
+            console.log('\n3. Checking global value set translations alignment...');
+            const alignedResult = await globalValueSetTranslations.areAligned({
+                mode: 'string'
+            });
+            console.log('✓ Alignment result:', alignedResult || 'No alignment issues');
+            
+        } catch (error) {
+            console.log('⚠ Global value set translations operations completed - no files found in project');
+            console.log('  → Translations would be processed where files exist');
+        }
+
+        console.log('\n📋 Complete Global Value Set Translations Workflow Example:');
+        // Complete global value set translations management workflow
+        async function completeGlobalValueSetTranslationsWorkflow() {
+            // 1. Split → 2. Edit CSVs → 3. Upsert → 4. Validate → 5. Merge
+            await globalValueSetTranslations.split();      // Convert XML to CSV
+            await globalValueSetTranslations.upsert();     // Update from CSV changes
+            await globalValueSetTranslations.areAligned(); // Validate consistency
+            await globalValueSetTranslations.merge();      // Back to deployable XML
+            await globalValueSetTranslations.updateKey();  // Update keys if needed
+        }
+
         console.log('\n=== All API demonstrations completed ===');
         console.log('\n💡 Key Benefits:');
         console.log('  • Automatic path resolution from easysources-settings.json');
-        console.log('  • Complete profiles, permission sets, custom labels AND applications lifecycle management');
-        console.log('  • Consistent namespace APIs: profiles.method, permissionsets.method, labels.method, applications.method');
+        console.log('  • Complete lifecycle management for 6 metadata types: profiles, permission sets, labels, applications, global value sets, global value set translations');
+        console.log('  • Consistent namespace APIs: profiles.method, permissionsets.method, labels.method, applications.method, globalValueSets.method, globalValueSetTranslations.method');
         console.log('  • Direct function imports for all metadata types');
         console.log('  • Minimal configuration required');
         console.log('  • Full TypeScript support available');

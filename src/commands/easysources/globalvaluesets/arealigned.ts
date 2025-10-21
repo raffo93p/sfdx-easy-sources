@@ -64,3 +64,18 @@ export default class GlobalValueSetsAreAligned extends SfdxCommand {
     return result;
   }
 }
+
+// Export function for programmatic API
+export async function globalValueSetAreAligned(options: any = {}): Promise<AnyJson> {
+  Performance.getInstance().start();
+  
+  let result;
+  if (options.mode === 'string') {
+    result = await areAligned(options, GVSETS_SUBPATH, GVSETS_EXTENSION, GVSETS_ROOT_TAG, GVSET_ITEMS);
+  } else {
+    result = await validateAlignment(options, GVSETS_SUBPATH, GVSETS_EXTENSION, GVSETS_ROOT_TAG, GVSET_ITEMS);
+  }
+  
+  Performance.getInstance().end();
+  return result;
+}

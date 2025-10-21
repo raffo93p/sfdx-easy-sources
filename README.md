@@ -56,11 +56,11 @@ Examples
 
 ## 🚀 Programmatic API Usage
 
-**NEW in v0.8.0**: Complete programmatic API with automatic path resolution! Use all profile, permission set, label, and application operations in your Node.js scripts without CLI overhead:
+**NEW in v0.8.0**: Complete programmatic API with automatic path resolution! Use all metadata operations (profiles, permission sets, labels, applications, global value sets, global value set translations) in your Node.js scripts without CLI overhead:
 
 ```javascript
 // JavaScript - with automatic path resolution
-const { profiles, permissionsets, labels, applications } = require('sfdx-easy-sources');
+const { profiles, permissionsets, labels, applications, globalValueSets, globalValueSetTranslations } = require('sfdx-easy-sources');
 
 async function automateMetadata() {
   // Profile operations - paths auto-resolved from settings file
@@ -80,11 +80,21 @@ async function automateMetadata() {
   await applications.split(); // Split applications into manageable CSVs
   await applications.upsert(); // Update from CSV changes
   
+  // Global Value Sets operations - metadata internationalization
+  await globalValueSets.split(); // Split global value sets
+  await globalValueSets.upsert(); // Update from CSV changes
+  
+  // Global Value Set Translations operations - localization support
+  await globalValueSetTranslations.split(); // Split translations
+  await globalValueSetTranslations.upsert(); // Update translations from CSV
+  
   // Complete workflow with all operations
   await profiles.upsert({ input: 'Admin' });
   await permissionsets.upsert();
   await labels.upsert();
   await applications.upsert();
+  await globalValueSets.upsert();
+  await globalValueSetTranslations.upsert();
   
   await profiles.minify();
   await permissionsets.minify();
@@ -98,12 +108,18 @@ async function automateMetadata() {
   await permissionsets.merge();
   await labels.merge();
   await applications.merge();
+  await globalValueSets.merge();
+  await globalValueSetTranslations.merge();
 }
 ```
 
 ```typescript
 // TypeScript - with full type safety
-import { profiles, permissionsets, labels, applications, ProfileOptions, PermissionsetOptions, LabelOptions, ApplicationOptions } from 'sfdx-easy-sources';
+import { 
+  profiles, permissionsets, labels, applications, globalValueSets, globalValueSetTranslations,
+  ProfileOptions, PermissionsetOptions, LabelOptions, ApplicationOptions, 
+  GlobalValueSetOptions, GlobalValueSetTranslationOptions 
+} from 'sfdx-easy-sources';
 
 async function automateMetadata() {
   // Auto-resolved paths with type safety
@@ -189,6 +205,20 @@ See the `examples/` directory for more complete usage examples.
 - `applications.merge(options)` - Merge CSV files back to XML
 - `applications.areAligned(options)` - Check XML/CSV alignment
 - `applications.updateKey(options)` - Update keys across CSV files
+
+### Available Global Value Sets API Methods
+- `globalValueSets.split(options)` - Split global value set XML files into CSV files
+- `globalValueSets.upsert(options)` - Upsert XML data into existing CSV files
+- `globalValueSets.merge(options)` - Merge CSV files back to XML
+- `globalValueSets.areAligned(options)` - Check XML/CSV alignment
+- `globalValueSets.updateKey(options)` - Update keys across CSV files
+
+### Available Global Value Set Translations API Methods
+- `globalValueSetTranslations.split(options)` - Split global value set translation XML files into CSV files
+- `globalValueSetTranslations.upsert(options)` - Upsert XML data into existing CSV files
+- `globalValueSetTranslations.merge(options)` - Merge CSV files back to XML
+- `globalValueSetTranslations.areAligned(options)` - Check XML/CSV alignment
+- `globalValueSetTranslations.updateKey(options)` - Update keys across CSV files
 
 
 Based on the source type, this plugin provides the following commands:

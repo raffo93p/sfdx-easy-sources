@@ -57,6 +57,28 @@ export {
     applicationUpdateKey
 } from './api/applications';
 
+// Export all global value set functionality
+export {
+    globalValueSets,
+    GlobalValueSetOptions,
+    globalValueSetSplit,
+    globalValueSetUpsert,
+    globalValueSetMerge,
+    globalValueSetAreAligned,
+    globalValueSetUpdateKey
+} from './api/globalvaluesets';
+
+// Export all global value set translation functionality
+export {
+    globalValueSetTranslations,
+    GlobalValueSetTranslationOptions,
+    globalValueSetTranslationSplit,
+    globalValueSetTranslationUpsert,
+    globalValueSetTranslationMerge,
+    globalValueSetTranslationAreAligned,
+    globalValueSetTranslationUpdateKey
+} from './api/globalvaluesettranslations';
+
 // Export all path functionality
 export {
     PathOptions,
@@ -67,5 +89,7 @@ export default {
     profiles: require('./api/profiles').profiles,
     permissionsets: require('./api/permissionsets').permissionsets,
     labels: require('./api/labels').labels,
-    applications: require('./api/applications').applications
+    applications: require('./api/applications').applications,
+    globalValueSets: require('./api/globalvaluesets').globalValueSets,
+    globalValueSetTranslations: require('./api/globalvaluesettranslations').globalValueSetTranslations
 };

@@ -64,3 +64,18 @@ export default class GlobalValueSetTranslationsAreAligned extends SfdxCommand {
     return result;
   }
 }
+
+// Export function for programmatic API
+export async function globalValueSetTranslationAreAligned(options: any = {}): Promise<AnyJson> {
+  Performance.getInstance().start();
+  
+  let result;
+  if (options.mode === 'string') {
+    result = await areAligned(options, GVSETTRANS_SUBPATH, GVSETTRANS_EXTENSION, GVSETTRANS_ROOT_TAG, GVSETTRAN_ITEMS);
+  } else {
+    result = await validateAlignment(options, GVSETTRANS_SUBPATH, GVSETTRANS_EXTENSION, GVSETTRANS_ROOT_TAG, GVSETTRAN_ITEMS);
+  }
+  
+  Performance.getInstance().end();
+  return result;
+}
