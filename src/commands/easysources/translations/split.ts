@@ -147,4 +147,15 @@ export default class Split extends SfdxCommand {
     }
 }
 
+// Export function for programmatic API
+export async function translationSplit(options: any = {}): Promise<AnyJson> {
+    Performance.getInstance().start();
+    
+    const result = await split(options, TRANSLATIONS_SUBPATH, TRANSLATIONS_EXTENSION, TRANSLATIONS_ROOT_TAG, TRANSLATION_ITEMS);
+    
+    Performance.getInstance().end();
+    
+    return result;
+}
+
 

@@ -134,3 +134,67 @@ export default class Clean extends SfdxCommand {
     
 }
 
+// Export function for programmatic API
+export async function translationMinify(options: any = {}): Promise<AnyJson> {
+    Performance.getInstance().start();
+    
+    const csvDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), TRANSLATIONS_SUBPATH) as string;
+    const xmlDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH)) as string;
+
+    const inputTranslation = (options.input) as string;
+
+    checkDirOrErrorSync(csvDir);
+    checkDirOrErrorSync(xmlDir);
+
+    var transationList = [];
+    if (inputTranslation) {
+        transationList = inputTranslation.split(',');
+    } else {
+        transationList = fs.readdirSync(csvDir, { withFileTypes: true })
+            .filter(item => item.isDirectory())
+            .map(item => item.name)
+    }
+
+    for (const translationName of transationList) {
+        console.log('Minifying on: ' + translationName);
+
+        for (const tag_section in TRANSLATION_ITEMS) {
+            const csvFilePath = join(csvDir, translationName, calcCsvFilename(translationName, tag_section));
+            if (fs.existsSync(csvFilePath)) {
+
+                var resListCsv = await readCsvToJsonArray(csvFilePath)
+
+                resListCsv = resListCsv.filter(function(res) {
+                    if(TRANSLAT_TAG_BOOL[tag_section] == null) return true;
+
+                    for(const boolName of toArray(TRANSLAT_TAG_BOOL[tag_section]) ){
+                        if(!isBlank(res[boolName])) return true;
+                    }
+
+                    return false;
+                });
+                
+                const headers = TRANSLATION_ITEMS[tag_section].headers;
+                const transforms = [unwind({ paths: headers })];
+                const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
+
+                if (options.sort === 'true') {
+                    resListCsv = sortByKey(resListCsv);
+                }
+
+                const csv = parser.parse(resListCsv);
+                try {
+                    fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+    
+    Performance.getInstance().end();
+
+    var outputString = 'OK'
+    return { outputString };
+}
+

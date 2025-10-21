@@ -79,6 +79,18 @@ export {
     globalValueSetTranslationUpdateKey
 } from './api/globalvaluesettranslations';
 
+// Export all translation functionality
+export {
+    translations,
+    TranslationOptions,
+    translationSplit,
+    translationUpsert,
+    translationMerge,
+    translationAreAligned,
+    translationMinify,
+    translationClearEmpty
+} from './api/translations';
+
 // Export all path functionality
 export {
     PathOptions,
@@ -91,5 +103,6 @@ export default {
     labels: require('./api/labels').labels,
     applications: require('./api/applications').applications,
     globalValueSets: require('./api/globalvaluesets').globalValueSets,
-    globalValueSetTranslations: require('./api/globalvaluesettranslations').globalValueSetTranslations
+    globalValueSetTranslations: require('./api/globalvaluesettranslations').globalValueSetTranslations,
+    translations: require('./api/translations').translations
 };
