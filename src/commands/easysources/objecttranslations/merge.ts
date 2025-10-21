@@ -205,5 +205,64 @@ export function deleteFieldTranslationsXmls(baseInputDir, objTrName){
             force: true,
         });
     }
+}
 
+// Export object translation-specific merge function for programmatic API
+export async function objectTranslationMerge(options: any = {}): Promise<{ outputString: string }> {
+    Performance.getInstance().start();
+
+    const baseInputDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), OBJTRANSL_SUBPATH) as string;
+    const baseOutputDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), OBJTRANSL_SUBPATH) as string;
+    const inputObject = (options.input) as string;
+
+    checkDirOrErrorSync(baseInputDir);
+
+    var objectList = [];
+    if (inputObject) {
+        objectList = inputObject.split(',');
+    } else {
+        objectList = fs.readdirSync(baseInputDir, { withFileTypes: true })
+            .filter(item => item.isDirectory())
+            .map(item => item.name)
+    }
+
+    for (const obj of objectList) {
+        if (!fs.existsSync(join(baseInputDir, obj, 'csv'))) continue;
+        const inputXML = join(baseInputDir, obj, 'csv', obj) + XML_PART_EXTENSION;
+
+        if(!fs.existsSync(inputXML)){
+            console.log('Skipping  ' + obj +'; File ' + inputXML + ' does not exist!');
+            continue;
+        }
+
+        console.log('Merging: ' + obj);
+
+        // Use the exported merge function
+        const mergedXml = await mergeObjectTranslationFromCsv(obj, join(baseInputDir, obj, 'csv'), options);
+        const outputDir = join(baseOutputDir, obj);
+        const outputFile = join(outputDir, obj + OBJTRANSL_EXTENSION);
+        
+        if (!fs.existsSync(outputDir)) {
+            fs.mkdirSync(outputDir);
+        }
+        await writeXmlToFile(outputFile, mergedXml);
+
+        // Handle fieldTranslations using the exported function
+        const fieldXmlArray = await getFieldTranslationsFromCsv(obj, join(baseInputDir, obj, 'csv'));
+        
+        if (fieldXmlArray.length > 0) {
+            deleteFieldTranslationsXmls(baseOutputDir, obj);
+
+            for (const entry of fieldXmlArray) {
+                await writeXmlToFile(join(baseOutputDir, obj, entry.name + OBJTRANSL_FIELDTRANSL_EXTENSION), 
+                    { [OBJTRANSL_CFIELDTRANSL_ROOT_TAG]: entry }
+                );
+            }
+        }
+    }
+
+    Performance.getInstance().end();
+
+    var outputString = 'OK'
+    return { outputString };
 }

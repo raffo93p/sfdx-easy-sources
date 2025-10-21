@@ -104,6 +104,18 @@ export {
     recordTypeClean
 } from './api/recordtypes';
 
+// Export all object translation functionality
+export {
+    objectTranslations,
+    ObjectTranslationOptions,
+    objectTranslationSplit,
+    objectTranslationUpsert,
+    objectTranslationMerge,
+    objectTranslationClearEmpty,
+    objectTranslationAreAligned,
+    objectTranslationMinify
+} from './api/objecttranslations';
+
 // Export all path functionality
 export {
     PathOptions,
@@ -118,5 +130,6 @@ export default {
     globalValueSets: require('./api/globalvaluesets').globalValueSets,
     globalValueSetTranslations: require('./api/globalvaluesettranslations').globalValueSetTranslations,
     translations: require('./api/translations').translations,
+    objectTranslations: require('./api/objecttranslations').objectTranslations,
     recordtypes: require('./api/recordtypes').recordtypes
 };

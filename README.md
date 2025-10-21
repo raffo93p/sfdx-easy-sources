@@ -35,7 +35,7 @@ With this plugin you can:
 | Global Value Sets | globalvaluesets | split, upsert, merge, updatekey, arealigned | 🔄 **Planned** |
 | Global Value Set Translations | globalvaluesettranslations | split, upsert, merge, updatekey, arealigned | 🔄 **Planned** |
 | Applications | applications | split, upsert, merge, updatekey, arealigned | 🔄 **Planned** |
-| Object Translations | objecttranslations | split, upsert, merge, minify, updatekey, clearempty, arealigned | 🔄 **Planned** |
+| Object Translations | objecttranslations | split, upsert, merge, minify, updatekey, clearempty, arealigned | ✅ **Complete** |
 | Translations | translations | split, upsert, merge, minify, updatekey, clearempty, arealigned | 🔄 **Planned** |
 
 
@@ -56,11 +56,11 @@ Examples
 
 ## 🚀 Programmatic API Usage
 
-**NEW in v0.8.0**: Complete programmatic API with automatic path resolution! Use all metadata operations (profiles, permission sets, labels, applications, global value sets, global value set translations) in your Node.js scripts without CLI overhead:
+**NEW in v0.8.0**: Complete programmatic API with automatic path resolution! Use all metadata operations (profiles, permission sets, labels, applications, global value sets, global value set translations, object translations) in your Node.js scripts without CLI overhead:
 
 ```javascript
 // JavaScript - with automatic path resolution
-const { profiles, permissionsets, labels, applications, globalValueSets, globalValueSetTranslations } = require('sfdx-easy-sources');
+const { profiles, permissionsets, labels, applications, globalValueSets, globalValueSetTranslations, objectTranslations } = require('sfdx-easy-sources');
 
 async function automateMetadata() {
   // Profile operations - paths auto-resolved from settings file
@@ -88,6 +88,11 @@ async function automateMetadata() {
   await globalValueSetTranslations.split(); // Split translations
   await globalValueSetTranslations.upsert(); // Update translations from CSV
   
+  // Object Translations operations - multilingual metadata support
+  await objectTranslations.split({ input: 'Account-es,Contact-fr' }); // Split object translations
+  await objectTranslations.upsert(); // Update translations from XML changes
+  await objectTranslations.minify(); // Remove empty translation entries
+  
   // Record Types operations - object configuration management
   await recordtypes.split({ object: 'Account,Contact' }); // Split record types
   await recordtypes.upsert(); // Update from CSV changes
@@ -100,14 +105,17 @@ async function automateMetadata() {
   await applications.upsert();
   await globalValueSets.upsert();
   await globalValueSetTranslations.upsert();
+  await objectTranslations.upsert();
   await recordtypes.upsert();
   
   await profiles.minify();
   await permissionsets.minify();
+  await objectTranslations.minify();
   // Labels and applications use updateKey for maintenance
   
   await profiles.clearEmpty();
   await permissionsets.clearEmpty();
+  await objectTranslations.clearEmpty();
   // Labels and applications have simpler structure
   
   await profiles.merge({ input: 'Admin' });
@@ -116,6 +124,7 @@ async function automateMetadata() {
   await applications.merge();
   await globalValueSets.merge();
   await globalValueSetTranslations.merge();
+  await objectTranslations.merge();
   await recordtypes.merge();
 }
 ```
@@ -123,9 +132,9 @@ async function automateMetadata() {
 ```typescript
 // TypeScript - with full type safety
 import { 
-  profiles, permissionsets, labels, applications, globalValueSets, globalValueSetTranslations, recordtypes,
+  profiles, permissionsets, labels, applications, globalValueSets, globalValueSetTranslations, objectTranslations, recordtypes,
   ProfileOptions, PermissionsetOptions, LabelOptions, ApplicationOptions, 
-  GlobalValueSetOptions, GlobalValueSetTranslationOptions, RecordTypeOptions 
+  GlobalValueSetOptions, GlobalValueSetTranslationOptions, ObjectTranslationOptions, RecordTypeOptions 
 } from 'sfdx-easy-sources';
 
 async function automateMetadata() {
@@ -171,9 +180,9 @@ See the `examples/` directory for more complete usage examples.
 ### Key API Features
 
 - **🔧 Automatic Path Resolution**: Use settings file for defaults, override only what you need
-- **📦 Complete Multi-Metadata APIs**: Profiles (9 ops), Permission Sets (9 ops), Custom Labels (5 ops) - all available programmatically
+- **📦 Complete Multi-Metadata APIs**: Profiles (9 ops), Permission Sets (9 ops), Custom Labels (5 ops), Object Translations (6 ops) - all available programmatically
 - **🎯 Zero Duplication**: Unified architecture - CLI commands delegate to API functions
-- **⚙️ TypeScript Support**: Full type definitions with `ProfileOptions`, `PermissionsetOptions`, and `LabelOptions` interfaces
+- **⚙️ TypeScript Support**: Full type definitions with `ProfileOptions`, `PermissionsetOptions`, `LabelOptions`, and `ObjectTranslationOptions` interfaces
 - **🔗 Settings Integration**: Seamless use of existing `easysources-settings.json`
 - **🔄 Consistent API**: Identical patterns across all metadata types
 
@@ -226,6 +235,14 @@ See the `examples/` directory for more complete usage examples.
 - `globalValueSetTranslations.merge(options)` - Merge CSV files back to XML
 - `globalValueSetTranslations.areAligned(options)` - Check XML/CSV alignment
 - `globalValueSetTranslations.updateKey(options)` - Update keys across CSV files
+
+### Available Object Translations API Methods
+- `objectTranslations.split(options)` - Split object translation XML files into CSV files
+- `objectTranslations.upsert(options)` - Upsert XML data into existing CSV files
+- `objectTranslations.merge(options)` - Merge CSV files back to XML
+- `objectTranslations.areAligned(options)` - Check XML/CSV alignment
+- `objectTranslations.minify(options)` - Remove entries with only empty translations
+- `objectTranslations.clearEmpty(options)` - Remove empty CSV files and folders
 
 #### 🧮 Record Types API
 

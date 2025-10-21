@@ -62,10 +62,21 @@ export default class Split extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        const baseInputDir = join((this.flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), OBJTRANSL_SUBPATH) as string;
-        const baseOutputDir = join((this.flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), OBJTRANSL_SUBPATH) as string;
+        const result = await objectTranslationSplit(this.flags);
 
-        const inputObject = (this.flags.input) as string;
+        Performance.getInstance().end();
+
+        return result;
+    }
+}
+
+// Export function for programmatic API
+export async function objectTranslationSplit(options: any = {}): Promise<AnyJson> {
+
+    const baseInputDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), OBJTRANSL_SUBPATH) as string;
+        const baseOutputDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), OBJTRANSL_SUBPATH) as string;
+
+        const inputObject = (options.input) as string;
 
         checkDirOrErrorSync(baseInputDir);
 
@@ -127,7 +138,7 @@ export default class Split extends SfdxCommand {
 
                 // generate _tagId column
                 generateTagId(myjson, OBJTRANSL_ITEMS[tag_section].key, OBJTRANSL_ITEMS[tag_section].headers);
-                if (this.flags.sort === 'true') {
+                if (options.sort === 'true') {
                     myjson = sortByKey(myjson);
                 }
 
@@ -163,9 +174,6 @@ export default class Split extends SfdxCommand {
             
         }
 
-        Performance.getInstance().end();
-
         var outputString = 'OK'
         return { outputString };
-    }
 }
