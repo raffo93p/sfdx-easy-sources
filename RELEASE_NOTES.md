@@ -1,5 +1,8 @@
 # Release Notes
 
+## Version 0.7.6
+- **New Feature: Targeted upsert with `type` and `tagid` parameters** - Enhanced the upsert commands for profiles and permission sets with new `--type` (-t) and `--tagid` (-k) flags. The `--type` flag allows specifying specific permission types to upsert (e.g., fieldPermissions, classAccesses etc). The `--tagid` flag enables targeting specific elements by their tag ID. These flags can be used independently or together for precise control over upsert operations, supporting comma-separated values for multiple types or tagids.
+
 ## Version 0.7.5
 - **Enhancement: Refactored `arealigned` command** - Performed comprehensive refactoring of the `arealigned` command to improve code readability and reduce code duplication. The merge logic has been extracted into reusable functions that are shared between the `merge` and `arealigned` commands, ensuring consistency and better maintainability while preserving all existing functionality.
 - **Enhancement: Automatic split execution in upsert commands** - Enhanced upsert commands to automatically run the split command when the destination CSV directory or part.xml file doesn't exist. This improvement creates a seamless workflow where users don't need to manually run split before upsert.

@@ -3,6 +3,8 @@
   "sfXmlFlagDescription": "Specify a custom dir for input profiles. Default: '%s'",
   "esCsvFlagDescription": "Specify a custom dir for output profiles. Default: '%s'",
   "inputFlagDescription": "Specify a profile. Example: Admin",
+  "typeFlagDescription": "Specify the type of permission to upsert. Example: fieldPermissions, classAccesses",
+  "tagidFlagDescription": "Specify the tag ID(s) for the upsert operation. Use comma-separated values for multiple IDs",
   "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
   "ignoreuserpermFlagDescription": "Specify if user permission must be ignored. Default '%s'",
   "nameFlagDescription": "WTF",

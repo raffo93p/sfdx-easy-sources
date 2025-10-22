@@ -42,6 +42,14 @@ export default class Upsert extends SfdxCommand {
             char: 'i',
             description: messages.getMessage('inputFlagDescription'),
         }),
+        type: flags.string({
+            char: 't',
+            description: messages.getMessage('typeFlagDescription'),
+        }),
+        tagid: flags.string({
+            char: 'k',
+            description: messages.getMessage('tagidFlagDescription'),
+        }),
         sort: flags.enum({
             char: 'S',
             description: messages.getMessage('sortFlagDescription', ['true']),
@@ -53,7 +61,7 @@ export default class Upsert extends SfdxCommand {
             description: messages.getMessage('ignoreuserpermFlagDescription', ['false']),
             options: ['true', 'false'],
             default: 'false',
-        }),
+        })
     };
 
 
