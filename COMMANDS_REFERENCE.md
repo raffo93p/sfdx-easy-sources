@@ -26,6 +26,7 @@ The following flags are available across most commands:
 - `--es-csv, -c`: Output CSV directory  
 - `--input, -i`: Specific profile names (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
+- `--ignoreuserperm, -u`: Ignore user permissions (default: `false`)
 
 **Examples**:
 ```bash
@@ -90,8 +91,15 @@ sfdx easysources:profiles:upsert --type "fieldPermissions,classAccesses" --tagid
 **Description**: Clean Profile CSV files
 
 **Flags**:
+- `--sf-xml, -x`: Salesforce XML directory
 - `--es-csv, -c`: CSV directory
 - `--input, -i`: Specific profile names (comma-separated)
+- `--orgname, -u`: Target org username or alias
+- `--log-dir, -l`: Log directory path
+- `--mode, -m`: Cleaning mode (`clean`, `interactive`, `log`, default: `clean`)
+- `--target, -g`: Target to compare against (`org`, `local`, `both`, default: `both`)
+- `--include-standard-fields, -F`: Include standard fields in cleaning (default: `false`)
+- `--skip-manifest-creation, -M`: Skip manifest file creation (default: `false`)
 - `--sort, -S`: Sort results (default: `true`)
 
 ### `sfdx easysources:profiles:clearempty`
@@ -178,8 +186,15 @@ sfdx easysources:permissionsets:upsert --type "fieldPermissions" --tagid "Accoun
 **Description**: Clean Permission Set CSV files
 
 **Flags**:
+- `--sf-xml, -x`: Salesforce XML directory
 - `--es-csv, -c`: CSV directory
 - `--input, -i`: Specific permission set names (comma-separated)
+- `--orgname, -u`: Target org username or alias
+- `--log-dir, -l`: Log directory path
+- `--mode, -m`: Cleaning mode (`clean`, `interactive`, `log`, default: `clean`)
+- `--target, -g`: Target to compare against (`org`, `local`, `both`, default: `both`)
+- `--include-standard-fields, -F`: Include standard fields in cleaning (default: `false`)
+- `--skip-manifest-creation, -M`: Skip manifest file creation (default: `false`)
 - `--sort, -S`: Sort results (default: `true`)
 
 ### `sfdx easysources:permissionsets:clearempty`
@@ -208,7 +223,8 @@ sfdx easysources:permissionsets:upsert --type "fieldPermissions" --tagid "Accoun
 **Flags**:
 - `--sf-xml, -x`: Input record types directory
 - `--es-csv, -c`: Output CSV directory
-- `--input, -i`: Specific record type names (comma-separated)
+- `--object, -s`: Specific object names (comma-separated)
+- `--recordtype, -r`: Specific record type names (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
 ### `sfdx easysources:recordtypes:merge`
@@ -217,7 +233,8 @@ sfdx easysources:permissionsets:upsert --type "fieldPermissions" --tagid "Accoun
 **Flags**:
 - `--sf-xml, -x`: Output record types directory
 - `--es-csv, -c`: Input CSV directory
-- `--input, -i`: Specific record type names (comma-separated)
+- `--object, -s`: Specific object names (comma-separated)
+- `--recordtype, -r`: Specific record type names (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
 ### `sfdx easysources:recordtypes:upsert`
@@ -226,7 +243,8 @@ sfdx easysources:permissionsets:upsert --type "fieldPermissions" --tagid "Accoun
 **Flags**:
 - `--sf-xml, -x`: Input record types directory
 - `--es-csv, -c`: Input CSV directory
-- `--input, -i`: Specific record type names (comma-separated)
+- `--object, -s`: Specific object names (comma-separated)
+- `--recordtype, -r`: Specific record type names (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
 ### `sfdx easysources:recordtypes:arealigned`
@@ -235,15 +253,18 @@ sfdx easysources:permissionsets:upsert --type "fieldPermissions" --tagid "Accoun
 **Flags**:
 - `--sf-xml, -x`: Record types directory
 - `--es-csv, -c`: CSV directory
-- `--input, -i`: Specific record type names (comma-separated)
+- `--object, -s`: Specific object names (comma-separated)
+- `--recordtype, -r`: Specific record type names (comma-separated)
 - `--mode`: Comparison mode (`string` or `logic`, default: `string`)
+- `--sort, -S`: Sort results (default: `true`)
 
 ### `sfdx easysources:recordtypes:updatekey`
 **Description**: Update key fields in Record Type CSV files
 
 **Flags**:
 - `--es-csv, -c`: CSV directory
-- `--input, -i`: Specific record type names (comma-separated)
+- `--object, -s`: Specific object names (comma-separated)
+- `--recordtype, -r`: Specific record type names (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
 ### `sfdx easysources:recordtypes:delete`
@@ -267,8 +288,16 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 **Description**: Clean Record Type CSV files
 
 **Flags**:
+- `--sf-xml, -x`: Salesforce XML directory
 - `--es-csv, -c`: CSV directory
-- `--input, -i`: Specific record type names (comma-separated)
+- `--orgname, -u`: Target org username or alias
+- `--object, -s`: Specific object names (comma-separated)
+- `--recordtype, -r`: Specific record type names (comma-separated)
+- `--log-dir, -l`: Log directory path
+- `--mode, -m`: Cleaning mode (`clean`, `interactive`, `log`, default: `clean`)
+- `--target, -g`: Target to compare against (`org`, `local`, `both`, default: `both`)
+- `--include-standard-fields, -F`: Include standard fields in cleaning (default: `false`)
+- `--skip-manifest-creation, -M`: Skip manifest file creation (default: `false`)
 - `--sort, -S`: Sort results (default: `true`)
 
 ---

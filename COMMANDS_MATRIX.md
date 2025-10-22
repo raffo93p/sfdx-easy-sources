@@ -15,13 +15,13 @@ This document provides a quick reference matrix of all commands and their availa
 
 | Command | `--sf-xml` | `--es-csv` | `--input` | `--sort` | `--type` 🆕 | `--tagid` 🆕 | `--ignoreuserperm` | `--mode` | Special Params |
 |---------|------------|------------|-----------|----------|-------------|--------------|-------------------|----------|----------------|
-| **split** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | - |
+| **split** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | - |
 | **merge** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | - |
 | **upsert** | ✅ | ✅ | ✅ | ✅ | 🆕 | 🆕 | ✅ | ❌ | type + tagid (targeted) |
 | **arealigned** | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | string/logic mode |
 | **updatekey** | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | - |
 | **delete** | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | - |
-| **clean** | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | - |
+| **clean** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | `--orgname`, `--log-dir`, `--mode`, `--target`, `--include-standard-fields`, `--skip-manifest-creation` |
 | **clearempty** | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | - |
 | **minify** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | - |
 
@@ -37,7 +37,7 @@ This document provides a quick reference matrix of all commands and their availa
 | **arealigned** | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | string/logic mode |
 | **updatekey** | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | - |
 | **delete** | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | - |
-| **clean** | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | - |
+| **clean** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | `--orgname`, `--log-dir`, `--mode`, `--target`, `--include-standard-fields`, `--skip-manifest-creation` |
 | **clearempty** | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | - |
 | **minify** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | - |
 
@@ -45,15 +45,15 @@ This document provides a quick reference matrix of all commands and their availa
 
 ## Record Types Commands
 
-| Command | `--sf-xml` | `--es-csv` | `--input` | `--sort` | `--mode` | Special Params |
-|---------|------------|------------|-----------|----------|----------|----------------|
-| **split** | ✅ | ✅ | ✅ | ✅ | ❌ | - |
-| **merge** | ✅ | ✅ | ✅ | ✅ | ❌ | - |
-| **upsert** | ✅ | ✅ | ✅ | ✅ | ❌ | - |
-| **arealigned** | ✅ | ✅ | ✅ | ❌ | ✅ | string/logic mode |
-| **updatekey** | ❌ | ✅ | ✅ | ✅ | ❌ | - |
-| **delete** | ❌ | ✅ | ❌ | ✅ | ❌ | `--object`, `--recordtype`, `--picklist` (req), `--apiname` |
-| **clean** | ❌ | ✅ | ✅ | ✅ | ❌ | - |
+| Command | `--sf-xml` | `--es-csv` | `--object` | `--recordtype` | `--sort` | `--mode` | Special Params |
+|---------|------------|------------|------------|----------------|----------|----------|----------------|
+| **split** | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | - |
+| **merge** | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | - |
+| **upsert** | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | - |
+| **arealigned** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | string/logic mode |
+| **updatekey** | ❌ | ✅ | ✅ | ✅ | ✅ | ❌ | - |
+| **delete** | ❌ | ✅ | ✅ | ✅ | ✅ | ❌ | `--picklist` (req), `--apiname` |
+| **clean** | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | `--orgname`, `--log-dir`, `--mode`, `--target`, `--include-standard-fields`, `--skip-manifest-creation` |
 
 ---
 
