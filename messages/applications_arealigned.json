@@ -13,10 +13,10 @@
   "missingCsvDirectory": "❌ CSV directory not found: %s",
   "validationSummary": "Validation Summary: %s applications validated, %s aligned, %s misaligned",
   "examples": [
-    "sfdx easysources:applications:arealigned",
-    "sfdx easysources:applications:arealigned --mode string",
-    "sfdx easysources:applications:arealigned --mode logic",
-    "sfdx easysources:applications:arealigned -i Sales,Service -m string",
-    "sfdx easysources:applications:arealigned -x ./force-app/main/default -c ./easysources --mode logic"
+    "sf easysources applications arealigned",
+    "sf easysources applications arealigned --mode string",
+    "sf easysources applications arealigned --mode logic",
+    "sf easysources applications arealigned -i Sales,Service -m string",
+    "sf easysources applications arealigned -x ./force-app/main/default -c ./easysources --mode logic"
   ]
 }

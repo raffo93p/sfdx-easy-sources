@@ -4,8 +4,8 @@
   "esCsvFlagDescription": "Easy Sources CSV path (default: %s)",
   "inputFlagDescription": "Comma-separated list of profile names to process. If not specified, all profiles will be processed",
   "examples": [
-    "$ sfdx easysources:profiles:clearempty",
-    "$ sfdx easysources:profiles:clearempty --input Admin,Sales",
-    "$ sfdx easysources:profiles:clearempty --es-csv ./csv --sf-xml ./force-app"
+    "$ sf easysources profiles clearempty",
+    "$ sf easysources profiles clearempty --input Admin,Sales",
+    "$ sf easysources profiles clearempty --es-csv ./csv --sf-xml ./force-app"
   ]
 }

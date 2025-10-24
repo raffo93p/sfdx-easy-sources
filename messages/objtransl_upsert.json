@@ -7,9 +7,9 @@
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:objecttranslations:upsert",
-    "sfdx easysources:objecttranslations:upsert -i MyObject-en_US",
-    "sfdx easysources:objecttranslations:upsert -i 'MyObject-en_US,MyObject-es-CO'",
-    "sfdx easysources:objecttranslations:upsert -c './force-app/src/default' -c './easysources'"
+    "sf easysources objecttranslations upsert",
+    "sf easysources objecttranslations upsert -i MyObject-en_US",
+    "sf easysources objecttranslations upsert -i 'MyObject-en_US,MyObject-es-CO'",
+    "sf easysources objecttranslations upsert -c './force-app/src/default' -c './easysources'"
   ]
 }

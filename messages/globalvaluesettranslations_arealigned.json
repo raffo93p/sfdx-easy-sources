@@ -13,10 +13,10 @@
   "missingCsvDirectory": "❌ CSV directory not found: %s",
   "validationSummary": "Validation Summary: %s global value set translations validated, %s aligned, %s misaligned",
   "examples": [
-    "sfdx easysources:globalvaluesettranslations:arealigned",
-    "sfdx easysources:globalvaluesettranslations:arealigned --mode string",
-    "sfdx easysources:globalvaluesettranslations:arealigned --mode logic",
-    "sfdx easysources:globalvaluesettranslations:arealigned -i Priority-en_US,Status-es -m string",
-    "sfdx easysources:globalvaluesettranslations:arealigned -x ./force-app/main/default -c ./easysources --mode logic"
+    "sf easysources globalvaluesettranslations arealigned",
+    "sf easysources globalvaluesettranslations arealigned --mode string",
+    "sf easysources globalvaluesettranslations arealigned --mode logic",
+    "sf easysources globalvaluesettranslations arealigned -i Priority-en_US,Status-es -m string",
+    "sf easysources globalvaluesettranslations arealigned -x ./force-app/main/default -c ./easysources --mode logic"
   ]
 }

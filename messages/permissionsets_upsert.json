@@ -9,7 +9,7 @@
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:permissionsets:upsert",
-    "sfdx easysources:permissionsets:upsert -i './force-app/src/default' -c './easysources'"
+    "sf easysources permissionsets upsert",
+    "sf easysources permissionsets upsert -i './force-app/src/default' -c './easysources'"
   ]
 }

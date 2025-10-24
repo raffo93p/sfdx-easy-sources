@@ -5,7 +5,7 @@
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:labels:updatekey",
-    "sfdx easysources:labels:updatekey -x './force-app/src/default'"
+    "sf easysources labels updatekey",
+    "sf easysources labels updatekey -x './force-app/src/default'"
   ]
 }

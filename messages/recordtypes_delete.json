@@ -10,8 +10,8 @@
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:recordTypes:delete -p MyPicklist -k fullname",
-    "sfdx easysources:recordTypes:delete -p MyPicklist -k fullname1,fullname2",
-    "sfdx easysources:recordTypes:delete -s Account  -p MyPicklist -k fullname"
+    "sf easysources recordTypes delete -p MyPicklist -k fullname",
+    "sf easysources recordTypes delete -p MyPicklist -k fullname1,fullname2",
+    "sf easysources recordTypes delete -s Account  -p MyPicklist -k fullname"
   ]
 }

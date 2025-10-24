@@ -4,8 +4,8 @@
   "esCsvFlagDescription": "Easy Sources CSV path (default: %s)",
   "inputFlagDescription": "Comma-separated list of permission set names to process. If not specified, all permission sets will be processed",
   "examples": [
-    "$ sfdx easysources:permissionsets:clearempty",
-    "$ sfdx easysources:permissionsets:clearempty --input Admin_Access,Custom_Perms",
-    "$ sfdx easysources:permissionsets:clearempty --es-csv ./csv --sf-xml ./force-app"
+    "$ sf easysources permissionsets clearempty",
+    "$ sf easysources permissionsets clearempty --input Admin_Access,Custom_Perms",
+    "$ sf easysources permissionsets clearempty --es-csv ./csv --sf-xml ./force-app"
   ]
 }

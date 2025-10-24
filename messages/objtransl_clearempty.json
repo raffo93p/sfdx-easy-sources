@@ -4,8 +4,8 @@
   "esCsvFlagDescription": "Easy Sources CSV path (default: %s)",
   "inputFlagDescription": "Comma-separated list of object translation names to process. If not specified, all object translations will be processed",
   "examples": [
-    "$ sfdx easysources:objecttranslations:clearempty",
-    "$ sfdx easysources:objecttranslations:clearempty --input Account,Contact",
-    "$ sfdx easysources:objecttranslations:clearempty --es-csv ./csv --sf-xml ./force-app"
+    "$ sf easysources objecttranslations clearempty",
+    "$ sf easysources objecttranslations clearempty --input Account,Contact",
+    "$ sf easysources objecttranslations clearempty --es-csv ./csv --sf-xml ./force-app"
   ]
 }

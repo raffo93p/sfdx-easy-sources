@@ -16,9 +16,9 @@
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:profiles:clean",
-    "sfdx easysources:profiles:clean --mode=log --target=local",
-    "sfdx easysources:profiles:clean --mode=clean --target=org --orgname='myOrgAlias",
-    "sfdx easysources:profiles:clean --mode=log --target=both --orgname='myOrgAlias"
+    "sf easysources profiles clean",
+    "sf easysources profiles clean --mode=log --target=local",
+    "sf easysources profiles clean --mode=clean --target=org --orgname='myOrgAlias",
+    "sf easysources profiles clean --mode=log --target=both --orgname='myOrgAlias"
   ]
 }

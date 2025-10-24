@@ -6,7 +6,7 @@
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:all:merge",
-    "sfdx easysources:all:merge -x './force-app/src/default' -c './easysources'"
+    "sf easysources all merge",
+    "sf easysources all merge -x './force-app/src/default' -c './easysources'"
   ]
 }

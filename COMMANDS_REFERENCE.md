@@ -18,7 +18,7 @@ The following flags are available across most commands:
 
 ## Profiles Commands
 
-### `sfdx easysources:profiles:split`
+### `sf easysources profiles split`
 **Description**: Split Profile XML files into CSV format
 
 **Flags**:
@@ -30,11 +30,11 @@ The following flags are available across most commands:
 
 **Examples**:
 ```bash
-sfdx easysources:profiles:split
-sfdx easysources:profiles:split --input "Admin,Standard User"
+sf easysources profiles split
+sf easysources profiles split --input "Admin,Standard User"
 ```
 
-### `sfdx easysources:profiles:merge`
+### `sf easysources profiles merge`
 **Description**: Merge CSV files back to Profile XML format
 
 **Flags**:
@@ -43,7 +43,7 @@ sfdx easysources:profiles:split --input "Admin,Standard User"
 - `--input, -i`: Specific profile names (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:profiles:upsert`
+### `sf easysources profiles upsert`
 **Description**: Update Profile XML files with CSV data
 
 **Flags**:
@@ -57,12 +57,12 @@ sfdx easysources:profiles:split --input "Admin,Standard User"
 
 **Examples**:
 ```bash
-sfdx easysources:profiles:upsert
-sfdx easysources:profiles:upsert --type "fieldPermissions" --tagid "Account.Name"
-sfdx easysources:profiles:upsert --type "fieldPermissions,classAccesses" --tagid "ABC123,DEF456"
+sf easysources profiles upsert
+sf easysources profiles upsert --type "fieldPermissions" --tagid "Account.Name"
+sf easysources profiles upsert --type "fieldPermissions,classAccesses" --tagid "ABC123,DEF456"
 ```
 
-### `sfdx easysources:profiles:arealigned`
+### `sf easysources profiles arealigned`
 **Description**: Validate alignment between XML and CSV files
 
 **Flags**:
@@ -71,7 +71,7 @@ sfdx easysources:profiles:upsert --type "fieldPermissions,classAccesses" --tagid
 - `--input, -i`: Specific profile names (comma-separated)
 - `--mode`: Comparison mode (`string` for exact match, `logic` for logical comparison, default: `string`)
 
-### `sfdx easysources:profiles:updatekey`
+### `sf easysources profiles updatekey`
 **Description**: Update key fields in Profile CSV files
 
 **Flags**:
@@ -79,7 +79,7 @@ sfdx easysources:profiles:upsert --type "fieldPermissions,classAccesses" --tagid
 - `--input, -i`: Specific profile names (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:profiles:delete`
+### `sf easysources profiles delete`
 **Description**: Delete specific entries from Profile CSV files
 
 **Flags**:
@@ -87,7 +87,7 @@ sfdx easysources:profiles:upsert --type "fieldPermissions,classAccesses" --tagid
 - `--input, -i`: Specific profile names (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:profiles:clean`
+### `sf easysources profiles clean`
 **Description**: Clean Profile CSV files
 
 **Flags**:
@@ -102,14 +102,14 @@ sfdx easysources:profiles:upsert --type "fieldPermissions,classAccesses" --tagid
 - `--skip-manifest-creation, -M`: Skip manifest file creation (default: `false`)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:profiles:clearempty`
+### `sf easysources profiles clearempty`
 **Description**: Remove empty CSV files and folders
 
 **Flags**:
 - `--es-csv, -c`: CSV directory
 - `--input, -i`: Specific profile names (comma-separated)
 
-### `sfdx easysources:profiles:minify`
+### `sf easysources profiles minify`
 **Description**: Minify Profile CSV files by removing entries with all false permissions
 
 **Flags**:
@@ -122,7 +122,7 @@ sfdx easysources:profiles:upsert --type "fieldPermissions,classAccesses" --tagid
 
 ## Permission Sets Commands
 
-### `sfdx easysources:permissionsets:split`
+### `sf easysources permissionsets split`
 **Description**: Split Permission Set XML files into CSV format
 
 **Flags**:
@@ -131,7 +131,7 @@ sfdx easysources:profiles:upsert --type "fieldPermissions,classAccesses" --tagid
 - `--input, -i`: Specific permission set names (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:permissionsets:merge`
+### `sf easysources permissionsets merge`
 **Description**: Merge CSV files back to Permission Set XML format
 
 **Flags**:
@@ -140,7 +140,7 @@ sfdx easysources:profiles:upsert --type "fieldPermissions,classAccesses" --tagid
 - `--input, -i`: Specific permission set names (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:permissionsets:upsert`
+### `sf easysources permissionsets upsert`
 **Description**: Update Permission Set XML files with CSV data
 
 **Flags**:
@@ -153,11 +153,11 @@ sfdx easysources:profiles:upsert --type "fieldPermissions,classAccesses" --tagid
 
 **Examples**:
 ```bash
-sfdx easysources:permissionsets:upsert
-sfdx easysources:permissionsets:upsert --type "fieldPermissions" --tagid "Account.Name"
+sf easysources permissionsets upsert
+sf easysources permissionsets upsert --type "fieldPermissions" --tagid "Account.Name"
 ```
 
-### `sfdx easysources:permissionsets:arealigned`
+### `sf easysources permissionsets arealigned`
 **Description**: Validate alignment between XML and CSV files
 
 **Flags**:
@@ -166,7 +166,7 @@ sfdx easysources:permissionsets:upsert --type "fieldPermissions" --tagid "Accoun
 - `--input, -i`: Specific permission set names (comma-separated)
 - `--mode`: Comparison mode (`string` or `logic`, default: `string`)
 
-### `sfdx easysources:permissionsets:updatekey`
+### `sf easysources permissionsets updatekey`
 **Description**: Update key fields in Permission Set CSV files
 
 **Flags**:
@@ -174,7 +174,7 @@ sfdx easysources:permissionsets:upsert --type "fieldPermissions" --tagid "Accoun
 - `--input, -i`: Specific permission set names (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:permissionsets:delete`
+### `sf easysources permissionsets delete`
 **Description**: Delete specific entries from Permission Set CSV files
 
 **Flags**:
@@ -182,7 +182,7 @@ sfdx easysources:permissionsets:upsert --type "fieldPermissions" --tagid "Accoun
 - `--input, -i`: Specific permission set names (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:permissionsets:clean`
+### `sf easysources permissionsets clean`
 **Description**: Clean Permission Set CSV files
 
 **Flags**:
@@ -197,14 +197,14 @@ sfdx easysources:permissionsets:upsert --type "fieldPermissions" --tagid "Accoun
 - `--skip-manifest-creation, -M`: Skip manifest file creation (default: `false`)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:permissionsets:clearempty`
+### `sf easysources permissionsets clearempty`
 **Description**: Remove empty CSV files and folders
 
 **Flags**:
 - `--es-csv, -c`: CSV directory
 - `--input, -i`: Specific permission set names (comma-separated)
 
-### `sfdx easysources:permissionsets:minify`
+### `sf easysources permissionsets minify`
 **Description**: Minify Permission Set CSV files by removing entries with all false permissions
 
 **Flags**:
@@ -217,7 +217,7 @@ sfdx easysources:permissionsets:upsert --type "fieldPermissions" --tagid "Accoun
 
 ## Record Types Commands
 
-### `sfdx easysources:recordtypes:split`
+### `sf easysources recordtypes split`
 **Description**: Split Record Type XML files into CSV format
 
 **Flags**:
@@ -227,7 +227,7 @@ sfdx easysources:permissionsets:upsert --type "fieldPermissions" --tagid "Accoun
 - `--recordtype, -r`: Specific record type names (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:recordtypes:merge`
+### `sf easysources recordtypes merge`
 **Description**: Merge CSV files back to Record Type XML format
 
 **Flags**:
@@ -237,7 +237,7 @@ sfdx easysources:permissionsets:upsert --type "fieldPermissions" --tagid "Accoun
 - `--recordtype, -r`: Specific record type names (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:recordtypes:upsert`
+### `sf easysources recordtypes upsert`
 **Description**: Update Record Type XML files with CSV data
 
 **Flags**:
@@ -247,7 +247,7 @@ sfdx easysources:permissionsets:upsert --type "fieldPermissions" --tagid "Accoun
 - `--recordtype, -r`: Specific record type names (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:recordtypes:arealigned`
+### `sf easysources recordtypes arealigned`
 **Description**: Validate alignment between XML and CSV files
 
 **Flags**:
@@ -258,7 +258,7 @@ sfdx easysources:permissionsets:upsert --type "fieldPermissions" --tagid "Accoun
 - `--mode`: Comparison mode (`string` or `logic`, default: `string`)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:recordtypes:updatekey`
+### `sf easysources recordtypes updatekey`
 **Description**: Update key fields in Record Type CSV files
 
 **Flags**:
@@ -267,7 +267,7 @@ sfdx easysources:permissionsets:upsert --type "fieldPermissions" --tagid "Accoun
 - `--recordtype, -r`: Specific record type names (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:recordtypes:delete`
+### `sf easysources recordtypes delete`
 **Description**: Delete specific picklist values from Record Type CSV files
 
 **Flags**:
@@ -280,11 +280,11 @@ sfdx easysources:permissionsets:upsert --type "fieldPermissions" --tagid "Accoun
 
 **Examples**:
 ```bash
-sfdx easysources:recordtypes:delete --object "Account" --picklist "Status"
-sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inactive"
+sf easysources recordtypes delete --object "Account" --picklist "Status"
+sf easysources recordtypes delete --picklist "Status" --apiname "Active,Inactive"
 ```
 
-### `sfdx easysources:recordtypes:clean`
+### `sf easysources recordtypes clean`
 **Description**: Clean Record Type CSV files
 
 **Flags**:
@@ -304,7 +304,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 
 ## Translations Commands
 
-### `sfdx easysources:translations:split`
+### `sf easysources translations split`
 **Description**: Split Translation XML files into CSV format
 
 **Flags**:
@@ -313,7 +313,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 - `--input, -i`: Specific translation files (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:translations:merge`
+### `sf easysources translations merge`
 **Description**: Merge CSV files back to Translation XML format
 
 **Flags**:
@@ -322,7 +322,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 - `--input, -i`: Specific translation files (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:translations:upsert`
+### `sf easysources translations upsert`
 **Description**: Update Translation XML files with CSV data
 
 **Flags**:
@@ -331,7 +331,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 - `--input, -i`: Specific translation files (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:translations:arealigned`
+### `sf easysources translations arealigned`
 **Description**: Validate alignment between XML and CSV files
 
 **Flags**:
@@ -340,14 +340,14 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 - `--input, -i`: Specific translation files (comma-separated)
 - `--mode`: Comparison mode (`string` or `logic`, default: `string`)
 
-### `sfdx easysources:translations:clearempty`
+### `sf easysources translations clearempty`
 **Description**: Remove empty CSV files and folders
 
 **Flags**:
 - `--es-csv, -c`: CSV directory
 - `--input, -i`: Specific translation files (comma-separated)
 
-### `sfdx easysources:translations:minify`
+### `sf easysources translations minify`
 **Description**: Minify Translation CSV files by removing entries with all false values
 
 **Flags**:
@@ -360,7 +360,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 
 ## Object Translations Commands
 
-### `sfdx easysources:objecttranslations:split`
+### `sf easysources objecttranslations split`
 **Description**: Split Object Translation XML files into CSV format
 
 **Flags**:
@@ -369,7 +369,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 - `--input, -i`: Specific object translation files (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:objecttranslations:merge`
+### `sf easysources objecttranslations merge`
 **Description**: Merge CSV files back to Object Translation XML format
 
 **Flags**:
@@ -378,7 +378,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 - `--input, -i`: Specific object translation files (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:objecttranslations:upsert`
+### `sf easysources objecttranslations upsert`
 **Description**: Update Object Translation XML files with CSV data
 
 **Flags**:
@@ -387,7 +387,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 - `--input, -i`: Specific object translation files (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:objecttranslations:arealigned`
+### `sf easysources objecttranslations arealigned`
 **Description**: Validate alignment between XML and CSV files
 
 **Flags**:
@@ -396,14 +396,14 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 - `--input, -i`: Specific object translation files (comma-separated)
 - `--mode`: Comparison mode (`string` or `logic`, default: `string`)
 
-### `sfdx easysources:objecttranslations:clearempty`
+### `sf easysources objecttranslations clearempty`
 **Description**: Remove empty CSV files and folders
 
 **Flags**:
 - `--es-csv, -c`: CSV directory
 - `--input, -i`: Specific object translation files (comma-separated)
 
-### `sfdx easysources:objecttranslations:minify`
+### `sf easysources objecttranslations minify`
 **Description**: Minify Object Translation CSV files by removing entries with all false values
 
 **Flags**:
@@ -416,7 +416,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 
 ## Applications Commands
 
-### `sfdx easysources:applications:split`
+### `sf easysources applications split`
 **Description**: Split Application XML files into CSV format
 
 **Flags**:
@@ -425,7 +425,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 - `--input, -i`: Specific application names (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:applications:merge`
+### `sf easysources applications merge`
 **Description**: Merge CSV files back to Application XML format
 
 **Flags**:
@@ -434,7 +434,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 - `--input, -i`: Specific application names (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:applications:upsert`
+### `sf easysources applications upsert`
 **Description**: Update Application XML files with CSV data
 
 **Flags**:
@@ -443,7 +443,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 - `--input, -i`: Specific application names (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:applications:arealigned`
+### `sf easysources applications arealigned`
 **Description**: Validate alignment between XML and CSV files
 
 **Flags**:
@@ -452,7 +452,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 - `--input, -i`: Specific application names (comma-separated)
 - `--mode`: Comparison mode (`string` or `logic`, default: `string`)
 
-### `sfdx easysources:applications:updatekey`
+### `sf easysources applications updatekey`
 **Description**: Update key fields in Application CSV files
 
 **Flags**:
@@ -464,7 +464,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 
 ## Labels Commands
 
-### `sfdx easysources:labels:split`
+### `sf easysources labels split`
 **Description**: Split Custom Label XML files into CSV format
 
 **Flags**:
@@ -473,7 +473,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 - `--input, -i`: Specific label files (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:labels:merge`
+### `sf easysources labels merge`
 **Description**: Merge CSV files back to Custom Label XML format
 
 **Flags**:
@@ -482,7 +482,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 - `--input, -i`: Specific label files (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:labels:upsert`
+### `sf easysources labels upsert`
 **Description**: Update Custom Label XML files with CSV data
 
 **Flags**:
@@ -491,7 +491,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 - `--input, -i`: Specific label files (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:labels:arealigned`
+### `sf easysources labels arealigned`
 **Description**: Validate alignment between XML and CSV files
 
 **Flags**:
@@ -500,7 +500,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 - `--input, -i`: Specific label files (comma-separated)
 - `--mode`: Comparison mode (`string` or `logic`, default: `string`)
 
-### `sfdx easysources:labels:updatekey`
+### `sf easysources labels updatekey`
 **Description**: Update key fields in Custom Label CSV files
 
 **Flags**:
@@ -512,7 +512,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 
 ## Global Value Sets Commands
 
-### `sfdx easysources:globalvaluesets:split`
+### `sf easysources globalvaluesets split`
 **Description**: Split Global Value Set XML files into CSV format
 
 **Flags**:
@@ -521,7 +521,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 - `--input, -i`: Specific global value set names (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:globalvaluesets:merge`
+### `sf easysources globalvaluesets merge`
 **Description**: Merge CSV files back to Global Value Set XML format
 
 **Flags**:
@@ -530,7 +530,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 - `--input, -i`: Specific global value set names (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:globalvaluesets:upsert`
+### `sf easysources globalvaluesets upsert`
 **Description**: Update Global Value Set XML files with CSV data
 
 **Flags**:
@@ -539,7 +539,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 - `--input, -i`: Specific global value set names (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:globalvaluesets:arealigned`
+### `sf easysources globalvaluesets arealigned`
 **Description**: Validate alignment between XML and CSV files
 
 **Flags**:
@@ -548,7 +548,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 - `--input, -i`: Specific global value set names (comma-separated)
 - `--mode`: Comparison mode (`string` or `logic`, default: `string`)
 
-### `sfdx easysources:globalvaluesets:updatekey`
+### `sf easysources globalvaluesets updatekey`
 **Description**: Update key fields in Global Value Set CSV files
 
 **Flags**:
@@ -560,7 +560,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 
 ## Global Value Set Translations Commands
 
-### `sfdx easysources:globalvaluesettranslations:split`
+### `sf easysources globalvaluesettranslations split`
 **Description**: Split Global Value Set Translation XML files into CSV format
 
 **Flags**:
@@ -569,7 +569,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 - `--input, -i`: Specific translation files (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:globalvaluesettranslations:merge`
+### `sf easysources globalvaluesettranslations merge`
 **Description**: Merge CSV files back to Global Value Set Translation XML format
 
 **Flags**:
@@ -578,7 +578,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 - `--input, -i`: Specific translation files (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:globalvaluesettranslations:upsert`
+### `sf easysources globalvaluesettranslations upsert`
 **Description**: Update Global Value Set Translation XML files with CSV data
 
 **Flags**:
@@ -587,7 +587,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 - `--input, -i`: Specific translation files (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
-### `sfdx easysources:globalvaluesettranslations:arealigned`
+### `sf easysources globalvaluesettranslations arealigned`
 **Description**: Validate alignment between XML and CSV files
 
 **Flags**:
@@ -596,7 +596,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 - `--input, -i`: Specific translation files (comma-separated)
 - `--mode`: Comparison mode (`string` or `logic`, default: `string`)
 
-### `sfdx easysources:globalvaluesettranslations:updatekey`
+### `sf easysources globalvaluesettranslations updatekey`
 **Description**: Update key fields in Global Value Set Translation CSV files
 
 **Flags**:
@@ -608,7 +608,7 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 
 ## All Metadata Commands
 
-### `sfdx easysources:allmeta:retrieve`
+### `sf easysources allmeta retrieve`
 **Description**: Retrieve all metadata types from a Salesforce org and automatically split/merge
 
 **Flags**:
@@ -625,32 +625,32 @@ sfdx easysources:recordtypes:delete --picklist "Status" --apiname "Active,Inacti
 
 **Examples**:
 ```bash
-sfdx easysources:allmeta:retrieve --orgname "myorg" --split-merge
-sfdx easysources:allmeta:retrieve --orgname "myorg" --manifest "./manifest/package.xml"
+sf easysources allmeta retrieve --orgname "myorg" --split-merge
+sf easysources allmeta retrieve --orgname "myorg" --manifest "./manifest/package.xml"
 ```
 
-### `sfdx easysources:allmeta:split`
+### `sf easysources allmeta split`
 **Description**: Split all metadata types from XML to CSV format
 
 **Flags**:
 - `--sf-xml, -x`: Input XML directory
 - `--es-csv, -c`: Output CSV directory
 
-### `sfdx easysources:allmeta:merge`
+### `sf easysources allmeta merge`
 **Description**: Merge all CSV files back to XML format
 
 **Flags**:
 - `--sf-xml, -x`: Output XML directory
 - `--es-csv, -c`: Input CSV directory
 
-### `sfdx easysources:allmeta:upsert`
+### `sf easysources allmeta upsert`
 **Description**: Update all XML files with CSV data
 
 **Flags**:
 - `--sf-xml, -x`: Input XML directory
 - `--es-csv, -c`: Input CSV directory
 
-### `sfdx easysources:allmeta:minify`
+### `sf easysources allmeta minify`
 **Description**: Minify all XML files
 
 **Flags**:
@@ -660,12 +660,12 @@ sfdx easysources:allmeta:retrieve --orgname "myorg" --manifest "./manifest/packa
 
 ## Settings Commands
 
-### `sfdx easysources:settings:init`
+### `sf easysources settings init`
 **Description**: Initialize easysources-settings.json configuration file
 
 **Examples**:
 ```bash
-sfdx easysources:settings:init
+sf easysources settings init
 ```
 
 ---
@@ -688,39 +688,39 @@ You can create an `easysources-settings.json` file in your project root to set d
 ### 1. Basic Workflow
 ```bash
 # Split XML to CSV for editing
-sfdx easysources:profiles:split
+sf easysources profiles split
 
 # Edit CSV files as needed
 
 # Merge back to XML
-sfdx easysources:profiles:merge
+sf easysources profiles merge
 ```
 
 ### 2. Targeted Updates
 ```bash
 # Update only specific permission types
-sfdx easysources:profiles:upsert --type "fieldPermissions" --tagid "Account.Name,Contact.Email"
+sf easysources profiles upsert --type "fieldPermissions" --tagid "Account.Name,Contact.Email"
 
 # Update specific permission sets
-sfdx easysources:permissionsets:upsert --input "MyPermSet" --type "objectPermissions"
+sf easysources permissionsets upsert --input "MyPermSet" --type "objectPermissions"
 ```
 
 ### 3. Bulk Operations
 ```bash
 # Retrieve and process all metadata
-sfdx easysources:allmeta:retrieve --orgname "myorg" --split-merge --clean
+sf easysources allmeta retrieve --orgname "myorg" --split-merge --clean
 
 # Split all metadata types
-sfdx easysources:allmeta:split
+sf easysources allmeta split
 ```
 
 ### 4. Validation
 ```bash
 # Check if XML and CSV are aligned
-sfdx easysources:profiles:arealigned --mode "logic"
+sf easysources profiles arealigned --mode "logic"
 
 # Clean up empty files
-sfdx easysources:profiles:clearempty
+sf easysources profiles clearempty
 ```
 
 ---
@@ -731,4 +731,4 @@ sfdx easysources:profiles:clearempty
 - **Type and TagID filtering**: Available in upsert commands for profiles and permission sets for precise control
 - **Sorting**: Most commands include a `--sort` flag to control output ordering
 - **Path flexibility**: All commands respect custom paths via flags or configuration file
-- **Background operations**: Long-running commands like `allmeta:retrieve` support background processing options
+- **Background operations**: Long-running commands like `allmeta retrieve` support background processing options

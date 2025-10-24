@@ -8,9 +8,9 @@
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:profiles:split",
-    "sfdx easysources:profiles:split -x './force-app/src/default'",
-    "sfdx easysources:profiles:split -i 'Admin'",
-    "sfdx easysources:profiles:split -x './force-app/src/default' -c './easysources'"
+    "sf easysources profiles split",
+    "sf easysources profiles split -x './force-app/src/default'",
+    "sf easysources profiles split -i 'Admin'",
+    "sf easysources profiles split -x './force-app/src/default' -c './easysources'"
   ]
 }

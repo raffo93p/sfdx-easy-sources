@@ -7,8 +7,8 @@
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:applications:upsert",
-    "sfdx easysources:applications:upsert -i 'Sales,Marketing'",
-    "sfdx easysources:applications:upsert -x './force-app/src/default' -c './easysources'"
+    "sf easysources applications upsert",
+    "sf easysources applications upsert -i 'Sales,Marketing'",
+    "sf easysources applications upsert -x './force-app/src/default' -c './easysources'"
   ]
 }

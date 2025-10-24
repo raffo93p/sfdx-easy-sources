@@ -7,8 +7,8 @@
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:globalvaluesets:merge",
-    "sfdx easysources:globalvaluesets:merge -i 'MyGlobalValueSet'",
-    "sfdx easysources:globalvaluesets:merge -x './force-app/src/default' -c './easysources'"
+    "sf easysources globalvaluesets merge",
+    "sf easysources globalvaluesets merge -i 'MyGlobalValueSet'",
+    "sf easysources globalvaluesets merge -x './force-app/src/default' -c './easysources'"
   ]
 }

@@ -10,9 +10,9 @@
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:profiles:upsert",
-    "sfdx easysources:profiles:upsert -i Admin",
-    "sfdx easysources:profiles:upsert -i 'Admin,Another Profile'",
-    "sfdx easysources:profiles:upsert -c './force-app/src/default' -c './easysources'"
+    "sf easysources profiles upsert",
+    "sf easysources profiles upsert -i Admin",
+    "sf easysources profiles upsert -i 'Admin,Another Profile'",
+    "sf easysources profiles upsert -c './force-app/src/default' -c './easysources'"
   ]
 }

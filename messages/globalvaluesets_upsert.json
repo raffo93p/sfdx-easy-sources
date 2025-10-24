@@ -7,7 +7,7 @@
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:globalvaluesets:upsert",
-    "sfdx easysources:globalvaluesets:upsert -x './force-app/src/default' -c './easysources'"
+    "sf easysources globalvaluesets upsert",
+    "sf easysources globalvaluesets upsert -x './force-app/src/default' -c './easysources'"
   ]
 }

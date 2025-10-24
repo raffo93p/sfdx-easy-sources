@@ -13,11 +13,11 @@
   "missingCsvDirectory": "❌ CSV directory not found: %s",
   "validationSummary": "Validation Summary: %s permission sets validated, %s aligned, %s misaligned",
   "examples": [
-    "sfdx easysources:permissionsets:arealigned",
-    "sfdx easysources:permissionsets:arealigned --mode string",
-    "sfdx easysources:permissionsets:arealigned --mode logic",
-    "sfdx easysources:permissionsets:arealigned -i Admin_Access,Custom_Permissions -m string",
-    "sfdx easysources:permissionsets:arealigned -x ./force-app/main/default -c ./easysources --mode logic",
-    "sfdx easysources:permissionsets:arealigned --sort false --mode string"
+    "sf easysources permissionsets arealigned",
+    "sf easysources permissionsets arealigned --mode string",
+    "sf easysources permissionsets arealigned --mode logic",
+    "sf easysources permissionsets arealigned -i Admin_Access,Custom_Permissions -m string",
+    "sf easysources permissionsets arealigned -x ./force-app/main/default -c ./easysources --mode logic",
+    "sf easysources permissionsets arealigned --sort false --mode string"
   ]
 }

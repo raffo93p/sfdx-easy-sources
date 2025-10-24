@@ -6,7 +6,7 @@
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:globalvaluesettranslations:updatekey",
-    "sfdx easysources:globalvaluesettranslations:updatekey -c './easysources'"
+    "sf easysources globalvaluesettranslations updatekey",
+    "sf easysources globalvaluesettranslations updatekey -c './easysources'"
   ]
 }

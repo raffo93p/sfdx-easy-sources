@@ -1,7 +1,7 @@
 {
   "name": "sfdx-easy-sources",
   "description": "This plugin provides tools to simplify Salesforce sources",
-  "version": "0.7.6",
+  "version": "0.7.7",
   "author": "Raffaele Prudenzano @raffo93p",
   "bugs": "https://github.com/raffo93p/sfdx-easy-sources/issues",
   "dependencies": {
@@ -74,7 +74,7 @@
     "prepack": "rm -rf lib && tsc -b && oclif manifest && oclif readme",
     "test": "rm -rf test_tmp && mkdir test_tmp && cd test_tmp && nyc --extension .ts --require ts-node/register mocha --forbid-only \"../test/**/*.test.ts\"",
     "version": "oclif readme && git add README.md",
-    "link": "npm install && npm run build && sfdx plugins:link ."
+    "link": "npm install && npm run build && sf plugins link"
   },
   "nyc": {
     "extends": "@istanbuljs/nyc-config-typescript",

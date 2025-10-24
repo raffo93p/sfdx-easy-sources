@@ -7,8 +7,8 @@
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:globalvaluesets:split",
-    "sfdx easysources:globalvaluesets:split -i 'MyGlobalValueSet1'",
-    "sfdx easysources:globalvaluesets:split -x './force-app/src/default' -c './easysources'"
+    "sf easysources globalvaluesets split",
+    "sf easysources globalvaluesets split -i 'MyGlobalValueSet1'",
+    "sf easysources globalvaluesets split -x './force-app/src/default' -c './easysources'"
   ]
 }

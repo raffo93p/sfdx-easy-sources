@@ -7,9 +7,9 @@
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:objecttranslations:split",
-    "sfdx easysources:objecttranslations:split -x './force-app/src/default'",
-    "sfdx easysources:objecttranslations:split -i 'en_US'",
-    "sfdx easysources:objecttranslations:split -x './force-app/src/default' -c './easysources'"
+    "sf easysources objecttranslations split",
+    "sf easysources objecttranslations split -x './force-app/src/default'",
+    "sf easysources objecttranslations split -i 'en_US'",
+    "sf easysources objecttranslations split -x './force-app/src/default' -c './easysources'"
   ]
 }
