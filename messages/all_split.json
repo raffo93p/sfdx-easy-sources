@@ -6,8 +6,8 @@
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:all:split",
-    "sfdx easysources:all:split -x './force-app/src/default'",
-    "sfdx easysources:all:split -x './force-app/src/default' -c './easysources'"
+    "sf easysources all split",
+    "sf easysources all split -x './force-app/src/default'",
+    "sf easysources all split -x './force-app/src/default' -c './easysources'"
   ]
 }

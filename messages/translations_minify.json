@@ -7,7 +7,7 @@
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:profiles:minify",
-    "sfdx easysources:profiles:minify -i en_US"
+    "sf easysources profiles minify",
+    "sf easysources profiles minify -i en_US"
   ]
 }

@@ -13,11 +13,11 @@
   "missingCsvDirectory": "❌ CSV directory not found: %s",
   "validationSummary": "Validation Summary: %s object translations validated, %s aligned, %s misaligned, %s warnings",
   "examples": [
-    "sfdx easysources:objecttranslations:arealigned",
-    "sfdx easysources:objecttranslations:arealigned --mode string",
-    "sfdx easysources:objecttranslations:arealigned --mode logic",
-    "sfdx easysources:objecttranslations:arealigned -i Account-en_US,Contact-it_IT -m string",
-    "sfdx easysources:objecttranslations:arealigned -x ./force-app/main/default -c ./easysources --mode logic",
-    "sfdx easysources:objecttranslations:arealigned --sort false --mode string"
+    "sf easysources objecttranslations arealigned",
+    "sf easysources objecttranslations arealigned --mode string",
+    "sf easysources objecttranslations arealigned --mode logic",
+    "sf easysources objecttranslations arealigned -i Account-en_US,Contact-it_IT -m string",
+    "sf easysources objecttranslations arealigned -x ./force-app/main/default -c ./easysources --mode logic",
+    "sf easysources objecttranslations arealigned --sort false --mode string"
   ]
 }

@@ -7,8 +7,8 @@
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:objecttranslations:merge",
-    "sfdx easysources:objecttranslations:merge -i 'MyObject1-en_US,MyObject1-es_CO'",
-    "sfdx easysources:objecttranslations:merge -x './force-app/src/default' -c './easysources'"
+    "sf easysources objecttranslations merge",
+    "sf easysources objecttranslations merge -i 'MyObject1-en_US,MyObject1-es_CO'",
+    "sf easysources objecttranslations merge -x './force-app/src/default' -c './easysources'"
   ]
 }

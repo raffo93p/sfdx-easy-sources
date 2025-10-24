@@ -13,11 +13,11 @@
   "missingCsvDirectory": "❌ CSV directory not found: %s",
   "validationSummary": "Validation Summary: %s profiles validated, %s aligned, %s misaligned",
   "examples": [
-    "sfdx easysources:profiles:arealigned",
-    "sfdx easysources:profiles:arealigned --mode string",
-    "sfdx easysources:profiles:arealigned --mode logic",
-    "sfdx easysources:profiles:arealigned -i Admin,StandardUser -m string",
-    "sfdx easysources:profiles:arealigned -x ./force-app/main/default -c ./easysources --mode logic",
-    "sfdx easysources:profiles:arealigned --sort false --mode string"
+    "sf easysources profiles arealigned",
+    "sf easysources profiles arealigned --mode string",
+    "sf easysources profiles arealigned --mode logic",
+    "sf easysources profiles arealigned -i Admin,StandardUser -m string",
+    "sf easysources profiles arealigned -x ./force-app/main/default -c ./easysources --mode logic",
+    "sf easysources profiles arealigned --sort false --mode string"
   ]
 }

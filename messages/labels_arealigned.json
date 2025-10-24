@@ -13,10 +13,10 @@
   "missingCsvDirectory": "❌ CSV directory not found: %s",
   "validationSummary": "Validation Summary: %s labels validated, %s aligned, %s misaligned",
   "examples": [
-    "sfdx easysources:labels:arealigned",
-    "sfdx easysources:labels:arealigned --mode string",
-    "sfdx easysources:labels:arealigned --mode logic",
-    "sfdx easysources:labels:arealigned -i CustomLabels -m string",
-    "sfdx easysources:labels:arealigned -x ./force-app/main/default -c ./easysources --mode logic"
+    "sf easysources labels arealigned",
+    "sf easysources labels arealigned --mode string",
+    "sf easysources labels arealigned --mode logic",
+    "sf easysources labels arealigned -i CustomLabels -m string",
+    "sf easysources labels arealigned -x ./force-app/main/default -c ./easysources --mode logic"
   ]
 }

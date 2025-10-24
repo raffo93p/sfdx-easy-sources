@@ -9,6 +9,6 @@ export const DEFAULT_ESCSV_PATH = './force-app/main/default';
 export const DEFAULT_LOG_PATH ='./easysources/log';
 export const SETTINGS_PATH = './easysources-settings.json';
 
-export const SFDX_CMD = 'sfdx';
+export const SF_CMD = 'sf';
 
 export const PLUGIN_NAME = "sfdx-easy-sources";

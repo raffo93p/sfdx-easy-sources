@@ -7,10 +7,10 @@
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:applications:merge",
-    "sfdx easysources:applications:merge -i 'Sales'",
-    "sfdx easysources:applications:merge -i 'Sales,Marketing'",
-    "sfdx easysources:applications:merge -x './force-app/src/default' -c './easysources'"
+    "sf easysources applications merge",
+    "sf easysources applications merge -i 'Sales'",
+    "sf easysources applications merge -i 'Sales,Marketing'",
+    "sf easysources applications merge -x './force-app/src/default' -c './easysources'"
     
   ]
 }

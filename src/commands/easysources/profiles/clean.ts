@@ -89,6 +89,11 @@ export default class Clean extends SfdxCommand {
             description: messages.getMessage('skipTypesFlagDescription', ['Settings']),
             default: ['Settings'],
         }),
+        'include-types': flags.array({
+            char: 'd',
+            description: messages.getMessage('includeTypesFlagDescription', ['']),
+            default: [],
+        }),
         'skip-manifest-creation': flags.boolean({
             char: 'M',
             description: messages.getMessage('skipManifestCreationFlagDescription', ['false']),
@@ -126,7 +131,13 @@ export async function profileClean(options: any): Promise<any> {
     const skipStandardFields = !options['include-standard-fields'];
     const skipStandardTabs = !options['include-standard-tabs'];
     const skipTypes = options['skip-types'] || ['Settings'];
+    const includeTypes = options['include-types'] || [];
     const skipManifestCreation = options['skip-manifest-creation'];
+
+    // Check for mutually exclusive flags
+    if (skipTypes && skipTypes.length > 0 && includeTypes && includeTypes.length > 0) {
+        throw new Error('--skip-types and --include-types flags are mutually exclusive. Please use only one of them.');
+    }
 
     if (mode === 'log') checkDirOrCreateSync(logdir);
 
@@ -195,6 +206,7 @@ export async function profileClean(options: any): Promise<any> {
                     resListCsv = resListCsv.filter(function (res) {
                         if (res[key] == null) return true;
                         if (skipTypes != null && skipTypes.includes(typename)) return true;
+                        if (includeTypes != null && includeTypes.length > 0 && !includeTypes.includes(typename)) return true;
                         if (skipStandardFields && typename === "CustomField" && !res[key].endsWith("__c")) return true;
                         if (skipStandardTabs && typename === "CustomTab" && res[key].startsWith("standard-")) return true;
 

@@ -15,8 +15,8 @@
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:recorodtypes:clean",
-    "sfdx easysources:recorodtypes:clean --mode=log --target=local",
-    "sfdx easysources:recorodtypes:clean --mode=clean --target=org --orgname='myOrgAlias",
-    "sfdx easysources:recorodtypes:clean --mode=log --target=both --orgname='myOrgAlias"  ]
+    "sf easysources recorodtypes clean",
+    "sf easysources recorodtypes clean --mode=log --target=local",
+    "sf easysources recorodtypes clean --mode=clean --target=org --orgname='myOrgAlias",
+    "sf easysources recorodtypes clean --mode=log --target=both --orgname='myOrgAlias"  ]
 }

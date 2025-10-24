@@ -6,7 +6,7 @@
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:applications:updatekey",
-    "sfdx easysources:applications:updatekey -c './easysources'"
+    "sf easysources applications updatekey",
+    "sf easysources applications updatekey -c './easysources'"
   ]
 }

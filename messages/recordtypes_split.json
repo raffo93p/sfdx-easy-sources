@@ -8,10 +8,10 @@
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:recordtypes:split",
-    "sfdx easysources:recordtypes:split -x './force-app/src/default'",
-    "sfdx easysources:recordtypes:split -x './force-app/src/default' -s 'Account'",
-    "sfdx easysources:recordtypes:split -x './force-app/src/default' -c './easysources'",
-    "sfdx easysources:recordtypes:split -x './force-app/src/default' -s 'Account' -r 'MyRecordType.recordType-meta.xml'"
+    "sf easysources recordtypes split",
+    "sf easysources recordtypes split -x './force-app/src/default'",
+    "sf easysources recordtypes split -x './force-app/src/default' -s 'Account'",
+    "sf easysources recordtypes split -x './force-app/src/default' -c './easysources'",
+    "sf easysources recordtypes split -x './force-app/src/default' -s 'Account' -r 'MyRecordType.recordType-meta.xml'"
   ]
 }

@@ -15,12 +15,12 @@
   "missingCsvDirectory": "❌ CSV directory not found: %s",
   "validationSummary": "Validation Summary: %s record types validated, %s aligned, %s misaligned",
   "examples": [
-    "sfdx easysources:recordtypes:arealigned",
-    "sfdx easysources:recordtypes:arealigned --mode string",
-    "sfdx easysources:recordtypes:arealigned --mode logic",
-    "sfdx easysources:recordtypes:arealigned -s Account,Contact --mode string",
-    "sfdx easysources:recordtypes:arealigned -s Account -r Standard,Custom -m logic",
-    "sfdx easysources:recordtypes:arealigned -x ./force-app/main/default -c ./easysources --mode logic",
-    "sfdx easysources:recordtypes:arealigned --sort false --mode string"
+    "sf easysources recordtypes arealigned",
+    "sf easysources recordtypes arealigned --mode string",
+    "sf easysources recordtypes arealigned --mode logic",
+    "sf easysources recordtypes arealigned -s Account,Contact --mode string",
+    "sf easysources recordtypes arealigned -s Account -r Standard,Custom -m logic",
+    "sf easysources recordtypes arealigned -x ./force-app/main/default -c ./easysources --mode logic",
+    "sf easysources recordtypes arealigned --sort false --mode string"
   ]
 }

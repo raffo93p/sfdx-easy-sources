@@ -7,9 +7,9 @@
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:applications:split",
-    "sfdx easysources:applications:split -x './force-app/src/default' -c './easysources'",
-    "sfdx easysources:applications:split -x './force-app/src/default' -i 'Sales'",
-    "sfdx easysources:applications:split -x './force-app/src/default' -i 'Sales,Marketing'"
+    "sf easysources applications split",
+    "sf easysources applications split -x './force-app/src/default' -c './easysources'",
+    "sf easysources applications split -x './force-app/src/default' -i 'Sales'",
+    "sf easysources applications split -x './force-app/src/default' -i 'Sales,Marketing'"
       ]
 }

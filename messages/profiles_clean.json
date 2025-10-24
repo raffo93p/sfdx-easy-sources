@@ -11,13 +11,14 @@
   "includeStandardTabsFlagDescription": "Includes standard tabs. Default: '%s'",
   "targetFlagDescription": "Specify a target execution. Default: '%s'",
   "skipTypesFlagDescription": "Skips types. eg CustomField, ApexClass, UserPermissions, CustomSettingAccesses ecc. Default: '%s'",
+  "includeTypesFlagDescription": "Includes only specified types. eg CustomField, ApexClass, UserPermissions, CustomSettingAccesses ecc. If empty, all types are included (except those in skip-types). Default: '%s'",
   "skipManifestCreationFlagDescription": "Skips manifest creation. Default: '%s'",
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:profiles:clean",
-    "sfdx easysources:profiles:clean --mode=log --target=local",
-    "sfdx easysources:profiles:clean --mode=clean --target=org --orgname='myOrgAlias",
-    "sfdx easysources:profiles:clean --mode=log --target=both --orgname='myOrgAlias"
+    "sf easysources profiles clean",
+    "sf easysources profiles clean --mode=log --target=local",
+    "sf easysources profiles clean --mode=clean --target=org --orgname='myOrgAlias",
+    "sf easysources profiles clean --mode=log --target=both --orgname='myOrgAlias"
   ]
 }

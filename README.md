@@ -43,14 +43,14 @@ With this plugin you can:
 ```sh-session
 $ npm install -g sfdx-easy-sources
 or
-$ sfdx plugin:install sfdx-easy-sources
+$ sf plugins install sfdx-easy-sources
 
-GENERAL USAGE (CLI)
-  $ sfdx easysources:<metadataapi>:<command> [...parameters]
-  $ sfdx easysources:<metadataapi>:<command> --help    // to get help, the list of parameters and some examples
+GENERAL USAGE
+  $ sf easysources <metadataapi> <command> [...parameters]
+  $ sf easysources <metadataapi> <command> --help    // to get help, the list of parameters and some examples
 Examples
-  $ sfdx easysources:profiles:split
-  $ sfdx easysources:labels:upsert
+  $ sf easysources profiles split
+  $ sf easysources labels upsert
 ...
 ```
 
@@ -275,10 +275,10 @@ Based on the source type, this plugin provides the following commands:
 # Let's start!
 ## Prerequisites
 ### Prerequisite 1 - Initialize the settings
-This should be done once you have your sfdx project (for example after "Creating a new project with manifest").
+This should be done once you have your sf project (for example after "Creating a new project with manifest").
 To better instruct the plugin with the directories of the project, you can run the command
 ```sh-session
-$ sfdx easysources:settings:init
+$ sf easysources settings init
 ```
 and a file _easysources-settings.json_ will appear.
 This file contains the directory of:
@@ -287,7 +287,7 @@ This file contains the directory of:
 - the log files.
 
 Since I prefer to have the csv files near the xml ones, I left the default directories in my project. Consider that, in this case, you should need to:
-- have a .forceignore file to ignore .csv and .part-xml files when running sfdx commands
+- have a .forceignore file to ignore .csv and .part-xml files when running sf commands
 - have a .pipelineignore file to ignore .csv and .part-xml files when running other plugins, for example when using sfdx-git-delta.
 
 Simply put these lines inside those files
@@ -302,7 +302,7 @@ To deal with Salesforce files all the source code from the org must be downloade
 One can perform this task in various ways, but this plugin also offers a simply way to download everything from the org.
 
 ```sh-session
-$ sfdx easysources:allmeta:retrieve --orgname="orgname"
+$ sf easysources allmeta retrieve --orgname="orgname"
 ```
 
 
@@ -318,9 +318,9 @@ Once all the metadata have been downloaded, before to start dealing with the csv
 To do this run these commands (but first, please, understand the meaning of each command reading this guide)
 
 ```sh-session
-$ sfdx easysources:allmeta:split
-$ sfdx easysources:allmeta:minify
-$ sfdx easysources:allmeta:merge
+$ sf easysources allmeta split
+$ sf easysources allmeta minify
+$ sf easysources allmeta merge
 ```
 
 ## Description of each command
@@ -334,7 +334,7 @@ This is an example of an xml profile splitted in csv.
 Once we run the command
 
 ```sh-session
-  $ sfdx easysources:profiles:split
+  $ sf easysources profiles split
 ```
 the plugin generates a folder with all the csv files.
 ![profile_split](.images/profile_split.png)
@@ -376,10 +376,10 @@ This command is very useful if you don't want to have in your csv files all the 
 For example, in the following image, the lines in red don't specify any permission so they could be removed.
 
 ```sh-session
-  $ sfdx easysources:profiles:minify
-  $ sfdx easysources:permissionsets:minify
-  $ sfdx easysources:objecttranslations:minify
-  $ sfdx easysources:translations:minify
+  $ sf easysources profiles minify
+  $ sf easysources permissionsets minify
+  $ sf easysources objecttranslations minify
+  $ sf easysources translations minify
 ```
 
 ![profile_minify](.images/profile_minify.png)
@@ -393,10 +393,10 @@ This command removes empty CSV files and folders from the generated CSV files, h
 After splitting metadata into CSV files, you might end up with empty CSV files or empty folders that don't contain any meaningful data. This command identifies and removes these empty files and directories automatically.
 
 ```sh-session
-  $ sfdx easysources:profiles:clearempty
-  $ sfdx easysources:permissionsets:clearempty
-  $ sfdx easysources:objecttranslations:clearempty
-  $ sfdx easysources:translations:clearempty
+  $ sf easysources profiles clearempty
+  $ sf easysources permissionsets clearempty
+  $ sf easysources objecttranslations clearempty
+  $ sf easysources translations clearempty
 ```
 
 This is particularly useful for object translations where you might have many empty field translation files, or for translations where some language files might be empty.
@@ -409,15 +409,15 @@ The command supports two validation modes:
 
 **String Mode** (`--mode string` - default):
 ```sh-session
-$ sfdx easysources:profiles:arealigned --mode string
+$ sf easysources profiles arealigned --mode string
 # or simply (uses string mode by default):
-$ sfdx easysources:profiles:arealigned
+$ sf easysources profiles arealigned
 ```
 Performs an exact string comparison by temporarily merging CSV files back into XML format and comparing the complete file content character by character. This mode detects even minor formatting differences and is the default mode.
 
 **Logic Mode** (`--mode logic`):
 ```sh-session
-$ sfdx easysources:profiles:arealigned --mode logic
+$ sf easysources profiles arealigned --mode logic
 ```
 Performs a logical comparison by parsing both XML and CSV data structures and comparing the actual values. This mode is faster and focuses on data content rather than formatting differences.
 

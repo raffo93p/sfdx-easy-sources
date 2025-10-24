@@ -15,6 +15,14 @@
   - **Settings Integration**: Seamless integration with existing `easysources-settings.json` configuration
   - **Consistent API Pattern**: Identical API structure across all supported metadata types
   - See [API.md](./API.md) for complete documentation and examples
+## Version 0.7.7
+- **New Feature: `include-types` flag for clean commands** - Added the `--include-types` (`-d`) flag to both `profiles:clean` and `permissionsets:clean` commands. This flag allows you to specify a whitelist of metadata types to process during cleaning operations. When used, only the specified types will be cleaned, providing more granular control over the cleaning process. The flag accepts comma-separated values and works alongside the existing `--skip-types` flag.
+- **Started Migration to SF CLI (Work in Progress)** - Started migration from SFDX CLI to Salesforce CLI (`sf` command) for specific commands (such as clean commands) that were not working correctly with the legacy SFDX CLI. Complete migration of the entire codebase structure will be implemented in future releases.
+
+## Version 0.7.6
+- **New Feature: Targeted upsert with `type` and `tagid` parameters** - Enhanced the upsert commands for profiles and permission sets with new `--type` (-t) and `--tagid` (-k) flags. The `--type` flag allows specifying specific permission types to upsert (e.g., fieldPermissions, classAccesses etc). The `--tagid` flag enables targeting specific elements by their tag ID. These flags can be used independently or together for precise control over upsert operations, supporting comma-separated values for multiple types or tagids.
+- **New Documentation: Commands Reference and Matrix** - Added comprehensive documentation files `COMMANDS_REFERENCE.md` and `COMMANDS_MATRIX.md` providing complete reference guides for all available commands. The reference document offers detailed descriptions, flags, and examples for each command, while the matrix provides a quick tabular view of which parameters are available for each command across all metadata types.
+- **Bug Fix: Missing `ignoreuserperm` flag in profiles split** - Added the missing `--ignoreuserperm` (`-u`) flag to the profiles split command, bringing it in line with the documented functionality and ensuring consistent user permission handling across all profile commands.
 
 ## Version 0.7.5
 - **Enhancement: Refactored `arealigned` command** - Performed comprehensive refactoring of the `arealigned` command to improve code readability and reduce code duplication. The merge logic has been extracted into reusable functions that are shared between the `merge` and `arealigned` commands, ensuring consistency and better maintainability while preserving all existing functionality.

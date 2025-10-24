@@ -6,7 +6,7 @@
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:all:upsert",
-    "sfdx easysources:all:upsert -x './force-app/src/default' -c './easysources'"
+    "sf easysources all upsert",
+    "sf easysources all upsert -x './force-app/src/default' -c './easysources'"
   ]
 }

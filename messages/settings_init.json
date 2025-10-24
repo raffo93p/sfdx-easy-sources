@@ -2,6 +2,6 @@
   "commandDescription": "Initialize the local settings file",
   "nameFlagDescription": "Settings Init",
   "examples": [
-    "sfdx easysources:settings:init"
+    "sf easysources settings init"
   ]
 }

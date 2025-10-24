@@ -13,12 +13,12 @@
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:allmeta:retrieve -r 'myOrgAlias'",
-    "sfdx easysources:allmeta:retrieve -x './force-app/src/default' -r 'myOrgAlias'",
-    "sfdx easysources:allmeta:retrieve -x './force-app/src/default' -c './force-app/src/default' -r 'myOrgAlias'",
-    "sfdx easysources:allmeta:retrieve -x './force-app/src/default' -c './force-app/src/default' -r 'myOrgAlias' -n 9000",
-    "sfdx easysources:allmeta:retrieve -x './force-app/src/default' -c './force-app/src/default' -r 'myOrgAlias' --clean --split-merge",
-    "sfdx easysources:allmeta:retrieve -x './force-app/src/default' -c './force-app/src/default' -r 'myOrgAlias' --dont-retrieve"
+    "sf easysources allmeta retrieve -r 'myOrgAlias'",
+    "sf easysources allmeta retrieve -x './force-app/src/default' -r 'myOrgAlias'",
+    "sf easysources allmeta retrieve -x './force-app/src/default' -c './force-app/src/default' -r 'myOrgAlias'",
+    "sf easysources allmeta retrieve -x './force-app/src/default' -c './force-app/src/default' -r 'myOrgAlias' -n 9000",
+    "sf easysources allmeta retrieve -x './force-app/src/default' -c './force-app/src/default' -r 'myOrgAlias' --clean --split-merge",
+    "sf easysources allmeta retrieve -x './force-app/src/default' -c './force-app/src/default' -r 'myOrgAlias' --dont-retrieve"
 
 
   ]

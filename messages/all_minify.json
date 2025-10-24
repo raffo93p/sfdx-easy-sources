@@ -6,8 +6,8 @@
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:all:minify",
-    "sfdx easysources:all:minify -x './force-app/src/default'",
-    "sfdx easysources:all:minify -x './force-app/src/default' -c './easysources'"
+    "sf easysources all minify",
+    "sf easysources all minify -x './force-app/src/default'",
+    "sf easysources all minify -x './force-app/src/default' -c './easysources'"
   ]
 }

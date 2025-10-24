@@ -6,7 +6,7 @@
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [
-    "sfdx easysources:permissionsets:updatekey",
-    "sfdx easysources:permissionsets:updatekey -i './force-app/src/default'"
+    "sf easysources permissionsets updatekey",
+    "sf easysources permissionsets updatekey -i './force-app/src/default'"
   ]
 }

@@ -47,6 +47,12 @@ export default class Split extends SfdxCommand {
             options: ['true', 'false'],
             default: 'true',
         }),
+        ignoreuserperm: flags.enum({
+            char: 'u',
+            description: messages.getMessage('ignoreuserpermFlagDescription', ['false']),
+            options: ['true', 'false'],
+            default: 'false',
+        })
     };
 
 
