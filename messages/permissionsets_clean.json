@@ -1,0 +1,22 @@
+{
+  "commandDescription": "Deletes ghost references from csv files based on the resources on the repository or on the org",
+  "sfXmlFlagDescription": "Specify a custom dir for xml sources. Default: '%s'",
+  "esCsvFlagDescription": "Specify a custom dir for input csv permission sets. Default: '%s'",
+  "inputFlagDescription": "Specify a permission set. Example: MyPermissionSet",
+  "orgFlagDescription": "Specify the alias of the org",
+  "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
+  "modeFlagDescription" : "Specify the mode you want to run the command. 'clean' directly deletes ghost references, 'interactive' prompt the user everytime, 'log' writes references in a file. Default: %s",
+  "logdirFlagDescription": "Optionally specify a dir for log files. Default: '%s'",
+  "includeStandardFieldsFlagDescription": "Includes standard fields. Default: '%s'",
+  "includeStandardTabsFlagDescription": "Includes standard tabs. Default: '%s'",
+  "targetFlagDescription": "Specify a target execution. Default: '%s'",
+  "skipTypesFlagDescription": "Skips types. eg CustomField, ApexClass, UserPermissions, CustomSettingAccesses ecc. Default: '%s'",
+  "includeTypesFlagDescription": "Includes only specified types. eg CustomField, ApexClass, UserPermissions, CustomSettingAccesses ecc. If empty, all types are included (except those in skip-types). Default: '%s'",
+  "skipManifestCreationFlagDescription": "Skips manifest creation. Default: '%s'",
+  "examples": [
+    "sf easysources permissionsets clean",
+    "sf easysources permissionsets clean --mode=log --target=local",
+    "sf easysources permissionsets clean --mode=clean --target=org --orgname='myOrgAlias",
+    "sf easysources permissionsets clean --mode=log --target=both --orgname='myOrgAlias"
+  ]
+}

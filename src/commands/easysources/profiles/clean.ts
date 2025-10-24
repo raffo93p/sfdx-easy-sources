@@ -91,6 +91,11 @@ export default class Clean extends SfdxCommand {
             description: messages.getMessage('skipTypesFlagDescription', ['Settings']),
             default: ['Settings'],
         }),
+        'include-types': flags.array({
+            char: 'd',
+            description: messages.getMessage('includeTypesFlagDescription', ['']),
+            default: [],
+        }),
         'skip-manifest-creation': flags.boolean({
             char: 'M',
             description: messages.getMessage('skipManifestCreationFlagDescription', ['false']),
@@ -117,6 +122,7 @@ export default class Clean extends SfdxCommand {
         const skipStandardFields = !this.flags['include-standard-fields'];
         const skipStandardTabs = !this.flags['include-standard-tabs'];
         const skipTypes = this.flags['skip-types'];
+        const includeTypes = this.flags['include-types'];
         const skipManifestCreation = this.flags['skip-manifest-creation'];
 
         if (mode ==='log' ) checkDirOrCreateSync(logdir);
@@ -187,6 +193,7 @@ export default class Clean extends SfdxCommand {
                         resListCsv = resListCsv.filter(function(res) {
                             if(res[key] == null) return true;
                             if(skipTypes != null && skipTypes.includes(typename)) return true;
+                            if(includeTypes != null && includeTypes.length > 0 && !includeTypes.includes(typename)) return true;
                             if(skipStandardFields && typename === "CustomField" && !res[key].endsWith("__c")) return true;
                             if(skipStandardTabs && typename === "CustomTab" && res[key].startsWith("standard-")) return true;
 

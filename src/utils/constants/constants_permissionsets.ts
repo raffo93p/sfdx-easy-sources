@@ -66,6 +66,21 @@ export const PERMSET_ITEMS = {
     [PERMSET_USERPERM_ROOT]: { headers: PERMSET_USERPERM_HEADER, key: PERMSET_USERPERM_KEY }
 }
 
+// used for clean command
+export const PERMSET_KEY_TYPE = {
+    [PERMSET_APP_ROOT]: { key: PERMSET_APP_KEY, typename: "CustomApplication"},
+    [PERMSET_CLASS_ROOT]: { key: PERMSET_CLASS_KEY, typename: "ApexClass" },
+    [PERMSET_CMDT_ROOT]: { key: PERMSET_CMDT_KEY, typename: "CustomObject"},
+    [PERMSET_CPERM_ROOT]: { key: PERMSET_CPERM_KEY, typename: "CustomPermission" },
+    [PERMSET_CSET_ROOT]: { key: PERMSET_CSET_KEY, typename: "Settings" }, // ?? 
+    [PERMSET_FIELD_ROOT]: { key: PERMSET_FIELD_KEY, typename: "CustomField" },
+    [PERMSET_OBJECT_ROOT]: {  key: PERMSET_OBJECT_KEY, typename: "CustomObject" },
+    [PERMSET_PAGE_ROOT]: {  key: PERMSET_PAGE_KEY, typename: "ApexPage" },
+    [PERMSET_RECTYPE_ROOT]: { key: PERMSET_RECTYPE_KEY, typename: "RecordType" },
+    [PERMSET_TAB_ROOT]: {  key: PERMSET_TAB_KEY, typename: "CustomTab" }
+    // [PERMSET_USERPERM_ROOT]: {  key: PERMSET_USERPERM_KEY, typename: "" } // ??
+}
+
 // used for minify command
 export const PERMSET_TAG_BOOL = {
     [PERMSET_APP_ROOT]:  ['default', 'visible'],

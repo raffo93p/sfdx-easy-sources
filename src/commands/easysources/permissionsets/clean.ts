@@ -12,15 +12,13 @@ const fs = require('fs-extra');
 import { join } from "path";
 import Performance from '../../../utils/performance';
 const { Parser, transforms: { unwind } } = require('json2csv');
-import { PROFILE_ITEMS } from "../../../utils/constants/constants_profiles";
+import { PERMSET_ITEMS, PERMSET_KEY_TYPE, PERMSETS_SUBPATH } from '../../../utils/constants/constants_permissionsets';
 import { calcCsvFilename, checkDirOrCreateSync, checkDirOrErrorSync, jsonArrayPackageToMap, readCsvToJsonArray, readXmlFromFile } from "../../../utils/filesUtils"
 import { sortByKey, toArray } from "../../../utils/utils"
 import { DEFAULT_ESCSV_PATH, DEFAULT_LOG_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
 import { loadSettings } from '../../../utils/localSettings';
 import { getDefaultOrgName, retrieveAllMetadataPackageLocal, retrieveAllMetadataPackageOrg } from '../../../utils/commands/utils';
 import { DEFAULT_PACKAGE_LOC_EXT, DEFAULT_PACKAGE_ORG_EXT, TYPES_PICKVAL_ROOT, TYPES_ROOT_TAG } from '../../../utils/constants/constants_sourcesdownload';
-import { PROFILE_KEY_TYPE } from '../../../utils/constants/constants_profiles';
-import { PERMSETS_SUBPATH } from '../../../utils/constants/constants_permissionsets';
 const _ = require('lodash') ;
 
 const prompt = require('prompt-sync')();
@@ -33,7 +31,7 @@ Messages.importMessagesDirectory(__dirname);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = Messages.loadMessages('sfdx-easy-sources', 'profiles_clean');
+const messages = Messages.loadMessages('sfdx-easy-sources', 'permissionsets_clean');
 
 export default class Clean extends SfdxCommand {
     public static description = messages.getMessage('commandDescription');
@@ -92,6 +90,11 @@ export default class Clean extends SfdxCommand {
             description: messages.getMessage('skipTypesFlagDescription', ['Settings']),
             default: ['Settings'],
         }),
+        'include-types': flags.array({
+            char: 'd',
+            description: messages.getMessage('includeTypesFlagDescription', ['']),
+            default: [],
+        }),
         'skip-manifest-creation': flags.boolean({
             char: 'M',
             description: messages.getMessage('skipManifestCreationFlagDescription', ['false']),
@@ -118,6 +121,7 @@ export default class Clean extends SfdxCommand {
         const skipStandardFields = !this.flags['include-standard-fields'];
         const skipStandardTabs = !this.flags['include-standard-tabs'];
         const skipTypes = this.flags['skip-types'];
+        const includeTypes = this.flags['include-types'];
         const skipManifestCreation = this.flags['skip-manifest-creation'];
 
         if (mode ==='log' ) checkDirOrCreateSync(logdir);
@@ -129,11 +133,11 @@ export default class Clean extends SfdxCommand {
         checkDirOrErrorSync(xmlDir);
 
 
-        var profileList = [];
+        var permissionSetList = [];
         if (inputProfile) {
-            profileList = inputProfile.split(',');
+            permissionSetList = inputProfile.split(',');
         } else {
-            profileList = fs.readdirSync(csvDir, { withFileTypes: true })
+            permissionSetList = fs.readdirSync(csvDir, { withFileTypes: true })
                 .filter(item => item.isDirectory())
                 .map(item => item.name)
         }
@@ -162,20 +166,20 @@ export default class Clean extends SfdxCommand {
         }
 
         var logList = [];
-        // profileName is the profile name without the extension
-        for (const profileName of profileList) {
-            console.log('Cleaning on: ' + profileName);
+        // permissionSetName is the permission set name without the extension
+        for (const permissionSetName of permissionSetList) {
+            console.log('Cleaning on: ' + permissionSetName);
 
-            for (const tag_section in PROFILE_ITEMS) {
-                // tag_section is a profile section (applicationVisibilities, classAccess ecc)
+            for (const tag_section in PERMSET_ITEMS) {
+                // tag_section is a permission set section (applicationVisibilities, classAccess ecc)
 
-                const csvFilePath = join(csvDir, profileName, calcCsvFilename(profileName, tag_section));
+                const csvFilePath = join(csvDir, permissionSetName, calcCsvFilename(permissionSetName, tag_section));
                 if (fs.existsSync(csvFilePath)) {
 
                     // get the list of resources on the csv. eg. the list of apex classes
                     var resListCsv = await readCsvToJsonArray(csvFilePath)
 
-                    for(const key_type of toArray(PROFILE_KEY_TYPE[tag_section]) ){
+                    for(const key_type of toArray(PERMSET_KEY_TYPE[tag_section]) ){
                         if (key_type == null) continue;
 
                         // for each tagsection, get:
@@ -188,6 +192,7 @@ export default class Clean extends SfdxCommand {
                         resListCsv = resListCsv.filter(function(res) {
                             if(res[key] == null) return true;
                             if(skipTypes != null && skipTypes.includes(typename)) return true;
+                            if(includeTypes != null && includeTypes.length > 0 && !includeTypes.includes(typename)) return true;
                             if(skipStandardFields && typename === "CustomField" && !res[key].endsWith("__c")) return true;
                             if(skipStandardTabs && typename === "CustomTab" && res[key].startsWith("standard-")) return true;
 
@@ -211,7 +216,7 @@ export default class Clean extends SfdxCommand {
                             var dontCanc = false;
 
                             if(!found){
-                                const errStr = `Profile ${profileName}, ${tag_section}: ${key} "${item}" not found in ${typename}.`;
+                                const errStr = `PermissionSet ${permissionSetName}, ${tag_section}: ${key} "${item}" not found in ${typename}.`;
                                 if(mode === "interactive") {
                                     dontCanc = prompt(`${errStr}. Do you want to delete it? (y/n): `) !== 'y';
                                 }
@@ -227,7 +232,7 @@ export default class Clean extends SfdxCommand {
                 
                     if(mode !== "log"){
                         // write the cleaned csv
-                        const headers = PROFILE_ITEMS[tag_section].headers;
+                        const headers = PERMSET_ITEMS[tag_section].headers;
                         const transforms = [unwind({ paths: headers })];
                         const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
 
@@ -250,7 +255,7 @@ export default class Clean extends SfdxCommand {
 
         // write log file
         if(mode === "log") {
-            fs.writeFileSync(join(logdir, 'profiles-clean.log'), logList.join('\n'), { flag: 'w+' });
+            fs.writeFileSync(join(logdir, 'permissionsets-clean.log'), logList.join('\n'), { flag: 'w+' });
         }
         
         Performance.getInstance().end();
