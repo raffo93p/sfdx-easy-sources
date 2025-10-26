@@ -21,7 +21,7 @@ This document provides a quick reference matrix of all commands and their availa
 | **arealigned** | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | string/logic mode |
 | **updatekey** | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | - |
 | **delete** | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | - |
-| **clean** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | `--orgname`, `--log-dir`, `--mode`, `--target`, `--include-standard-fields`, `--skip-manifest-creation` |
+| **clean** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | `--orgname`, `--log-dir`, `--target`, `--include-standard-fields`, `--skip-manifest-creation`, `--skip-types`, `--include-types` |
 | **clearempty** | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | - |
 | **minify** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | - |
 
@@ -37,7 +37,7 @@ This document provides a quick reference matrix of all commands and their availa
 | **arealigned** | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | string/logic mode |
 | **updatekey** | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | - |
 | **delete** | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | - |
-| **clean** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | `--orgname`, `--log-dir`, `--mode`, `--target`, `--include-standard-fields`, `--skip-manifest-creation` |
+| **clean** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | `--orgname`, `--log-dir`, `--target`, `--include-standard-fields`, `--skip-manifest-creation`, `--skip-types`, `--include-types` |
 | **clearempty** | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | - |
 | **minify** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | - |
 
@@ -53,7 +53,7 @@ This document provides a quick reference matrix of all commands and their availa
 | **arealigned** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | string/logic mode |
 | **updatekey** | ❌ | ✅ | ✅ | ✅ | ✅ | ❌ | - |
 | **delete** | ❌ | ✅ | ✅ | ✅ | ✅ | ❌ | `--picklist` (req), `--apiname` |
-| **clean** | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | `--orgname`, `--log-dir`, `--mode`, `--target`, `--include-standard-fields`, `--skip-manifest-creation` |
+| **clean** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | `--orgname`, `--log-dir`, `--target`, `--include-standard-fields`, `--skip-manifest-creation` |
 
 ---
 

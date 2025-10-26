@@ -100,6 +100,8 @@ sf easysources profiles upsert --type "fieldPermissions,classAccesses" --tagid "
 - `--target, -g`: Target to compare against (`org`, `local`, `both`, default: `both`)
 - `--include-standard-fields, -F`: Include standard fields in cleaning (default: `false`)
 - `--skip-manifest-creation, -M`: Skip manifest file creation (default: `false`)
+- `--skip-types`: Skip specified metadata types during cleaning (comma-separated)
+- `--include-types`: Include only specified metadata types during cleaning (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
 ### `sf easysources profiles clearempty`
@@ -195,6 +197,8 @@ sf easysources permissionsets upsert --type "fieldPermissions" --tagid "Account.
 - `--target, -g`: Target to compare against (`org`, `local`, `both`, default: `both`)
 - `--include-standard-fields, -F`: Include standard fields in cleaning (default: `false`)
 - `--skip-manifest-creation, -M`: Skip manifest file creation (default: `false`)
+- `--skip-types`: Skip specified metadata types during cleaning (comma-separated)
+- `--include-types`: Include only specified metadata types during cleaning (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
 ### `sf easysources permissionsets clearempty`
