@@ -29,14 +29,14 @@ With this plugin you can:
 | :---:    | :---:  | :---: | :---: |
 | All Meta | allmeta   | split, upsert, merge, minify, retrieve   | ❌ |
 | Profiles | profiles | split, upsert, merge, minify, updatekey, delete, clean, clearempty, arealigned | ✅ **Complete** |
-| Permission Sets | permissionsets | split, upsert, merge, minify, updatekey, delete, clean, clearempty, arealigned | 🔄 **Planned** |
-| Record Types | recordtypes | split, upsert, merge, updatekey, delete, clean, arealigned | 🔄 **Planned** |
-| Labels | labels | split, upsert, merge, updatekey, arealigned | 🔄 **Planned** |
-| Global Value Sets | globalvaluesets | split, upsert, merge, updatekey, arealigned | 🔄 **Planned** |
-| Global Value Set Translations | globalvaluesettranslations | split, upsert, merge, updatekey, arealigned | 🔄 **Planned** |
-| Applications | applications | split, upsert, merge, updatekey, arealigned | 🔄 **Planned** |
+| Permission Sets | permissionsets | split, upsert, merge, minify, updatekey, delete, clean, clearempty, arealigned | ✅ **Complete** |
+| Record Types | recordtypes | split, upsert, merge, updatekey, delete, clean, arealigned | ✅ **Complete** |
+| Labels | labels | split, upsert, merge, updatekey, arealigned | ✅ **Complete** |
+| Global Value Sets | globalvaluesets | split, upsert, merge, updatekey, arealigned | ✅ **Complete** |
+| Global Value Set Translations | globalvaluesettranslations | split, upsert, merge, updatekey, arealigned | ✅ **Complete** |
+| Applications | applications | split, upsert, merge, updatekey, arealigned | ✅ **Complete** |
 | Object Translations | objecttranslations | split, upsert, merge, minify, updatekey, clearempty, arealigned | ✅ **Complete** |
-| Translations | translations | split, upsert, merge, minify, updatekey, clearempty, arealigned | 🔄 **Planned** |
+| Translations | translations | split, upsert, merge, minify, updatekey, clearempty, arealigned | ✅ **Complete** |
 
 
 
@@ -56,203 +56,43 @@ Examples
 
 ## 🚀 Programmatic API Usage
 
-**NEW in v0.8.0**: Complete programmatic API with automatic path resolution! Use all metadata operations (profiles, permission sets, labels, applications, global value sets, global value set translations, object translations) in your Node.js scripts without CLI overhead:
+**NEW in v0.8.0**: Complete programmatic API with automatic path resolution! Use all metadata operations in your Node.js scripts with **57 total API operations** across 9 metadata types.
 
 ```javascript
-// JavaScript - with automatic path resolution
-const { profiles, permissionsets, labels, applications, globalValueSets, globalValueSetTranslations, objectTranslations } = require('sfdx-easy-sources');
+// JavaScript - Basic usage with automatic path resolution
+const { profiles, permissionsets, labels, objectTranslations } = require('sfdx-easy-sources');
 
 async function automateMetadata() {
-  // Profile operations - paths auto-resolved from settings file
-  await profiles.split({
-    input: 'Admin,Standard User'  // Paths come from easysources-settings.json
-  });
-  
-  // Permission set operations - same API pattern
-  await permissionsets.split({
-    input: 'MyCustomPermSet,AnotherPermSet'
-  });
-  
-  // Custom labels operations - simplified workflow
-  await labels.split();  // No input needed for labels
-  
-  // Application operations - consistent API pattern  
-  await applications.split(); // Split applications into manageable CSVs
-  await applications.upsert(); // Update from CSV changes
-  
-  // Global Value Sets operations - metadata internationalization
-  await globalValueSets.split(); // Split global value sets
-  await globalValueSets.upsert(); // Update from CSV changes
-  
-  // Global Value Set Translations operations - localization support
-  await globalValueSetTranslations.split(); // Split translations
-  await globalValueSetTranslations.upsert(); // Update translations from CSV
-  
-  // Object Translations operations - multilingual metadata support
-  await objectTranslations.split({ input: 'Account-es,Contact-fr' }); // Split object translations
-  await objectTranslations.upsert(); // Update translations from XML changes
-  await objectTranslations.minify(); // Remove empty translation entries
-  
-  // Record Types operations - object configuration management
-  await recordtypes.split({ object: 'Account,Contact' }); // Split record types
-  await recordtypes.upsert(); // Update from CSV changes
-  await recordtypes.clean(); // Validate field references
-  
-  // Complete workflow with all operations
+  // Paths auto-resolved from easysources-settings.json
+  await profiles.split({ input: 'Admin,Standard User' });
   await profiles.upsert({ input: 'Admin' });
-  await permissionsets.upsert();
-  await labels.upsert();
-  await applications.upsert();
-  await globalValueSets.upsert();
-  await globalValueSetTranslations.upsert();
-  await objectTranslations.upsert();
-  await recordtypes.upsert();
-  
-  await profiles.minify();
-  await permissionsets.minify();
-  await objectTranslations.minify();
-  // Labels and applications use updateKey for maintenance
-  
-  await profiles.clearEmpty();
-  await permissionsets.clearEmpty();
-  await objectTranslations.clearEmpty();
-  // Labels and applications have simpler structure
-  
   await profiles.merge({ input: 'Admin' });
-  await permissionsets.merge();
-  await labels.merge();
-  await applications.merge();
-  await globalValueSets.merge();
-  await globalValueSetTranslations.merge();
-  await objectTranslations.merge();
-  await recordtypes.merge();
+  
+  // Same pattern for all metadata types
+  await permissionsets.split();
+  await labels.upsert();
+  await objectTranslations.minify();
 }
 ```
 
 ```typescript
-// TypeScript - with full type safety
-import { 
-  profiles, permissionsets, labels, applications, globalValueSets, globalValueSetTranslations, objectTranslations, recordtypes,
-  ProfileOptions, PermissionsetOptions, LabelOptions, ApplicationOptions, 
-  GlobalValueSetOptions, GlobalValueSetTranslationOptions, ObjectTranslationOptions, RecordTypeOptions 
-} from 'sfdx-easy-sources';
+// TypeScript - Full type safety
+import { profiles, ProfileOptions } from 'sfdx-easy-sources';
 
-async function automateMetadata() {
-  // Auto-resolved paths with type safety
-  const profileResult = await profiles.split({
-    input: 'Admin,Standard User',
-    ignoreuserperm: 'true'
-  });
-  
-  const permsetResult = await permissionsets.split({
-    input: 'MyCustomPermSet'
-  });
-  
-  const labelResult = await labels.split();
-  
-  // Advanced operations - same patterns across all metadata types
-  await profiles.clean({
-    orgname: 'myorg',
-    target: 'org'
-  });
-  
-  await permissionsets.clean({
-    orgname: 'myorg', 
-    target: 'org'
-  });
-  
-  await profiles.delete({
-    type: 'fieldPermissions',
-    tagid: 'Account.OldField__c'
-  });
-  
-  await permissionsets.delete({
-    type: 'objectPermissions',
-    tagid: 'MyCustomObject__c'
-  });
-}
+const options: ProfileOptions = {
+  input: 'Admin,Standard User',
+  ignoreuserperm: 'true'
+};
+await profiles.split(options);
 ```
 
-See the `examples/` directory for more complete usage examples.
+**📚 Complete Documentation & Examples:** [API.md](./API.md)
 
-**📚 Full API Documentation:** [API.md](./API.md)
-
-### Key API Features
-
-- **🔧 Automatic Path Resolution**: Use settings file for defaults, override only what you need
-- **📦 Complete Multi-Metadata APIs**: Profiles (9 ops), Permission Sets (9 ops), Custom Labels (5 ops), Object Translations (6 ops) - all available programmatically
-- **🎯 Zero Duplication**: Unified architecture - CLI commands delegate to API functions
-- **⚙️ TypeScript Support**: Full type definitions with `ProfileOptions`, `PermissionsetOptions`, `LabelOptions`, and `ObjectTranslationOptions` interfaces
-- **🔗 Settings Integration**: Seamless use of existing `easysources-settings.json`
-- **🔄 Consistent API**: Identical patterns across all metadata types
-
-### Available Profile API Methods
-- `profiles.split(options)` - Split XML files into CSV files
-- `profiles.upsert(options)` - Upsert XML data into existing CSV files  
-- `profiles.merge(options)` - Merge CSV files back to XML
-- `profiles.clearEmpty(options)` - Remove empty CSV files
-- `profiles.areAligned(options)` - Check XML/CSV alignment
-- `profiles.updateKey(options)` - Update keys across CSV files
-- `profiles.minify(options)` - Remove entries with only false permissions
-- `profiles.delete(options)` - Delete specific entries from CSV files
-- `profiles.clean(options)` - Remove references to non-existent metadata
-
-### Available Permission Set API Methods
-- `permissionsets.split(options)` - Split permission set XML files into CSV files
-- `permissionsets.upsert(options)` - Upsert XML data into existing CSV files  
-- `permissionsets.merge(options)` - Merge CSV files back to XML
-- `permissionsets.clearEmpty(options)` - Remove empty CSV files
-- `permissionsets.areAligned(options)` - Check XML/CSV alignment
-- `permissionsets.updateKey(options)` - Update keys across CSV files
-- `permissionsets.minify(options)` - Remove entries with only false permissions
-- `permissionsets.delete(options)` - Delete specific entries from CSV files
-- `permissionsets.clean(options)` - Remove references to non-existent metadata
-
-### Available Custom Labels API Methods
-- `labels.split(options)` - Split custom label XML files into CSV files
-- `labels.upsert(options)` - Upsert XML data into existing CSV files  
-- `labels.merge(options)` - Merge CSV files back to XML
-- `labels.areAligned(options)` - Check XML/CSV alignment
-- `labels.updateKey(options)` - Update keys across CSV files
-
-### Available Applications API Methods
-- `applications.split(options)` - Split Salesforce application XML files into CSV files
-- `applications.upsert(options)` - Upsert XML data into existing CSV files
-- `applications.merge(options)` - Merge CSV files back to XML
-- `applications.areAligned(options)` - Check XML/CSV alignment
-- `applications.updateKey(options)` - Update keys across CSV files
-
-### Available Global Value Sets API Methods
-- `globalValueSets.split(options)` - Split global value set XML files into CSV files
-- `globalValueSets.upsert(options)` - Upsert XML data into existing CSV files
-- `globalValueSets.merge(options)` - Merge CSV files back to XML
-- `globalValueSets.areAligned(options)` - Check XML/CSV alignment
-- `globalValueSets.updateKey(options)` - Update keys across CSV files
-
-### Available Global Value Set Translations API Methods
-- `globalValueSetTranslations.split(options)` - Split global value set translation XML files into CSV files
-- `globalValueSetTranslations.upsert(options)` - Upsert XML data into existing CSV files
-- `globalValueSetTranslations.merge(options)` - Merge CSV files back to XML
-- `globalValueSetTranslations.areAligned(options)` - Check XML/CSV alignment
-- `globalValueSetTranslations.updateKey(options)` - Update keys across CSV files
-
-### Available Object Translations API Methods
-- `objectTranslations.split(options)` - Split object translation XML files into CSV files
-- `objectTranslations.upsert(options)` - Upsert XML data into existing CSV files
-- `objectTranslations.merge(options)` - Merge CSV files back to XML
-- `objectTranslations.areAligned(options)` - Check XML/CSV alignment
-- `objectTranslations.minify(options)` - Remove entries with only empty translations
-- `objectTranslations.clearEmpty(options)` - Remove empty CSV files and folders
-
-#### 🧮 Record Types API
-
-- `recordtypes.split(options)` - Split record type XML files into CSV files
-- `recordtypes.upsert(options)` - Upsert XML data into existing CSV files
-- `recordtypes.merge(options)` - Merge CSV files back to XML
-- `recordtypes.areAligned(options)` - Check XML/CSV alignment
-- `recordtypes.updateKey(options)` - Update keys across CSV files
-- `recordtypes.remove(options)` - Delete record types from org
-- `recordtypes.clean(options)` - Clean field references and validate data integrity
+### Key Features
+- **🔧 Automatic Path Resolution**: Uses `easysources-settings.json` for defaults
+- **⚙️ Full TypeScript Support**: Complete type definitions for all metadata types  
+- **🔄 Consistent API**: Identical patterns across all 9 supported metadata types
+- **🎯 Zero Code Duplication**: CLI commands delegate to API functions
 
 
 Based on the source type, this plugin provides the following commands:
