@@ -21,9 +21,6 @@ import { DEFAULT_PACKAGE_LOC_EXT, DEFAULT_PACKAGE_ORG_EXT, TYPES_PICKVAL_ROOT, T
 import { RECORDTYPE_ITEMS, RECORDTYPES_PICKVAL_ROOT, RECORDTYPES_SUBPATH } from '../../../utils/constants/constants_recordtypes';
 const _ = require('lodash') ;
 
-const prompt = require('prompt-sync')();
-
-
 const settings = loadSettings();
 
 // Initialize Messages with the current plugin directory
@@ -70,7 +67,7 @@ export default class Clean extends SfdxCommand {
         mode: flags.enum({
             char: 'm',
             description: messages.getMessage('modeFlagDescription', ['clean']),
-            options: ['clean', 'interactive', 'log'],
+            options: ['clean', 'log'],
             default: 'clean',
         }),
         target: flags.enum({
@@ -100,174 +97,147 @@ export default class Clean extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
         
-        const logdir = this.flags['log-dir'] || settings['easysources-log-path'] || DEFAULT_LOG_PATH;
-        const csvDir = join((this.flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
-        const xmlDir = join((flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH)) as string;
-        var orgname = this.flags.orgname || await getDefaultOrgName();
-        const mode = this.flags.mode;
-        const target = this.flags.target;
+        const result = await recordTypeClean(this.flags);
+        
+        Performance.getInstance().end();
 
-        const skipStandardFields = !this.flags['include-standard-fields'];
-        const skipManifestCreation = this.flags['skip-manifest-creation'];
+        return result;        
+    }
+    
+}
 
-        if (mode ==='log' ) checkDirOrCreateSync(logdir);
+// Export function for API usage  
+export async function recordTypeClean(options: any = {}): Promise<AnyJson> {
+    
+    const logdir = options['log-dir'] || settings['easysources-log-path'] || DEFAULT_LOG_PATH;
+    const csvDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
+    const xmlDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH)) as string;
+    const orgname = options.orgname || await getDefaultOrgName();
+    const mode = options.mode || 'clean';
+    const target = options.target || 'both';
+    const skipStandardFields = !options['include-standard-fields'];
+    const skipManifestCreation = options['skip-manifest-creation'];
 
-        const inputObject = (this.flags.object) as string;
-        const inputRecordType = (this.flags.recordtype) as string;
+    if (mode === 'log') checkDirOrCreateSync(logdir);
 
-        const manifestDir = join( '.', 'manifest') as string;
+    const inputObject = (options.object) as string;
+    const inputRecordType = (options.recordtype) as string;
+    const manifestDir = join('.', 'manifest') as string;
 
-        checkDirOrErrorSync(csvDir);
-        checkDirOrErrorSync(xmlDir);
+    checkDirOrErrorSync(csvDir);
+    checkDirOrErrorSync(xmlDir);
 
+    var objectList = [];
+    if (inputObject) {
+        objectList = inputObject.split(',');
+    } else {
+        objectList = fs.readdirSync(csvDir, { withFileTypes: true })
+            .filter(item => item.isDirectory())
+            .map(item => item.name)
+    }
 
-        var objectList = [];
-        if (inputObject) {
-            objectList = inputObject.split(',');
+    // create packages all metadata 
+    if (!skipManifestCreation) {
+        var retrievePromises = [];
+        if (target === 'org' || target === 'both') {
+            retrievePromises.push(retrieveAllMetadataPackageOrg(orgname, manifestDir));
+        }
+        if (target === 'local' || target === 'both') {
+            retrievePromises.push(retrieveAllMetadataPackageLocal(xmlDir, manifestDir));
+        }
+            // create org manifest and src manifest
+        await Promise.all(retrievePromises);
+    }
+
+    // read manifests
+    var typeItemsMap_list = [];
+    if (target === 'org' || target === 'both') {
+        typeItemsMap_list.push(await readPackageToMap(manifestDir, DEFAULT_PACKAGE_ORG_EXT));
+    }
+    if (target === 'local' || target === 'both') {
+        typeItemsMap_list.push(await readPackageToMap(manifestDir, DEFAULT_PACKAGE_LOC_EXT));
+    }
+
+    var logList = [];
+
+    for (const obj of objectList) {
+        var recordTypeList = [];
+
+        if (inputRecordType) {
+            recordTypeList = inputRecordType.split(',');
         } else {
-            objectList = fs.readdirSync(csvDir, { withFileTypes: true })
+            recordTypeList = fs.readdirSync(join(csvDir, obj, 'recordTypes'), { withFileTypes: true })
                 .filter(item => item.isDirectory())
                 .map(item => item.name)
         }
 
-        // create packages all metadata 
-        if(!skipManifestCreation){
-            var retrievePromises = [];
-            if(target === 'org' || target === 'both'){
-                retrievePromises.push(retrieveAllMetadataPackageOrg(orgname, manifestDir));
-            }
-            if(target === 'local' || target === 'both'){
-                retrievePromises.push(retrieveAllMetadataPackageLocal(xmlDir, manifestDir));
-            }
-
-            // create org manifest and src manifest
-            await Promise.all(retrievePromises);
-        }
-
-        // read manifests
-        var typeItemsMap_list = [];
-        if(target === 'org' || target === 'both'){
-            typeItemsMap_list.push(await readPackageToMap(manifestDir, DEFAULT_PACKAGE_ORG_EXT));
-        }
-        if(target === 'local' || target === 'both'){
-            typeItemsMap_list.push(await readPackageToMap(manifestDir, DEFAULT_PACKAGE_LOC_EXT));
-        }
-
-        var logList = [];
-
-        for (const obj of objectList) {
-            var recordTypeList = [];
-
-            if (inputRecordType) {
-                recordTypeList = inputRecordType.split(',');
-            } else {
-                recordTypeList = fs.readdirSync(join(csvDir, obj, 'recordTypes'), { withFileTypes: true })
-                    .filter(item => item.isDirectory())
-                    .map(item => item.name)
-            }
-
             // recType is the recordtype name without the extension
-            for (const recType of recordTypeList) {
-                console.log('Cleaning on: ' + join(obj, recType));
-                
-                const csvFilePath = join(csvDir, obj, 'recordTypes', recType, calcCsvFilename(recType, RECORDTYPES_PICKVAL_ROOT));
-                if (fs.existsSync(csvFilePath)) {
-
+        for (const recType of recordTypeList) {
+            console.log('Cleaning on: ' + join(obj, recType));
+            
+            const csvFilePath = join(csvDir, obj, 'recordTypes', recType, calcCsvFilename(recType, RECORDTYPES_PICKVAL_ROOT));
+            if (fs.existsSync(csvFilePath)) {
+                var resListCsv = await readCsvToJsonArray(csvFilePath);
                     // get the list of resources on the csv. eg. the list of apex classes
-                    var resListCsv = await readCsvToJsonArray(csvFilePath)
-
                     // for each tagsection, get:
                     // the typename on package. eg. ApexClass
                     // the key that contains the name on the csv. eg. apexClass
-                    var typename = 'CustomField';
-                    var key = 'picklist'; 
+                var typename = 'CustomField';
+                var key = 'picklist'; 
 
-                    
                     // res is a single resource on a given csv
-                    resListCsv = resListCsv.filter(function(res) {
-                        if(res[key] == null) return true;
-                        if(skipStandardFields && typename === "CustomField" && !res[key].endsWith("__c")) return true;
+                resListCsv = resListCsv.filter(function(res) {
+                    if (res[key] == null) return true;
+                    if (skipStandardFields && typename === "CustomField" && !res[key].endsWith("__c")) return true;
 
                         // perform some manipulation on the item for recordTypes
-                        var item = obj + '.' + res[key];
-                        item = manipulateItem(item, typename);
+                    var item = obj + '.' + res[key];
+                    item = manipulateItem(item, typename);
 
-                        var found = false;
-                        for(const typeItemsMap of typeItemsMap_list){
-                            // typeItemsMap is a map of typename -> list of items
-                            // eg: ApexClass -> [MyClass, MyClass2]
-                            // eg: CustomField -> [MyObject__c.MyField__c]
-                            // eg: CustomTab -> [MyTab]
-
-                            // get the list of typename resources from the two packages (org or local or both) and check if they include the current item
-                            // item == null added to skip something on manipulateItem function
-                            if(typeItemsMap != null && typeItemsMap.get(typename) != null && (item == null || typeItemsMap.get(typename).includes(item))){
-
-                                // TODO check for picklist entry on the field
-                                // prendi la entry della picklist (escludendo gli standard)
-                                // leggi il file del campo picklist
-                                // se non c'è, amen
-                                // se c'è il global value set referenziato, prendi quello
-                                // se c'è il valore, prendi quello
-                                // leggiti le entry e cercale
-                                // se non c'è la entry, segnalala
-
-                                found = true;
-                            }
-                            // todo se non c'è la picklist, segnala nella lista nera così evitiamo di ripetere i log
-                        }
-
-                        var dontCanc = false;
-
-                        if(!found){
-                            const errStr = `Object ${obj}, recordType ${recType}: ${key} "${item}" not found in ${typename}.`;
-                            if(mode === "interactive") {
-                                dontCanc = prompt(`${errStr}. Do you want to delete it? (y/n): `) !== 'y';
-                            }
-                            if(mode === "log") {
-                                logList.push(`${errStr}`);
-                            }
-                        }
-                        
-                        return found || dontCanc;
-                    })
-                    
-                    
-                
-                    if(mode !== "log"){
-                        const headers = RECORDTYPE_ITEMS[RECORDTYPES_PICKVAL_ROOT].headers;
-                        const transforms = [unwind({ paths: headers })];
-                        const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
-
-                        if (this.flags.sort === 'true') {
-                            resListCsv = sortByKey(resListCsv);
-                        }
-
-                        const csv = parser.parse(resListCsv);
-                        try {
-                            fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
-                            // file written successfully
-                        } catch (err) {
-                            console.error(err);
+                    var found = false;
+                    for (const typeItemsMap of typeItemsMap_list) {
+                        if (typeItemsMap != null && typeItemsMap.get(typename) != null && (item == null || typeItemsMap.get(typename).includes(item))) {
+                            found = true;
                         }
                     }
+
+                    var dontCanc = false;
+                    if (!found) {
+                        const errStr = `Object ${obj}, recordType ${recType}: ${key} "${item}" not found in ${typename}.`;
+                        if (mode === "log") {
+                            logList.push(`${errStr}`);
+                        }
+                    }
+                    
+                    return found || dontCanc;
+                });
+                
+                if (mode !== "log") {
+                    const headers = RECORDTYPE_ITEMS[RECORDTYPES_PICKVAL_ROOT].headers;
+                    const transforms = [unwind({ paths: headers })];
+                    const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
+
+                    if (options.sort === 'true' || options.sort === true || options.sort === undefined) {
+                        resListCsv = sortByKey(resListCsv);
+                    }
+
+                    const csv = parser.parse(resListCsv);
+                    try {
+                        fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
+                    } catch (err) {
+                        console.error(err);
+                    }
                 }
-            
             }
         }
+    }
 
-        // write log file
-        if(mode === "log") {
-            fs.writeFileSync(join(logdir, 'recordtypes-clean.log'), logList.join('\n'), { flag: 'w+' });
-        }
-        
-        Performance.getInstance().end();
-
-        var outputString = 'OK'
-        return { outputString };
-        
+    // write log file
+    if (mode === "log") {
+        fs.writeFileSync(join(logdir, 'recordtypes-clean.log'), logList.join('\n'), { flag: 'w+' });
     }
     
+    return { outputString: 'OK' };
 }
 
 export function manipulateItem(itemOrig, typename){

@@ -100,8 +100,5 @@ export async function split(flags, file_subpath, file_extension, file_root_tag, 
         }
     }
 
-
-    var outputString = 'OK'
-    return { outputString };
-
+    return { outputString: 'OK' };
 }

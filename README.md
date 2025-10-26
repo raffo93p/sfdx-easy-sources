@@ -25,18 +25,18 @@ With this plugin you can:
 
 ## Supported metadata types
 
-| Metadata Label| Metadata api | Available commands    |
-| :---:    | :---:  | :---: | 
-| All Meta | allmeta   | split, upsert, merge, minify, retrieve   |
-| Profiles | profiles | split, upsert, merge, minify, updatekey, delete, clean, clearempty, arealigned |
-| Permission Sets | permissionsets | split, upsert, merge, minify, updatekey, delete, clean, clearempty, arealigned |
-| Record Types | recordtypes | split, upsert, merge, updatekey, delete, clean, arealigned |
-| Labels | labels | split, upsert, merge, updatekey, arealigned |
-| Global Value Sets | globalvaluesets | split, upsert, merge, updatekey, arealigned |
-| Global Value Set Translations | globalvaluesettranslations | split, upsert, merge, updatekey, arealigned |
-| Applications | applications | split, upsert, merge, updatekey, arealigned |
-| Object Translations | objecttranslations | split, upsert, merge, minify, updatekey, clearempty, arealigned |
-| Translations | translations | split, upsert, merge, minify, updatekey, clearempty, arealigned |
+| Metadata Label| Metadata api | Available commands    | Programmatic API |
+| :---:    | :---:  | :---: | :---: |
+| All Meta | allmeta   | split, upsert, merge, minify, retrieve   | ❌ |
+| Profiles | profiles | split, upsert, merge, minify, updatekey, delete, clean, clearempty, arealigned | ✅ **Complete** |
+| Permission Sets | permissionsets | split, upsert, merge, minify, updatekey, delete, clean, clearempty, arealigned | ✅ **Complete** |
+| Record Types | recordtypes | split, upsert, merge, updatekey, delete, clean, arealigned | ✅ **Complete** |
+| Labels | labels | split, upsert, merge, updatekey, arealigned | ✅ **Complete** |
+| Global Value Sets | globalvaluesets | split, upsert, merge, updatekey, arealigned | ✅ **Complete** |
+| Global Value Set Translations | globalvaluesettranslations | split, upsert, merge, updatekey, arealigned | ✅ **Complete** |
+| Applications | applications | split, upsert, merge, updatekey, arealigned | ✅ **Complete** |
+| Object Translations | objecttranslations | split, upsert, merge, minify, updatekey, clearempty, arealigned | ✅ **Complete** |
+| Translations | translations | split, upsert, merge, minify, updatekey, clearempty, arealigned | ✅ **Complete** |
 
 
 
@@ -53,6 +53,46 @@ Examples
   $ sf easysources labels upsert
 ...
 ```
+
+## 🚀 Programmatic API Usage
+
+**NEW in v0.8.0**: Complete programmatic API with automatic path resolution! Use all metadata operations in your Node.js scripts with **57 total API operations** across 9 metadata types.
+
+```javascript
+// JavaScript - Basic usage with automatic path resolution
+const { profiles, permissionsets, labels, objectTranslations } = require('sfdx-easy-sources');
+
+async function automateMetadata() {
+  // Paths auto-resolved from easysources-settings.json
+  await profiles.split({ input: 'Admin,Standard User' });
+  await profiles.upsert({ input: 'Admin' });
+  await profiles.merge({ input: 'Admin' });
+  
+  // Same pattern for all metadata types
+  await permissionsets.split();
+  await labels.upsert();
+  await objectTranslations.minify();
+}
+```
+
+```typescript
+// TypeScript - Full type safety
+import { profiles, ProfileOptions } from 'sfdx-easy-sources';
+
+const options: ProfileOptions = {
+  input: 'Admin,Standard User',
+  ignoreuserperm: 'true'
+};
+await profiles.split(options);
+```
+
+**📚 Complete Documentation & Examples:** [API.md](./API.md)
+
+### Key Features
+- **🔧 Automatic Path Resolution**: Uses `easysources-settings.json` for defaults
+- **⚙️ Full TypeScript Support**: Complete type definitions for all metadata types  
+- **🔄 Consistent API**: Identical patterns across all 9 supported metadata types
+- **🎯 Zero Code Duplication**: CLI commands delegate to API functions
 
 
 Based on the source type, this plugin provides the following commands:

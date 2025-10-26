@@ -58,14 +58,14 @@ describe('easysources:labels ', function () {
 
     test
         .stdout()
-        .command(['easysources:labels:arealigned', '-i', 'CustomLabels', '--mode', 'logic'])
+        .command(['easysources:labels:arealigned', '--mode', 'logic'])
         .it('runs easysources:labels:arealigned with logic mode', async (ctx) => {
             expect(ctx.stdout).to.contain('1 aligned');
         });
 
     test
         .stdout()
-        .command(['easysources:labels:arealigned', '-i', 'CustomLabels', '--mode', 'string'])
+        .command(['easysources:labels:arealigned', '--mode', 'string'])
         .it('runs easysources:labels:arealigned with string mode', async (ctx) => {
             expect(ctx.stdout).to.contain('1 aligned');
         });

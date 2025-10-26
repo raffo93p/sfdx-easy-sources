@@ -72,13 +72,13 @@ export const PERMSET_KEY_TYPE = {
     [PERMSET_CLASS_ROOT]: { key: PERMSET_CLASS_KEY, typename: "ApexClass" },
     [PERMSET_CMDT_ROOT]: { key: PERMSET_CMDT_KEY, typename: "CustomObject"},
     [PERMSET_CPERM_ROOT]: { key: PERMSET_CPERM_KEY, typename: "CustomPermission" },
-    [PERMSET_CSET_ROOT]: { key: PERMSET_CSET_KEY, typename: "Settings" }, // ?? 
+    [PERMSET_CSET_ROOT]: { key: PERMSET_CSET_KEY, typename: "Settings" },
     [PERMSET_FIELD_ROOT]: { key: PERMSET_FIELD_KEY, typename: "CustomField" },
     [PERMSET_OBJECT_ROOT]: {  key: PERMSET_OBJECT_KEY, typename: "CustomObject" },
     [PERMSET_PAGE_ROOT]: {  key: PERMSET_PAGE_KEY, typename: "ApexPage" },
     [PERMSET_RECTYPE_ROOT]: { key: PERMSET_RECTYPE_KEY, typename: "RecordType" },
     [PERMSET_TAB_ROOT]: {  key: PERMSET_TAB_KEY, typename: "CustomTab" }
-    // [PERMSET_USERPERM_ROOT]: {  key: PERMSET_USERPERM_KEY, typename: "" } // ??
+    // [PERMSET_USERPERM_ROOT]: {  key: PERMSET_USERPERM_KEY, typename: "" } // User permissions don't need clean as they are standard
 }
 
 // used for minify command

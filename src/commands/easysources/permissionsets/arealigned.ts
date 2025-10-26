@@ -10,7 +10,7 @@ import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import { PERMSET_ITEMS, PERMSETS_EXTENSION, PERMSETS_ROOT_TAG, PERMSETS_SUBPATH } from '../../../utils/constants/constants_permissionsets';
 import Performance from '../../../utils/performance';
-import { areAligned, validateAlignment } from '../../../utils/commands/alignmentChecker';
+import { areAligned } from '../../../utils/commands/alignmentChecker';
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
 
 // Initialize Messages with the current plugin directory
@@ -56,14 +56,20 @@ export default class AreAligned extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        let result;
-        if (this.flags.mode === 'string') {
-            result = await areAligned(this.flags, PERMSETS_SUBPATH, PERMSETS_EXTENSION, PERMSETS_ROOT_TAG, PERMSET_ITEMS);
-        } else {
-            result = await validateAlignment(this.flags, PERMSETS_SUBPATH, PERMSETS_EXTENSION, PERMSETS_ROOT_TAG, PERMSET_ITEMS);
-        }
+        const result = await permissionsetAreAligned(this.flags);
 
         Performance.getInstance().end();
         return result;
     }
+}
+
+/**
+ * Permission set-specific are aligned function that encapsulates all permission set constants
+ * This function can be used programmatically without needing to pass permission set constants
+ * 
+ * @param options - Permission set are aligned options (paths will be resolved automatically if not provided)
+ * @returns Promise with are aligned operation result
+ */
+export async function permissionsetAreAligned(options: any): Promise<any> {
+    return await areAligned(options, PERMSETS_SUBPATH, PERMSETS_EXTENSION, PERMSETS_ROOT_TAG, PERMSET_ITEMS);
 }

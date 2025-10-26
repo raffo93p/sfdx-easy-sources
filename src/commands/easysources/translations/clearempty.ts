@@ -56,3 +56,15 @@ export default class ClearEmpty extends SfdxCommand {
         };
     }
 }
+
+// Export function for programmatic API
+export async function translationClearEmpty(options: any = {}): Promise<AnyJson> {
+    
+    const result = await clearEmpty(options, TRANSLATIONS_SUBPATH, TRANSLATION_ITEMS);
+
+    return {
+        outputString: result.outputString,
+        deletedFiles: result.deletedFiles,
+        deletedFolders: result.deletedFolders
+    };
+}

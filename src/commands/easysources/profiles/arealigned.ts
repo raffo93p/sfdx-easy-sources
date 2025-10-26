@@ -10,7 +10,7 @@ import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import { PROFILE_ITEMS, PROFILES_EXTENSION, PROFILES_ROOT_TAG, PROFILES_SUBPATH } from '../../../utils/constants/constants_profiles';
 import Performance from '../../../utils/performance';
-import { areAligned, validateAlignment } from '../../../utils/commands/alignmentChecker';
+import { areAligned } from '../../../utils/commands/alignmentChecker';
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
 
 // Initialize Messages with the current plugin directory
@@ -56,14 +56,14 @@ export default class AreAligned extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        let result;
-        if (this.flags.mode === 'string') {
-            result = await areAligned(this.flags, PROFILES_SUBPATH, PROFILES_EXTENSION, PROFILES_ROOT_TAG, PROFILE_ITEMS);
-        } else {
-            result = await validateAlignment(this.flags, PROFILES_SUBPATH, PROFILES_EXTENSION, PROFILES_ROOT_TAG, PROFILE_ITEMS);
-        }
+        const result = await profileAreAligned(this.flags);
 
         Performance.getInstance().end();
         return result;
     }
+}
+
+// Export a profile-specific areAligned function that encapsulates profile constants
+export async function profileAreAligned(options: any): Promise<any> {
+    return await areAligned(options, PROFILES_SUBPATH, PROFILES_EXTENSION, PROFILES_ROOT_TAG, PROFILE_ITEMS);
 }

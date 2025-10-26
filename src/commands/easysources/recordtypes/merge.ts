@@ -76,62 +76,64 @@ export default class Merge extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        const baseInputDir = join((this.flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
-        const baseOutputDir = join((this.flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), RECORDTYPES_SUBPATH) as string;
-        const inputObject = (this.flags.object) as string;
-        const inputRecordType = (this.flags.recordtype) as string;
+        const result = await recordTypeMerge(this.flags);
 
-        if (!fs.existsSync(baseInputDir)) {
-            console.log('Input folder ' + baseInputDir + ' does not exist!');
-            return;
-        }
+        Performance.getInstance().end();
 
-        var objectList = [];
-        if (inputObject) {
-            objectList = inputObject.split(',');
+        return result;
+    }
+}
+
+// Export function for API usage
+export async function recordTypeMerge(options: any = {}): Promise<AnyJson> {
+
+    const baseInputDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
+    const baseOutputDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), RECORDTYPES_SUBPATH) as string;
+    const inputObject = (options.object) as string;
+    const inputRecordType = (options.recordtype) as string;
+
+    if (!fs.existsSync(baseInputDir)) {
+        console.log('Input folder ' + baseInputDir + ' does not exist!');
+        return { outputString: 'ERROR: Input folder does not exist' };
+    }
+
+    var objectList = [];
+    if (inputObject) {
+        objectList = inputObject.split(',');
+    } else {
+        objectList = fs.readdirSync(baseInputDir, { withFileTypes: true })
+            .filter(item => item.isDirectory())
+            .map(item => item.name)
+    }
+
+    for (const obj of objectList) {
+        if (!fs.existsSync(join(baseInputDir, obj, 'recordTypes'))) continue;
+
+        var recordTypeList = [];
+
+        if (inputRecordType) {
+            recordTypeList = inputRecordType.split(',');
         } else {
-            objectList = fs.readdirSync(baseInputDir, { withFileTypes: true })
+            recordTypeList = fs.readdirSync(join(baseInputDir, obj, 'recordTypes'), { withFileTypes: true })
                 .filter(item => item.isDirectory())
                 .map(item => item.name)
         }
 
-        for (const obj of objectList) {
-            if (!fs.existsSync(join(baseInputDir, obj, 'recordTypes'))) continue;
+        for (const dir of recordTypeList) {
+            console.log('Merging: ' + join(obj, dir));
 
-            var recordTypeList = [];
-
-            if (inputRecordType) {
-                recordTypeList = inputRecordType.split(',');
-            } else {
-                recordTypeList = fs.readdirSync(join(baseInputDir, obj, 'recordTypes'), { withFileTypes: true })
-                    .filter(item => item.isDirectory())
-                    .map(item => item.name)
+            const mergedXml = await mergeRecordTypeFromCsv(dir, join(baseInputDir, obj, 'recordTypes', dir), options);
+            const outputDir = join(baseOutputDir, obj, 'recordTypes');
+            const outputFile = join(outputDir, dir + RECORDTYPES_EXTENSION);
+            
+            if (!fs.existsSync(outputDir)) {
+                fs.mkdirSync(outputDir, { recursive: true });
             }
-
-            for (const dir of recordTypeList) {
-                console.log('Merging: ' + join(obj, dir));
-
-                // Use the exported merge function
-                const mergedXml = await mergeRecordTypeFromCsv(dir, join(baseInputDir, obj, 'recordTypes', dir), this.flags);
-                const outputDir = join(baseOutputDir, obj, 'recordTypes');
-                const outputFile = join(outputDir, dir + RECORDTYPES_EXTENSION);
-                
-                if (!fs.existsSync(outputDir)) {
-                    fs.mkdirSync(outputDir, { recursive: true });
-                }
-                writeXmlToFile(outputFile, mergedXml);
-            }
+            writeXmlToFile(outputFile, mergedXml);
         }
-
-
-        // dir is the record type name without the extension
-
-
-        Performance.getInstance().end();
-
-        var outputString = 'OK'
-        return { outputString };
     }
+
+    return { outputString: 'OK' };
 }
 
 /**

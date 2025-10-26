@@ -62,3 +62,8 @@ export default class Merge extends SfdxCommand {
 
     }
 }
+
+// Export function for programmatic API
+export async function translationMerge(options: any = {}): Promise<AnyJson> {
+    return await merge(options, TRANSLATIONS_SUBPATH, TRANSLATIONS_EXTENSION, TRANSLATIONS_ROOT_TAG, TRANSLATION_ITEMS);
+}

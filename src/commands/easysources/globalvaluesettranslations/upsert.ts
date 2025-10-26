@@ -54,9 +54,14 @@ export default class Upsert extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        var result = await upsert(this.flags, GVSETTRANS_SUBPATH, GVSETTRANS_EXTENSION, GVSETTRANS_ROOT_TAG, GVSETTRAN_ITEMS);
+        const result = await upsert(this.flags, GVSETTRANS_SUBPATH, GVSETTRANS_EXTENSION, GVSETTRANS_ROOT_TAG, GVSETTRAN_ITEMS);
 
         Performance.getInstance().end();
         return result;
     }
+}
+
+// Export function for programmatic API
+export async function globalValueSetTranslationUpsert(options: any = {}): Promise<AnyJson> {
+    return await upsert(options, GVSETTRANS_SUBPATH, GVSETTRANS_EXTENSION, GVSETTRANS_ROOT_TAG, GVSETTRAN_ITEMS);
 }

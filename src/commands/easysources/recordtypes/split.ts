@@ -64,102 +64,105 @@ export default class Split extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        const baseInputDir = join((this.flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), RECORDTYPES_SUBPATH) as string;
-        const baseOutputDir = join((this.flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
-
-        const inputObject = (this.flags.object) as string;
-        const inputRecordType = (this.flags.recordtype) as string;
-
-        if (!fs.existsSync(baseInputDir)) {
-            console.log('Input folder ' + baseInputDir + ' does not exist!');
-            return;
-        }
-
-        var objectList = [];
-        if (inputObject) {
-            objectList = inputObject.split(',');
-        } else {
-            objectList = fs.readdirSync(baseInputDir, { withFileTypes: true })
-                .filter(item => item.isDirectory())
-                .map(item => item.name)
-        }
-
-        for (const obj of objectList) {
-            if (!fs.existsSync(join(baseInputDir, obj, 'recordTypes'))) continue;
-
-            var recordTypeList = [];
-
-            if (inputRecordType) {
-                recordTypeList = inputRecordType.split(',');
-            } else {
-                recordTypeList = fs.readdirSync(join(baseInputDir, obj, 'recordTypes'), { withFileTypes: true })
-                    .filter(item => !item.isDirectory() && item.name.endsWith(RECORDTYPES_EXTENSION))
-                    .map(item => item.name)
-            }
-
-
-            for (const filename of recordTypeList) {
-                const fullFilename = filename.endsWith(RECORDTYPES_EXTENSION) ? filename : filename + RECORDTYPES_EXTENSION;
-                console.log('Splitting: ' + join(obj, fullFilename));
-
-
-                const inputFile = join(baseInputDir, obj, 'recordTypes', fullFilename);
-                const xmlFileContent = (await readXmlFromFile(inputFile)) ?? {};
-                const recordtypeProperties = xmlFileContent[RECORDTYPES_ROOT_TAG] ?? {};
-
-                const recordTypeName = removeExtension(fullFilename);
-                const outputDir = join(baseOutputDir, obj, 'recordTypes', recordTypeName);
-
-                // Delete outputDir if it exists to ensure a clean split
-                if (fs.existsSync(outputDir)) {
-                    fs.removeSync(outputDir);
-                }
-
-                for (const tag_section in RECORDTYPE_ITEMS) {
-                    var myjson = recordtypeProperties[RECORDTYPES_PICKVAL_ROOT];
-                    if (myjson == undefined) continue;
-                    if (!Array.isArray(myjson)) myjson = [myjson];
-
-                    var jsforcsv = transformXMLtoCSV(myjson);
-
-
-                    // generate _tagId column
-                    generateTagId(jsforcsv, RECORDTYPE_ITEMS[tag_section].key, RECORDTYPE_ITEMS[tag_section].headers);
-                    if (this.flags.sort === 'true') {
-                        jsforcsv = sortByKey(jsforcsv);
-                    }
-
-                    const headers = RECORDTYPE_ITEMS[tag_section].headers;
-                    const parser = new Parser({ fields: [...headers, '_tagid'] });
-                    const csv = parser.parse(jsforcsv);
-
-                    const outputFileCSV = join(outputDir, calcCsvFilename(recordTypeName, tag_section));
-
-                    if (!fs.existsSync(outputDir)) {
-                        fs.mkdirSync(outputDir, { recursive: true });
-                    }
-
-                    try {
-                        fs.writeFileSync(outputFileCSV, csv, { flag: 'w+' });
-                        // file written successfully
-                    } catch (err) {
-                        console.error(err);
-                    }
-
-                    xmlFileContent[RECORDTYPES_ROOT_TAG][tag_section] = null;
-
-                }
-                if (fs.existsSync(outputDir)) {
-                    const outputFileXML = join(outputDir, recordTypeName + XML_PART_EXTENSION);
-                    writeXmlToFile(outputFileXML, xmlFileContent);
-                }
-            }
-        }
+        const result = await recordTypeSplit(this.flags);
 
         Performance.getInstance().end();
 
-        var outputString = 'OK'
-        return { outputString };
+        return result;
     }
+}
+
+// Export function for programmatic API
+export async function recordTypeSplit(options: any = {}): Promise<AnyJson> {
+
+    const baseInputDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), RECORDTYPES_SUBPATH) as string;
+    const baseOutputDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
+
+    const inputObject = (options.object) as string;
+    const inputRecordType = (options.recordtype) as string;
+
+    if (!fs.existsSync(baseInputDir)) {
+        console.log('Input folder ' + baseInputDir + ' does not exist!');
+        return;
+    }
+
+    var objectList = [];
+    if (inputObject) {
+        objectList = inputObject.split(',');
+    } else {
+        objectList = fs.readdirSync(baseInputDir, { withFileTypes: true })
+            .filter(item => item.isDirectory())
+            .map(item => item.name)
+    }
+
+    for (const obj of objectList) {
+        if (!fs.existsSync(join(baseInputDir, obj, 'recordTypes'))) continue;
+
+        var recordTypeList = [];
+
+        if (inputRecordType) {
+            recordTypeList = inputRecordType.split(',');
+        } else {
+            recordTypeList = fs.readdirSync(join(baseInputDir, obj, 'recordTypes'), { withFileTypes: true })
+                .filter(item => !item.isDirectory() && item.name.endsWith(RECORDTYPES_EXTENSION))
+                .map(item => item.name)
+        }
+
+        for (const filename of recordTypeList) {
+            const fullFilename = filename.endsWith(RECORDTYPES_EXTENSION) ? filename : filename + RECORDTYPES_EXTENSION;
+            console.log('Splitting: ' + join(obj, fullFilename));
+
+            const inputFile = join(baseInputDir, obj, 'recordTypes', fullFilename);
+            const xmlFileContent = (await readXmlFromFile(inputFile)) ?? {};
+            const recordtypeProperties = xmlFileContent[RECORDTYPES_ROOT_TAG] ?? {};
+
+            const recordTypeName = removeExtension(fullFilename);
+            const outputDir = join(baseOutputDir, obj, 'recordTypes', recordTypeName);
+
+                // Delete outputDir if it exists to ensure a clean split
+            if (fs.existsSync(outputDir)) {
+                fs.removeSync(outputDir);
+            }
+
+            for (const tag_section in RECORDTYPE_ITEMS) {
+                var myjson = recordtypeProperties[RECORDTYPES_PICKVAL_ROOT];
+                if (myjson == undefined) continue;
+                if (!Array.isArray(myjson)) myjson = [myjson];
+
+                var jsforcsv = transformXMLtoCSV(myjson);
+
+                    // generate _tagId column
+                generateTagId(jsforcsv, RECORDTYPE_ITEMS[tag_section].key, RECORDTYPE_ITEMS[tag_section].headers);
+                if (options.sort === 'true') {
+                    jsforcsv = sortByKey(jsforcsv);
+                }
+
+                const headers = RECORDTYPE_ITEMS[tag_section].headers;
+                const parser = new Parser({ fields: [...headers, '_tagid'] });
+                const csv = parser.parse(jsforcsv);
+
+                const outputFileCSV = join(outputDir, calcCsvFilename(recordTypeName, tag_section));
+
+                if (!fs.existsSync(outputDir)) {
+                    fs.mkdirSync(outputDir, { recursive: true });
+                }
+
+                try {
+                    fs.writeFileSync(outputFileCSV, csv, { flag: 'w+' });
+                } catch (err) {
+                    console.error(err);
+                }
+
+                xmlFileContent[RECORDTYPES_ROOT_TAG][tag_section] = null;
+            }
+            
+            if (fs.existsSync(outputDir)) {
+                const outputFileXML = join(outputDir, recordTypeName + XML_PART_EXTENSION);
+                writeXmlToFile(outputFileXML, xmlFileContent);
+            }
+        }
+    }
+    
+    return { outputString: 'OK' };
 }
 

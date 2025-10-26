@@ -4,7 +4,7 @@ import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import { GVSETTRAN_ITEMS, GVSETTRANS_EXTENSION, GVSETTRANS_ROOT_TAG, GVSETTRANS_SUBPATH } from '../../../utils/constants/constants_globalvaluesettranslations';
 import Performance from '../../../utils/performance';
-import { areAligned, validateAlignment } from '../../../utils/commands/alignmentChecker';
+import { areAligned } from '../../../utils/commands/alignmentChecker';
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
 
 // Initialize Messages with the current plugin directory
@@ -53,14 +53,14 @@ export default class GlobalValueSetTranslationsAreAligned extends SfdxCommand {
   public async run(): Promise<AnyJson> {
     Performance.getInstance().start();
 
-    let result;
-    if (this.flags.mode === 'string') {
-      result = await areAligned(this.flags, GVSETTRANS_SUBPATH, GVSETTRANS_EXTENSION, GVSETTRANS_ROOT_TAG, GVSETTRAN_ITEMS);
-    } else {
-      result = await validateAlignment(this.flags, GVSETTRANS_SUBPATH, GVSETTRANS_EXTENSION, GVSETTRANS_ROOT_TAG, GVSETTRAN_ITEMS);
-    }
+    const result = await globalValueSetTranslationAreAligned(this.flags);
 
     Performance.getInstance().end();
     return result;
   }
+}
+
+// Export function for programmatic API
+export async function globalValueSetTranslationAreAligned(options: any = {}): Promise<AnyJson> {
+  return await areAligned(options, GVSETTRANS_SUBPATH, GVSETTRANS_EXTENSION, GVSETTRANS_ROOT_TAG, GVSETTRAN_ITEMS);
 }

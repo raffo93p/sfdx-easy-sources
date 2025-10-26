@@ -5,7 +5,7 @@
   "objectFlagDescription": "Specify an object. Example: Case",
   "orgFlagDescription": "Specify the alias of the org",
   "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
-  "modeFlagDescription" : "Specify the mode you want to run the command.'clean' directly deletes ghost references, 'interactive' prompt the user everytime, 'log' writes references in a file. Default: %s",
+  "modeFlagDescription" : "Specify the mode you want to run the command. 'clean' directly deletes ghost references, 'log' writes references in a file. Default: %s",
   "logdirFlagDescription": "Optionally specify a dir for log files. Default: '%s'",
   "includeStandardFieldsFlagDescription": "Includes standard fields. Default: '%s'",
   "targetFlagDescription": "Specify a target execution. Default: '%s'",

@@ -50,9 +50,20 @@ export default class Upsert extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        var result = await upsert(this.flags, LABELS_SUBPATH, LABELS_EXTENSION, LABELS_ROOT_TAG, LABEL_ITEMS);
+        var result = await labelUpsert(this.flags);
 
         Performance.getInstance().end();
         return result;
     }
+}
+
+/**
+ * Label-specific upsert function that encapsulates all label constants
+ * This function can be used programmatically without needing to pass label constants
+ * 
+ * @param options - Label upsert options (paths will be resolved automatically if not provided)
+ * @returns Promise with upsert operation result
+ */
+export async function labelUpsert(options: any): Promise<any> {
+    return await upsert(options, LABELS_SUBPATH, LABELS_EXTENSION, LABELS_ROOT_TAG, LABEL_ITEMS);
 }

@@ -60,3 +60,8 @@ export default class Upsert extends SfdxCommand {
         return result;
     }
 }
+
+// Export function for programmatic API
+export async function globalValueSetUpsert(options: any = {}): Promise<AnyJson> {
+    return await upsert(options, GVSETS_SUBPATH, GVSETS_EXTENSION, GVSETS_ROOT_TAG, GVSET_ITEMS);
+}

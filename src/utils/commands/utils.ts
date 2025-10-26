@@ -6,6 +6,16 @@ import { DEFAULT_PACKAGE_LOC, DEFAULT_PACKAGE_ORG, MANIFEST_CREATE_CMD, ORG_DISP
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, SF_CMD } from '../constants/constants';
 const fs = require('fs');
 
+import { profiles } from '../../api/profiles';
+import { permissionSets } from '../../api/permissionsets';
+import { objectTranslations } from '../../api/objecttranslations';
+import { translations } from '../../api/translations';
+import { recordTypes } from '../../api/recordtypes';
+import { labels } from '../../api/labels';
+import { globalValueSetTranslations } from '../../api/globalvaluesettranslations';
+import { globalValueSets } from '../../api/globalvaluesets';
+import { applications } from '../../api/applications';
+
 export async function retrieveAllMetadataPackageOrg(orgname, manifestDir){
 	var cmdString = SF_CMD + ' ' + MANIFEST_CREATE_CMD + ' --fromorg ' + orgname + ' --manifestname='+DEFAULT_PACKAGE_ORG+' --outputdir=' + manifestDir + " -c managed";
 	console.log(cmdString);
@@ -70,47 +80,62 @@ export async function executeCommand(flags, cmd, mdt) {
 }
 
 export async function bulkExecuteCommands(flags, cmd, sequencial) {
-	if(cmd === 'minify'){
-		if(sequencial){
-			await executeCommand(flags, cmd, 'profiles');
-			await executeCommand(flags, cmd, 'permissionsets');
-			await executeCommand(flags, cmd, 'objecttranslations');
-			await executeCommand(flags, cmd, 'translations');
-		} else {
-			await Promise.all([
-				executeCommand(flags, cmd, 'profiles'),
-				executeCommand(flags, cmd, 'permissionsets'),
-				executeCommand(flags, cmd, 'objecttranslations'),
-				executeCommand(flags, cmd, 'translations')
-			]);
-		}
+	// Mappa i metadata alle rispettive API e funzioni
+	const apiMap = {
+		profiles,
+		permissionsets: permissionSets,
+		objecttranslations: objectTranslations,
+		translations,
+		recordtypes: recordTypes,
+		labels,
+		globalvaluesettranslations: globalValueSetTranslations,
+		globalvaluesets: globalValueSets,
+		applications
+	};
+
+	// Mappa i metadata da processare per ogni tipo di comando
+	let metadataList;
+	if (cmd === 'minify') {
+		metadataList = ['profiles', 'permissionsets', 'objecttranslations', 'translations'];
+	} else {
+		metadataList = [
+			'profiles',
+			'recordtypes',
+			'labels',
+			'permissionsets',
+			'globalvaluesettranslations',
+			'globalvaluesets',
+			'applications',
+			'objecttranslations',
+			'translations'
+		];
 	}
-	else {
-		if(sequencial){
-			await executeCommand(flags, cmd, 'profiles');
-			await executeCommand(flags, cmd, 'recordtypes');
-			await executeCommand(flags, cmd, 'labels');
-			await executeCommand(flags, cmd, 'permissionsets');
-			await executeCommand(flags, cmd, 'globalvaluesettranslations');
-			await executeCommand(flags, cmd, 'globalvaluesets');
-			await executeCommand(flags, cmd, 'applications');
-			await executeCommand(flags, cmd, 'objecttranslations');
-			await executeCommand(flags, cmd, 'translations');
-		} else {
-			await Promise.all([
-				executeCommand(flags, cmd, 'profiles'),
-				executeCommand(flags, cmd, 'recordtypes'),
-				executeCommand(flags, cmd, 'labels'),
-				executeCommand(flags, cmd, 'permissionsets'),
-				executeCommand(flags, cmd, 'globalvaluesettranslations'),
-				executeCommand(flags, cmd, 'globalvaluesets'),
-				executeCommand(flags, cmd, 'applications'),
-				executeCommand(flags, cmd, 'objecttranslations'),
-				executeCommand(flags, cmd, 'translations')
-			]);
+
+	// Prepara le chiamate alle API
+	const calls = metadataList.map(mdt => {
+		const api = apiMap[mdt];
+		if (!api || typeof api[cmd] !== 'function') {
+			return async () => {
+				console.warn(`API function for ${mdt}.${cmd} not found`);
+			};
 		}
+		return async () => {
+			try {
+				await api[cmd](flags);
+			} catch (err) {
+				const msg = err && err.message ? err.message : String(err);
+				console.error(`Errore in ${mdt}.${cmd}: ${msg}`);
+			}
+		};
+	});
+
+	if (sequencial) {
+		for (const call of calls) {
+			await call();
+		}
+	} else {
+		await Promise.all(calls.map(fn => fn()));
 	}
-	
 }
 
 export async function getDefaultOrgName(){

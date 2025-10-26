@@ -55,3 +55,8 @@ export default class UpdateKey extends SfdxCommand {
         return result;
     }
 }
+
+// Export function for programmatic API
+export async function applicationUpdateKey(options: any = {}): Promise<AnyJson> {
+    return await updatekey(options, APPLICATIONS_SUBPATH, APPLICATION_ITEMS);
+}

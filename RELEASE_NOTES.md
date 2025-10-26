@@ -1,5 +1,15 @@
 # Release Notes
 
+## Version 0.8.0
+- **Major Enhancement: Complete Programmatic API for All Metadata Types** - Added comprehensive programmatic API support with automatic path resolution! You can now use all operations for every supported metadata types directly in your Node.js scripts with **57 total API operations** across 9 metadata types (Profiles, Permission Sets, Custom Labels, Applications, Global Value Sets, Global Value Set Translations, Translations, Object Translations, Record Types).
+  - **Automatic Path Resolution**: All methods auto-resolve paths from `easysources-settings.json` - specify only what you need to override
+  - **Unified Architecture**: Commands now export functions for API use while maintaining CLI compatibility
+  - **Complete TypeScript Support**: Full type definitions for all metadata types
+  - **Zero Code Duplication**: CLI commands delegate to API functions for single source of truth
+  - **Settings Integration**: Seamless integration with existing `easysources-settings.json` configuration
+  - See [API.md](./API.md) for complete documentation and examples
+- **Breaking Change: Removed interactive mode from clean commands** - Deprecated and removed the `interactive` mode option from all clean commands (`profiles:clean`, `permissionsets:clean`, `recordtypes:clean`) as it was effectively unused and provided no real value. Clean commands now support only `clean` and `log` modes, simplifying the interface and improving maintainability.
+
 ## Version 0.7.7
 - **New Feature: `include-types` flag for clean commands** - Added the `--include-types` (`-d`) flag to both `profiles:clean` and `permissionsets:clean` commands. This flag allows you to specify a whitelist of metadata types to process during cleaning operations. When used, only the specified types will be cleaned, providing more granular control over the cleaning process. The flag accepts comma-separated values and works alongside the existing `--skip-types` flag.
 - **Started Migration to SF CLI (Work in Progress)** - Started migration from SFDX CLI to Salesforce CLI (`sf` command) for specific commands (such as clean commands) that were not working correctly with the legacy SFDX CLI. Complete migration of the entire codebase structure will be implemented in future releases.

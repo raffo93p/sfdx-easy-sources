@@ -61,3 +61,8 @@ export default class Upsert extends SfdxCommand {
         return result;
     }
 }
+
+// Export function for programmatic API
+export async function translationUpsert(options: any = {}): Promise<AnyJson> { 
+    return await upsert(options, TRANSLATIONS_SUBPATH, TRANSLATIONS_EXTENSION, TRANSLATIONS_ROOT_TAG, TRANSLATION_ITEMS);
+}

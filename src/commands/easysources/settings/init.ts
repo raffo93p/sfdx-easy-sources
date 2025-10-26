@@ -37,7 +37,6 @@ export default class Init extends SfdxCommand {
         fs.writeFileSync(SETTINGS_PATH, JSON.stringify(settings, null, 4));
         console.log('Settings file generated at path ' + SETTINGS_PATH);
 
-        var outputString = 'OK';
-        return { outputString };
+        return { outputString: 'OK' };
     }
 }

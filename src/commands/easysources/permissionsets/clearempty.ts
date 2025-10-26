@@ -46,7 +46,7 @@ export default class ClearEmpty extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
         
-        const result = await clearEmpty(this.flags, PERMSETS_SUBPATH, PERMSET_ITEMS);
+        const result = await permissionsetClearEmpty(this.flags);
 
         Performance.getInstance().end();
         return {
@@ -55,4 +55,15 @@ export default class ClearEmpty extends SfdxCommand {
             deletedFolders: result.deletedFolders
         };
     }
+}
+
+/**
+ * Permission set-specific clear empty function that encapsulates all permission set constants
+ * This function can be used programmatically without needing to pass permission set constants
+ * 
+ * @param options - Permission set clear empty options (paths will be resolved automatically if not provided)
+ * @returns Promise with clear empty operation result
+ */
+export async function permissionsetClearEmpty(options: any): Promise<any> {
+    return await clearEmpty(options, PERMSETS_SUBPATH, PERMSET_ITEMS);
 }

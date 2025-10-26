@@ -4,7 +4,7 @@ import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import { LABEL_ITEMS, LABELS_EXTENSION, LABELS_ROOT_TAG, LABELS_SUBPATH } from '../../../utils/constants/constants_labels';
 import Performance from '../../../utils/performance';
-import { areAligned, validateAlignment } from '../../../utils/commands/alignmentChecker';
+import { areAligned } from '../../../utils/commands/alignmentChecker';
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
 
 // Initialize Messages with the current plugin directory
@@ -32,10 +32,6 @@ export default class LabelsAreAligned extends SfdxCommand {
         char: 'c',
         description: messages.getMessage('esCsvFlagDescription', [DEFAULT_ESCSV_PATH]),
     }),
-    input: flags.string({
-        char: 'i',
-        description: messages.getMessage('inputFlagDescription'),
-    }),
     sort: flags.enum({
         char: 'S',
         description: messages.getMessage('sortFlagDescription', ['true']),
@@ -53,14 +49,20 @@ export default class LabelsAreAligned extends SfdxCommand {
   public async run(): Promise<AnyJson> {
     Performance.getInstance().start();
 
-    let result;
-    if (this.flags.mode === 'string') {
-      result = await areAligned(this.flags, LABELS_SUBPATH, LABELS_EXTENSION, LABELS_ROOT_TAG, LABEL_ITEMS);
-    } else {
-      result = await validateAlignment(this.flags, LABELS_SUBPATH, LABELS_EXTENSION, LABELS_ROOT_TAG, LABEL_ITEMS);
-    }
+    const result = await labelAreAligned(this.flags);
 
     Performance.getInstance().end();
     return result;
   }
+}
+
+/**
+ * Label-specific are aligned function that encapsulates all label constants
+ * This function can be used programmatically without needing to pass label constants
+ * 
+ * @param options - Label are aligned options (paths will be resolved automatically if not provided)
+ * @returns Promise with are aligned operation result
+ */
+export async function labelAreAligned(options: any): Promise<any> {
+    return await areAligned(options, LABELS_SUBPATH, LABELS_EXTENSION, LABELS_ROOT_TAG, LABEL_ITEMS);
 }

@@ -68,9 +68,14 @@ export default class Upsert extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        var result = await upsert(this.flags, PROFILES_SUBPATH, PROFILES_EXTENSION, PROFILES_ROOT_TAG, PROFILE_ITEMS);
+        var result = await profileUpsert(this.flags);
 
         Performance.getInstance().end();
         return result;
     }
+}
+
+// Export a profile-specific upsert function that encapsulates profile constants
+export async function profileUpsert(options: any): Promise<any> {
+    return await upsert(options, PROFILES_SUBPATH, PROFILES_EXTENSION, PROFILES_ROOT_TAG, PROFILE_ITEMS);
 }

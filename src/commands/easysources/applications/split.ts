@@ -53,10 +53,15 @@ export default class Split extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        var result = await split(this.flags, APPLICATIONS_SUBPATH, APPLICATIONS_EXTENSION, APPLICATIONS_ROOT_TAG, APPLICATION_ITEMS);
+        const result = await split(this.flags, APPLICATIONS_SUBPATH, APPLICATIONS_EXTENSION, APPLICATIONS_ROOT_TAG, APPLICATION_ITEMS);
 
         Performance.getInstance().end();
 
         return result;
     }
+}
+
+// Export function for programmatic API
+export async function applicationSplit(options: any = {}): Promise<AnyJson> {
+    return await split(options, APPLICATIONS_SUBPATH, APPLICATIONS_EXTENSION, APPLICATIONS_ROOT_TAG, APPLICATION_ITEMS);
 }
