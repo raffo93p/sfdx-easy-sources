@@ -15,7 +15,7 @@ import { permissionsetClean } from '../commands/easysources/permissionsets/clean
 /**
  * Configuration options for permission set operations
  */
-export interface PermissionsetOptions extends PathOptions {
+export interface PermissionSetOptions extends PathOptions {
     // === Common Options (used by multiple operations) ===
     /** Comma-separated list of specific permission sets to process (without .permissionset-meta.xml extension) */
     input?: string;
@@ -76,13 +76,13 @@ export interface PermissionsetOptions extends PathOptions {
  * });
  * ```
  */
-export const permissionsets = {
+export const permissionSets = {
   /**
    * Splits permission sets into separate CSV files for easier management and version control.
    * @param options Optional configuration, automatically resolved from settings if not provided
    * @returns Promise resolving to operation result
    */
-  split: async (options: PermissionsetOptions = {}): Promise<AnyJson> => {
+  split: async (options: PermissionSetOptions = {}): Promise<AnyJson> => {
     return await permissionsetSplit(options);
   },
 
@@ -91,7 +91,7 @@ export const permissionsets = {
    * @param options Optional configuration, automatically resolved from settings if not provided
    * @returns Promise resolving to operation result
    */
-  upsert: async (options: PermissionsetOptions = {}): Promise<AnyJson> => {
+  upsert: async (options: PermissionSetOptions = {}): Promise<AnyJson> => {
     return await permissionsetUpsert(options);
   },
 
@@ -100,7 +100,7 @@ export const permissionsets = {
    * @param options Optional configuration, automatically resolved from settings if not provided
    * @returns Promise resolving to operation result
    */
-  merge: async (options: PermissionsetOptions = {}): Promise<AnyJson> => {
+  merge: async (options: PermissionSetOptions = {}): Promise<AnyJson> => {
     return await permissionsetMerge(options);
   },
 
@@ -109,7 +109,7 @@ export const permissionsets = {
    * @param options Optional configuration, automatically resolved from settings if not provided
    * @returns Promise resolving to operation result
    */
-  clearEmpty: async (options: PermissionsetOptions = {}): Promise<AnyJson> => {
+  clearEmpty: async (options: PermissionSetOptions = {}): Promise<AnyJson> => {
     return await permissionsetClearEmpty(options);
   },
 
@@ -118,7 +118,7 @@ export const permissionsets = {
    * @param options Optional configuration, automatically resolved from settings if not provided
    * @returns Promise resolving to operation result
    */
-  areAligned: async (options: PermissionsetOptions = {}): Promise<AnyJson> => {
+  areAligned: async (options: PermissionSetOptions = {}): Promise<AnyJson> => {
     return await permissionsetAreAligned(options);
   },
 
@@ -127,7 +127,7 @@ export const permissionsets = {
    * @param options Configuration options for the update key operation
    * @returns Promise resolving to operation result
    */
-  updateKey: async (options: PermissionsetOptions): Promise<AnyJson> => {
+  updateKey: async (options: PermissionSetOptions): Promise<AnyJson> => {
     return await permissionsetUpdateKey(options);
   },
 
@@ -136,7 +136,7 @@ export const permissionsets = {
    * @param options Optional configuration, automatically resolved from settings if not provided
    * @returns Promise resolving to operation result
    */
-  minify: async (options: PermissionsetOptions = {}): Promise<AnyJson> => {
+  minify: async (options: PermissionSetOptions = {}): Promise<AnyJson> => {
     return await permissionsetMinify(options);
   },
 
@@ -145,7 +145,7 @@ export const permissionsets = {
    * @param options Configuration options for the delete operation
    * @returns Promise resolving to operation result
    */
-  delete: async (options: PermissionsetOptions): Promise<AnyJson> => {
+  delete: async (options: PermissionSetOptions): Promise<AnyJson> => {
     return await permissionsetDelete(options);
   },
 
@@ -154,7 +154,7 @@ export const permissionsets = {
    * @param options Optional configuration, automatically resolved from settings if not provided
    * @returns Promise resolving to operation result
    */
-  clean: async (options: PermissionsetOptions = {}): Promise<AnyJson> => {
+  clean: async (options: PermissionSetOptions = {}): Promise<AnyJson> => {
     return await permissionsetClean(options);
   }
 };

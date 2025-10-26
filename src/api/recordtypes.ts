@@ -72,7 +72,7 @@ export interface RecordTypeOptions extends PathOptions{
  * });
  * ```
  */
-export const recordtypes = {
+export const recordTypes = {
   /**
    * Split record type metadata from XML to CSV format for easier editing.
    * @param options Optional configuration, automatically resolved from settings if not provided

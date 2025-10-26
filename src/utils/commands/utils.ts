@@ -7,10 +7,10 @@ import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, SF_CMD } from '../constants/con
 const fs = require('fs');
 
 import { profiles } from '../../api/profiles';
-import { permissionsets } from '../../api/permissionsets';
+import { permissionSets } from '../../api/permissionsets';
 import { objectTranslations } from '../../api/objecttranslations';
 import { translations } from '../../api/translations';
-import { recordtypes } from '../../api/recordtypes';
+import { recordTypes } from '../../api/recordtypes';
 import { labels } from '../../api/labels';
 import { globalValueSetTranslations } from '../../api/globalvaluesettranslations';
 import { globalValueSets } from '../../api/globalvaluesets';
@@ -83,10 +83,10 @@ export async function bulkExecuteCommands(flags, cmd, sequencial) {
 	// Mappa i metadata alle rispettive API e funzioni
 	const apiMap = {
 		profiles,
-		permissionsets,
+		permissionsets: permissionSets,
 		objecttranslations: objectTranslations,
 		translations,
-		recordtypes,
+		recordtypes: recordTypes,
 		labels,
 		globalvaluesettranslations: globalValueSetTranslations,
 		globalvaluesets: globalValueSets,

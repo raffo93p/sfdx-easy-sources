@@ -9,8 +9,8 @@
 // When using as an installed package, use: require('sfdx-easy-sources')
 // When running from the project directory, use the relative path:
 const {
-    profiles, permissionsets, labels, applications, 
-    globalValueSets, globalValueSetTranslations, translations, recordtypes,
+    profiles, permissionSets, labels, applications, 
+    globalValueSets, globalValueSetTranslations, translations, recordTypes,
     PathOptions, resolvePaths
 } = require('../lib');
 
@@ -182,7 +182,7 @@ async function automateProfileManagement() {
         console.log('9. Permission set operations with namespace API...');
         try {
             // Split permission sets (similar to profiles but for permission sets)
-            const permsetSplitResult = await permissionsets.split({
+            const permsetSplitResult = await permissionSets.split({
                 input: 'MyCustomPermissionSet'
             });
             console.log('✓ Permission set split result:', permsetSplitResult.outputString);
@@ -194,7 +194,7 @@ async function automateProfileManagement() {
         // Example: Permission set upsert with namespace API
         console.log('10. Permission set operations with namespace API...');
         try {
-            const permsetUpsertResult = await permissionsets.upsert();
+            const permsetUpsertResult = await permissionSets.upsert();
             console.log('✓ Permission set upsert result:', permsetUpsertResult.outputString);
         } catch (error) {
             console.log('⚠ Expected error (no permission sets directory):', error.message || 'Input folder does not exist');
@@ -204,10 +204,10 @@ async function automateProfileManagement() {
         // Example: Permission set maintenance operations
         console.log('11. Permission set maintenance operations...');
         try {
-            await permissionsets.minify({ input: 'MyCustomPermissionSet' });
+            await permissionSets.minify({ input: 'MyCustomPermissionSet' });
             console.log('✓ Permission sets minified - removed entries with only false permissions');
             
-            const clearResult = await permissionsets.clearEmpty();
+            const clearResult = await permissionSets.clearEmpty();
             console.log('✓ Permission set cleanup result:', clearResult.outputString);
             
             // Advanced: Permission set cleaning against org metadata
@@ -477,17 +477,17 @@ async function manageCustomLabels() {
         try {
             // Split record types
             console.log('\n1. Splitting record types...');
-            const splitResult = await recordtypes.split();
+            const splitResult = await recordTypes.split();
             console.log('✓ Split result:', splitResult.outputString);
             
             // Upsert record types
             console.log('\n2. Upserting record types from CSV...');
-            const upsertResult = await recordtypes.upsert();
+            const upsertResult = await recordTypes.upsert();
             console.log('✓ Upsert result:', upsertResult.outputString || 'No CSV changes found');
             
             // Clean record types (unique feature for field validation)
             console.log('\n3. Cleaning record types (validating field references)...');
-            const cleanResult = await recordtypes.clean({
+            const cleanResult = await recordTypes.clean({
                 mode: 'log',
                 target: 'both'
             });

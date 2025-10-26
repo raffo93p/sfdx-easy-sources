@@ -13,8 +13,8 @@ export {
 
 // Export all permission set functionality
 export {
-    permissionsets,
-    PermissionsetOptions
+    permissionSets,
+    PermissionSetOptions
 } from './api/permissionsets';
 
 // Export all label functionality
@@ -24,7 +24,7 @@ export {
 } from './api/labels';
 
 // Export all application functionality
-export {
+export {    
     applications,
     ApplicationOptions
 } from './api/applications';
@@ -49,7 +49,7 @@ export {
 
 // Export all record type functionality
 export {
-    recordtypes,
+    recordTypes,
     RecordTypeOptions
 } from './api/recordtypes';
 
@@ -67,12 +67,12 @@ export {
 
 export default {
     profiles: require('./api/profiles').profiles,
-    permissionsets: require('./api/permissionsets').permissionsets,
+    permissionSets: require('./api/permissionsets').permissionSets,
     labels: require('./api/labels').labels,
     applications: require('./api/applications').applications,
     globalValueSets: require('./api/globalvaluesets').globalValueSets,
     globalValueSetTranslations: require('./api/globalvaluesettranslations').globalValueSetTranslations,
     translations: require('./api/translations').translations,
     objectTranslations: require('./api/objecttranslations').objectTranslations,
-    recordtypes: require('./api/recordtypes').recordtypes
+    recordTypes: require('./api/recordtypes').recordTypes
 };

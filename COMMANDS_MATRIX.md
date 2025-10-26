@@ -188,17 +188,17 @@ This document provides a quick reference matrix of all commands and their availa
 ```bash
 # Basic operations
 sf easysources profiles:split --input "Admin,Standard User"
-sf easysources permissionsets:merge
+sf easysources permissionsets merge
 
 # Targeted upsert (NEW in v0.7.6)
 sf easysources profiles:upsert --type "fieldPermissions" --tagid "Account.Name"
-sf easysources permissionsets:upsert --type "objectPermissions" --tagid "Account,Contact"
+sf easysources permissionsets upsert --type "objectPermissions" --tagid "Account,Contact"
 
 # Record types delete
-sf easysources recordtypes:delete --picklist "Status" --apiname "Inactive"
+sf easysources recordtypes delete --picklist "Status" --apiname "Inactive"
 
 # All metadata retrieve
-sf easysources allmeta:retrieve --orgname "myorg" --split-merge --clean
+sf easysources allmeta retrieve --orgname "myorg" --split-merge --clean
 ```
 
 ---
