@@ -52,6 +52,18 @@ export default class Split extends SfdxCommand {
             description: messages.getMessage('ignoreuserpermFlagDescription', ['false']),
             options: ['true', 'false'],
             default: 'false',
+        }),
+        parallel: flags.enum({
+            char: 'p',
+            description: 'Enable parallel processing for faster execution (default: true)',
+            options: ['true', 'false'],
+            default: 'true',
+        }),
+        maxworkers: flags.integer({
+            char: 'w',
+            description: 'Maximum number of worker threads for parallel processing (default: number of CPU cores)',
+            min: 1,
+            max: 16,
         })
     };
 

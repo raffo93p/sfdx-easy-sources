@@ -13,7 +13,9 @@ export function initSettings() {
         "salesforce-xml-path": DEFAULT_SFXML_PATH,
         "easysources-csv-path": DEFAULT_ESCSV_PATH,
         "easysources-log-path": DEFAULT_LOG_PATH,
-        "ignore-user-permissions": true
+        "ignore-user-permissions": true,
+        "use-parallel-processing": true,
+        "max-workers": 4
     }
     return settings;
 }
