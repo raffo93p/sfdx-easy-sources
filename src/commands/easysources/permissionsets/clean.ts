@@ -21,9 +21,6 @@ import { DEFAULT_PACKAGE_LOC_EXT, DEFAULT_PACKAGE_ORG_EXT, TYPES_PICKVAL_ROOT, T
 import { PERMSETS_SUBPATH, PERMSET_ITEMS, PERMSET_KEY_TYPE } from '../../../utils/constants/constants_permissionsets';
 const _ = require('lodash') ;
 
-const prompt = require('prompt-sync')();
-
-
 const settings = loadSettings();
 
 // Initialize Messages with the current plugin directory
@@ -66,7 +63,7 @@ export default class Clean extends SfdxCommand {
         mode: flags.enum({
             char: 'm',
             description: messages.getMessage('modeFlagDescription', ['clean']),
-            options: ['clean', 'interactive', 'log'],
+            options: ['clean', 'log'],
             default: 'clean',
         }),
         target: flags.enum({
@@ -237,9 +234,6 @@ export async function permissionsetClean(options: any): Promise<any> {
 
                         if(!found){
                             const errStr = `Permission Set ${profileName}, ${tag_section}: ${key} "${item}" not found in ${typename}.`;
-                            if(mode === "interactive") {
-                                dontCanc = prompt(`${errStr}. Do you want to delete it? (y/n): `) !== 'y';
-                            }
                             if(mode === "log") {
                                 logList.push(`${errStr}`);
                             }

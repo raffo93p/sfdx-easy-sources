@@ -8,6 +8,7 @@
   - **Zero Code Duplication**: CLI commands delegate to API functions for single source of truth
   - **Settings Integration**: Seamless integration with existing `easysources-settings.json` configuration
   - See [API.md](./API.md) for complete documentation and examples
+- **Breaking Change: Removed interactive mode from clean commands** - Deprecated and removed the `interactive` mode option from all clean commands (`profiles:clean`, `permissionsets:clean`, `recordtypes:clean`) as it was effectively unused and provided no real value. Clean commands now support only `clean` and `log` modes, simplifying the interface and improving maintainability.
 
 ## Version 0.7.7
 - **New Feature: `include-types` flag for clean commands** - Added the `--include-types` (`-d`) flag to both `profiles:clean` and `permissionsets:clean` commands. This flag allows you to specify a whitelist of metadata types to process during cleaning operations. When used, only the specified types will be cleaned, providing more granular control over the cleaning process. The flag accepts comma-separated values and works alongside the existing `--skip-types` flag.

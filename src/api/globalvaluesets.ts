@@ -1,4 +1,5 @@
 import { AnyJson } from '@salesforce/ts-types';
+import { PathOptions } from './paths';
 import { globalValueSetSplit } from '../commands/easysources/globalvaluesets/split';
 import { globalValueSetUpsert } from '../commands/easysources/globalvaluesets/upsert';
 import { globalValueSetMerge } from '../commands/easysources/globalvaluesets/merge';
@@ -9,12 +10,8 @@ import { globalValueSetUpdateKey } from '../commands/easysources/globalvaluesets
  * Interface for Global Value Set operation options.
  * All properties are optional and will be resolved automatically from easysources-settings.json if not provided.
  */
-export interface GlobalValueSetOptions {
-  /** Path to Salesforce XML metadata files */
-  'sf-xml'?: string;
-  /** Path to EasySources CSV files */
-  'es-csv'?: string;
-  /** Input path override */
+export interface GlobalValueSetOptions extends PathOptions {
+  /** Input global value sets (comma-separated) */
   input?: string;
   /** Sort output (default: 'false') */
   sort?: 'true' | 'false';
@@ -96,14 +93,4 @@ export const globalValueSets = {
   }
 };
 
-// Export individual functions for more granular imports
-export { globalValueSetSplit };
-export { globalValueSetUpsert };
-export { globalValueSetMerge };
-export { globalValueSetAreAligned };
-export { globalValueSetUpdateKey };
-export { globalValueSetSplit as split };
-export { globalValueSetUpsert as upsert };
-export { globalValueSetMerge as merge };
-export { globalValueSetAreAligned as areAligned };
-export { globalValueSetUpdateKey as updateKey };
+

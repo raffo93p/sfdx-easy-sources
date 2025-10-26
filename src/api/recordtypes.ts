@@ -1,4 +1,7 @@
 import { AnyJson } from '@salesforce/ts-types';
+import { PathOptions } from './paths';
+
+// Import record type-specific functions directly from command files
 import { recordTypeSplit } from '../commands/easysources/recordtypes/split';
 import { recordTypeMerge } from '../commands/easysources/recordtypes/merge';
 import { recordTypeUpsert } from '../commands/easysources/recordtypes/upsert';
@@ -10,180 +13,126 @@ import { recordTypeClean } from '../commands/easysources/recordtypes/clean';
 /**
  * Configuration options for record type operations
  */
-export interface RecordTypeOptions {
-    /** Path to Salesforce XML directory */
-    sfXml?: string;
-    /** Path to EasySources CSV directory */  
-    esCsv?: string;
-    /** Target org username/alias */
-    orgname?: string;
-    /** Comma-separated list of object names */
+export interface RecordTypeOptions extends PathOptions{
+    // === Common Options (used by multiple operations) ===
+    /** Comma-separated list of object names (all operations) */
     object?: string;
-    /** Comma-separated list of record type names */
+    /** Comma-separated list of record type names (all operations) */
     recordtype?: string;
-    /** Sort entries alphabetically */
+    /** Sort entries alphabetically (all operations) */
     sort?: boolean | string;
-    /** Validation mode for areAligned */
-    mode?: 'string' | 'logic';
-    /** Validation only, no actual deployment */
-    checkonly?: boolean;
-    /** Clean mode */
-    cleanMode?: 'clean' | 'interactive' | 'log';
-    /** Validation target */
+    
+    // === Operation-specific Options ===
+    /** Target org username/alias (clean only) */
+    orgname?: string;
+    /** Validation mode - areAligned: 'string'|'logic', clean: 'clean'|'log' */
+    mode?: 'string' | 'logic' | 'clean' | 'log';
+    /** Validation target (clean only) */
     target?: 'org' | 'local' | 'both';
-    /** Include standard fields in operations */
-    includeStandardFields?: boolean;
-    /** Skip package manifest creation */
-    skipManifestCreation?: boolean;
-    /** Log directory path */
-    logDir?: string;
+    /** Include standard fields in validation (clean only) */
+    'include-standard-fields'?: boolean;
+    /** Skip package manifest creation (clean only) */  
+    'skip-manifest-creation'?: boolean;
+    /** Log directory path (clean only) */
+    'log-dir'?: string;
+    /** Picklist name to delete (delete only - required) */
+    picklist?: string;
+    /** API name to delete (delete only - optional) */
+    apiname?: string;
 }
 
+
+
 /**
- * Record Types API - Programmatic access to all record type management operations
+ * Record Types namespace containing all programmatic API functions for Salesforce Record Type metadata operations.
  * 
- * This module provides a comprehensive API for managing Salesforce record type metadata
- * using the EasySources plugin's CSV-based split-merge workflow.
+ * All methods automatically resolve paths from easysources-settings.json configuration file.
+ * You only need to provide options to override the default behavior.
+ * 
+ * Available operations:
+ * - split(): Splits record types into separate CSV files
+ * - merge(): Merges record type CSV files back to XML
+ * - upsert(): Updates or inserts record type data from XML to CSV
+ * - delete(): Deletes specific entries from CSV files
+ * - areAligned(): Checks if record types are aligned between XML and CSV
+ * - updateKey(): Updates record type keys in CSV files
+ * - clean(): Removes references to non-existent metadata
  * 
  * @example
- * ```typescript
- * import { recordtypes } from 'sfdx-easy-sources';
+ * ```javascript
+ * const { recordtypes } = require('sfdx-easy-sources');
  * 
- * // Split record types to CSV
- * await recordtypes.split({ object: 'Account,Contact' });
+ * // Using default settings from easysources-settings.json
+ * await recordtypes.split({ object: 'Account' });
  * 
- * // Merge modified CSV back to XML
- * await recordtypes.merge({ recordtype: 'BusinessAccount' });
- * 
- * // Update record types in org
- * await recordtypes.upsert({ object: 'Account' });
+ * // Override specific paths
+ * await recordtypes.merge({
+ *   'sf-xml': './custom-metadata-path',
+ *   'es-csv': './custom-csv-path'
+ * });
  * ```
  */
-
-/**
- * Split record type metadata from XML to CSV format for easier editing
- * @param options - Configuration options
- * @param options.sfXml - Path to Salesforce XML directory
- * @param options.esCsv - Path to EasySources CSV directory  
- * @param options.object - Comma-separated list of object names to process
- * @param options.recordtype - Comma-separated list of record type names to process
- * @param options.sort - Sort CSV entries (default: true)
- * @returns Promise resolving to operation result
- */
-export async function split(options: any = {}): Promise<AnyJson> {
-    return await recordTypeSplit(options);
-}
-
-/**
- * Merge CSV record type data back into XML format
- * @param options - Configuration options
- * @param options.sfXml - Path to Salesforce XML directory
- * @param options.esCsv - Path to EasySources CSV directory
- * @param options.object - Comma-separated list of object names to process
- * @param options.recordtype - Comma-separated list of record type names to process
- * @param options.sort - Sort merged entries (default: true)
- * @returns Promise resolving to operation result
- */
-export async function merge(options: any = {}): Promise<AnyJson> {
-    return await recordTypeMerge(options);
-}
-
-/**
- * Deploy record types to Salesforce org (create/update)
- * @param options - Configuration options
- * @param options.sfXml - Path to Salesforce XML directory
- * @param options.orgname - Target org username/alias
- * @param options.object - Comma-separated list of object names to process
- * @param options.recordtype - Comma-separated list of record type names to process
- * @param options.checkonly - Validate deployment without committing changes
- * @returns Promise resolving to deployment result
- */
-export async function upsert(options: any = {}): Promise<AnyJson> {
-    return await recordTypeUpsert(options);
-}
-
-/**
- * Delete record types from Salesforce org
- * @param options - Configuration options
- * @param options.orgname - Target org username/alias
- * @param options.object - Comma-separated list of object names to process
- * @param options.recordtype - Comma-separated list of record type names to process
- * @param options.checkonly - Validate deletion without committing changes
- * @returns Promise resolving to deletion result
- */
-export async function remove(options: any = {}): Promise<AnyJson> {
-    return await recordTypeDelete(options);
-}
-
-/**
- * Validate alignment between XML and CSV record type data
- * @param options - Configuration options
- * @param options.sfXml - Path to Salesforce XML directory
- * @param options.esCsv - Path to EasySources CSV directory
- * @param options.object - Comma-separated list of object names to process
- * @param options.recordtype - Comma-separated list of record type names to process
- * @param options.mode - Validation mode: 'string' or 'logic' (default: 'string')
- * @param options.sort - Sort comparison data (default: true)
- * @returns Promise resolving to validation results
- */
-export async function areAligned(options: any = {}): Promise<AnyJson> {
-    return await recordTypeAreAligned(options);
-}
-
-/**
- * Update CSV tag IDs for record type entries
- * @param options - Configuration options
- * @param options.esCsv - Path to EasySources CSV directory
- * @param options.object - Comma-separated list of object names to process
- * @param options.recordtype - Comma-separated list of record type names to process
- * @param options.sort - Sort updated entries (default: true)
- * @returns Promise resolving to update result
- */
-export async function updateKey(options: any = {}): Promise<AnyJson> {
-    return await recordTypeUpdateKey(options);
-}
-
-/**
- * Clean invalid field references from record type CSV data
- * @param options - Configuration options
- * @param options.sfXml - Path to Salesforce XML directory
- * @param options.esCsv - Path to EasySources CSV directory
- * @param options.orgname - Source org username/alias
- * @param options.object - Comma-separated list of object names to process
- * @param options.recordtype - Comma-separated list of record type names to process
- * @param options.mode - Clean mode: 'clean', 'interactive', or 'log' (default: 'clean')
- * @param options.target - Validation target: 'org', 'local', or 'both' (default: 'both')
- * @param options.includeStandardFields - Include standard fields in validation (default: false)
- * @param options.skipManifestCreation - Skip package manifest generation (default: false)
- * @param options.logDir - Directory for log output
- * @param options.sort - Sort cleaned entries (default: true)
- * @returns Promise resolving to cleaning result
- */
-export async function clean(options: any = {}): Promise<AnyJson> {
-    return await recordTypeClean(options);
-}
-
-// Individual function exports for direct import
-export { recordTypeSplit, recordTypeMerge, recordTypeUpsert, recordTypeDelete, recordTypeAreAligned, recordTypeUpdateKey, recordTypeClean };
-
-// Namespace export
 export const recordtypes = {
-    split,
-    merge,
-    upsert,
-    remove,
-    areAligned,
-    updateKey,
-    clean
-};
+  /**
+   * Split record type metadata from XML to CSV format for easier editing.
+   * @param options Optional configuration, automatically resolved from settings if not provided
+   * @returns Promise resolving to operation result
+   */
+  split: async (options: RecordTypeOptions = {}): Promise<AnyJson> => {
+    return await recordTypeSplit(options);
+  },
 
-// Default export with all functions
-export default {
-    split,
-    merge,
-    upsert,
-    remove,
-    areAligned,
-    updateKey,
-    clean
+  /**
+   * Merge CSV record type data back into XML format.
+   * @param options Optional configuration, automatically resolved from settings if not provided
+   * @returns Promise resolving to operation result
+   */
+  merge: async (options: RecordTypeOptions = {}): Promise<AnyJson> => {
+    return await recordTypeMerge(options);
+  },
+
+  /**
+   * Upsert XML record type data into existing CSV files.
+   * @param options Optional configuration, automatically resolved from settings if not provided
+   * @returns Promise resolving to operation result
+   */
+  upsert: async (options: RecordTypeOptions = {}): Promise<AnyJson> => {
+    return await recordTypeUpsert(options);
+  },
+
+  /**
+   * Delete entries from record type CSV files.
+   * @param options Configuration options for the delete operation
+   * @returns Promise resolving to operation result
+   */
+  delete: async (options: RecordTypeOptions): Promise<AnyJson> => {
+    return await recordTypeDelete(options);
+  },
+
+  /**
+   * Validate alignment between XML and CSV record type data.
+   * @param options Optional configuration, automatically resolved from settings if not provided
+   * @returns Promise resolving to operation result
+   */
+  areAligned: async (options: RecordTypeOptions = {}): Promise<AnyJson> => {
+    return await recordTypeAreAligned(options);
+  },
+
+  /**
+   * Update CSV tag IDs for record type entries.
+   * @param options Optional configuration, automatically resolved from settings if not provided
+   * @returns Promise resolving to operation result
+   */
+  updateKey: async (options: RecordTypeOptions = {}): Promise<AnyJson> => {
+    return await recordTypeUpdateKey(options);
+  },
+
+  /**
+   * Clean invalid field references from record type CSV data.
+   * @param options Optional configuration, automatically resolved from settings if not provided
+   * @returns Promise resolving to operation result
+   */
+  clean: async (options: RecordTypeOptions = {}): Promise<AnyJson> => {
+    return await recordTypeClean(options);
+  }
 };

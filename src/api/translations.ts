@@ -1,4 +1,7 @@
 import { AnyJson } from '@salesforce/ts-types';
+import { PathOptions } from './paths';
+
+// Import translation-specific functions directly from command files
 import { translationSplit } from '../commands/easysources/translations/split';
 import { translationUpsert } from '../commands/easysources/translations/upsert';
 import { translationMerge } from '../commands/easysources/translations/merge';
@@ -10,12 +13,8 @@ import { translationClearEmpty } from '../commands/easysources/translations/clea
  * Interface for Translation operation options.
  * All properties are optional and will be resolved automatically from easysources-settings.json if not provided.
  */
-export interface TranslationOptions {
-  /** Path to Salesforce XML metadata files */
-  'sf-xml'?: string;
-  /** Path to EasySources CSV files */
-  'es-csv'?: string;
-  /** Input path override */
+export interface TranslationOptions extends PathOptions {
+  /** Input translations (comma-separated) */
   input?: string;
   /** Sort output (default: 'true') */
   sort?: 'true' | 'false';
@@ -106,17 +105,3 @@ export const translations = {
     return translationClearEmpty(options);
   }
 };
-
-// Export individual functions for more granular imports
-export { translationSplit };
-export { translationUpsert };
-export { translationMerge };
-export { translationAreAligned };
-export { translationMinify };
-export { translationClearEmpty };
-export { translationSplit as split };
-export { translationUpsert as upsert };
-export { translationMerge as merge };
-export { translationAreAligned as areAligned };
-export { translationMinify as minify };
-export { translationClearEmpty as clearEmpty };

@@ -67,7 +67,7 @@ export default class Clean extends SfdxCommand {
         mode: flags.enum({
             char: 'm',
             description: messages.getMessage('modeFlagDescription', ['clean']),
-            options: ['clean', 'interactive', 'log'],
+            options: ['clean', 'log'],
             default: 'clean',
         }),
         target: flags.enum({

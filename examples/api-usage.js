@@ -5,44 +5,16 @@
  * with automatic path resolution from easysources-settings.json.
  */
 
-// Import all API namespaces and individual functions
+// Import all API namespaces
 // When using as an installed package, use: require('sfdx-easy-sources')
 // When running from the project directory, use the relative path:
 const {
     profiles, permissionsets, labels, applications, 
     globalValueSets, globalValueSetTranslations, translations, recordtypes,
-    PathOptions, resolvePaths,
-    profileSplit, labelUpsert, applicationMerge, permissionsetClean,
-    globalValueSetSplit, globalValueSetTranslationMerge, translationMinify,
-    recordTypeSplit
+    PathOptions, resolvePaths
 } = require('../lib');
 
-// You can also import individual functions directly for more flexibility:
-const { 
-    profileSplit, 
-    profileUpsert, 
-    profileMerge, 
-    profileMinify,
-    profileDelete,
-    profileClean,
-    profileClearEmpty,
-    profileAreAligned,
-    profileUpdateKey,
-    permissionsetSplit,
-    permissionsetUpsert,
-    permissionsetMerge,
-    permissionsetMinify,
-    permissionsetDelete,
-    permissionsetClean,
-    permissionsetClearEmpty,
-    permissionsetAreAligned,
-    permissionsetUpdateKey,
-    labelSplit,
-    labelUpsert,
-    labelMerge,
-    labelAreAligned,
-    labelUpdateKey
-} = require('../lib/index.js');
+
 
 async function main() {
     try {
@@ -67,11 +39,11 @@ async function main() {
             console.log('  → In a real project, this would split your profile XML files into CSV files');
         }
 
-        // Example 2: Upsert using direct function import
-        console.log('\n2. Upserting profile changes using direct function...');
+        // Example 2: Upsert using namespace API
+        console.log('\n2. Upserting profile changes using namespace API...');
         try {
             // Override specific path while using settings for others
-            const upsertResult = await profileUpsert({
+            const upsertResult = await profiles.upsert({
                 'sf-xml': './custom-source-path', // Override this path
                 ignoreuserperm: 'false'          // Use settings for 'es-csv' path
             });
@@ -110,10 +82,10 @@ async function main() {
         // Example 5: Clean profiles (remove non-existent metadata references)
         console.log('\n5. Cleaning profiles against org metadata...');
         try {
-            const cleanResult = await profileClean({
+            const cleanResult = await profiles.clean({
                 orgname: 'myorg',
                 target: 'org',
-                mode: 'log' // Options: 'interactive', 'log', 'clean'
+                mode: 'log' // Options: 'log', 'clean'
             });
             console.log('✓ Result:', cleanResult.outputString);
         } catch (error) {
@@ -166,7 +138,7 @@ async function main() {
         // Example 9: Update keys across CSV files
         console.log('\n9. Updating field reference keys...');
         try {
-            const updateResult = await profileUpdateKey({
+            const updateResult = await profiles.updateKey({
                 input: 'Admin'
             });
             console.log('✓ Key update completed');
@@ -219,10 +191,10 @@ async function automateProfileManagement() {
             console.log('  → In a real project, this would split your permission set XML files into CSV files');
         }
 
-        // Example: Direct function import for permission sets
-        console.log('10. Permission set operations with direct function imports...');
+        // Example: Permission set upsert with namespace API
+        console.log('10. Permission set operations with namespace API...');
         try {
-            const permsetUpsertResult = await permissionsetUpsert();
+            const permsetUpsertResult = await permissionsets.upsert();
             console.log('✓ Permission set upsert result:', permsetUpsertResult.outputString);
         } catch (error) {
             console.log('⚠ Expected error (no permission sets directory):', error.message || 'Input folder does not exist');
@@ -297,10 +269,10 @@ async function managePermissionSets() {
             console.log('  → In a real project, this would split your custom label XML files into CSV files');
         }
 
-        // Example: Direct function import for labels
-        console.log('13. Label operations with direct function imports...');
+        // Example: Label upsert with namespace API
+        console.log('13. Label operations with namespace API...');
         try {
-            const labelUpsertResult = await labelUpsert();
+            const labelUpsertResult = await labels.upsert();
             console.log('✅ Label upsert result:', labelUpsertResult.outputString);
         } catch (error) {
             console.log('⚠ Expected error (no labels directory):', error.message || 'Input folder does not exist');
@@ -550,7 +522,6 @@ async function manageCustomLabels() {
         console.log('  • Automatic path resolution from easysources-settings.json');
         console.log('  • Complete lifecycle management for 8 metadata types: profiles, permission sets, labels, applications, global value sets, global value set translations, translations, record types');
         console.log('  • Consistent namespace APIs: profiles.method, permissionsets.method, labels.method, applications.method, globalValueSets.method, globalValueSetTranslations.method, translations.method, recordtypes.method');
-        console.log('  • Direct function imports for all metadata types');
         console.log('  • Minimal configuration required');
         console.log('  • Full TypeScript support available');
         console.log('  • Identical API patterns across all metadata types');

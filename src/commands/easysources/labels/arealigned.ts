@@ -32,10 +32,6 @@ export default class LabelsAreAligned extends SfdxCommand {
         char: 'c',
         description: messages.getMessage('esCsvFlagDescription', [DEFAULT_ESCSV_PATH]),
     }),
-    input: flags.string({
-        char: 'i',
-        description: messages.getMessage('inputFlagDescription'),
-    }),
     sort: flags.enum({
         char: 'S',
         description: messages.getMessage('sortFlagDescription', ['true']),

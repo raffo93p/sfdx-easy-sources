@@ -96,7 +96,7 @@ sf easysources profiles upsert --type "fieldPermissions,classAccesses" --tagid "
 - `--input, -i`: Specific profile names (comma-separated)
 - `--orgname, -u`: Target org username or alias
 - `--log-dir, -l`: Log directory path
-- `--mode, -m`: Cleaning mode (`clean`, `interactive`, `log`, default: `clean`)
+- `--mode, -m`: Cleaning mode (`clean`, `log`, default: `clean`)
 - `--target, -g`: Target to compare against (`org`, `local`, `both`, default: `both`)
 - `--include-standard-fields, -F`: Include standard fields in cleaning (default: `false`)
 - `--skip-manifest-creation, -M`: Skip manifest file creation (default: `false`)
@@ -191,7 +191,7 @@ sf easysources permissionsets upsert --type "fieldPermissions" --tagid "Account.
 - `--input, -i`: Specific permission set names (comma-separated)
 - `--orgname, -u`: Target org username or alias
 - `--log-dir, -l`: Log directory path
-- `--mode, -m`: Cleaning mode (`clean`, `interactive`, `log`, default: `clean`)
+- `--mode, -m`: Cleaning mode (`clean`, `log`, default: `clean`)
 - `--target, -g`: Target to compare against (`org`, `local`, `both`, default: `both`)
 - `--include-standard-fields, -F`: Include standard fields in cleaning (default: `false`)
 - `--skip-manifest-creation, -M`: Skip manifest file creation (default: `false`)
@@ -294,7 +294,7 @@ sf easysources recordtypes delete --picklist "Status" --apiname "Active,Inactive
 - `--object, -s`: Specific object names (comma-separated)
 - `--recordtype, -r`: Specific record type names (comma-separated)
 - `--log-dir, -l`: Log directory path
-- `--mode, -m`: Cleaning mode (`clean`, `interactive`, `log`, default: `clean`)
+- `--mode, -m`: Cleaning mode (`clean`, `log`, default: `clean`)
 - `--target, -g`: Target to compare against (`org`, `local`, `both`, default: `both`)
 - `--include-standard-fields, -F`: Include standard fields in cleaning (default: `false`)
 - `--skip-manifest-creation, -M`: Skip manifest file creation (default: `false`)
@@ -470,7 +470,6 @@ sf easysources recordtypes delete --picklist "Status" --apiname "Active,Inactive
 **Flags**:
 - `--sf-xml, -x`: Input labels directory
 - `--es-csv, -c`: Output CSV directory
-- `--input, -i`: Specific label files (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
 ### `sf easysources labels merge`
@@ -479,7 +478,6 @@ sf easysources recordtypes delete --picklist "Status" --apiname "Active,Inactive
 **Flags**:
 - `--sf-xml, -x`: Output labels directory
 - `--es-csv, -c`: Input CSV directory
-- `--input, -i`: Specific label files (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
 ### `sf easysources labels upsert`
@@ -488,7 +486,6 @@ sf easysources recordtypes delete --picklist "Status" --apiname "Active,Inactive
 **Flags**:
 - `--sf-xml, -x`: Input labels directory
 - `--es-csv, -c`: Input CSV directory
-- `--input, -i`: Specific label files (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
 ### `sf easysources labels arealigned`
@@ -497,7 +494,6 @@ sf easysources recordtypes delete --picklist "Status" --apiname "Active,Inactive
 **Flags**:
 - `--sf-xml, -x`: Labels directory
 - `--es-csv, -c`: CSV directory
-- `--input, -i`: Specific label files (comma-separated)
 - `--mode`: Comparison mode (`string` or `logic`, default: `string`)
 
 ### `sf easysources labels updatekey`
@@ -505,7 +501,6 @@ sf easysources recordtypes delete --picklist "Status" --apiname "Active,Inactive
 
 **Flags**:
 - `--es-csv, -c`: CSV directory
-- `--input, -i`: Specific label files (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
 ---

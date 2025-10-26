@@ -97,13 +97,13 @@ This document provides a quick reference matrix of all commands and their availa
 
 ## Labels Commands
 
-| Command | `--sf-xml` | `--es-csv` | `--input` | `--sort` | `--mode` | Special Params |
-|---------|------------|------------|-----------|----------|----------|----------------|
-| **split** | ✅ | ✅ | ✅ | ✅ | ❌ | - |
-| **merge** | ✅ | ✅ | ✅ | ✅ | ❌ | - |
-| **upsert** | ✅ | ✅ | ✅ | ✅ | ❌ | - |
-| **arealigned** | ✅ | ✅ | ✅ | ❌ | ✅ | string/logic mode |
-| **updatekey** | ❌ | ✅ | ✅ | ✅ | ❌ | - |
+| Command | `--sf-xml` | `--es-csv` | `--sort` | `--mode` | Special Params |
+|---------|------------|------------|----------|----------|----------------|
+| **split** | ✅ | ✅ | ✅ | ❌ | - |
+| **merge** | ✅ | ✅ | ✅ | ❌ | - |
+| **upsert** | ✅ | ✅ | ✅ | ❌ | - |
+| **arealigned** | ✅ | ✅ | ❌ | ✅ | string/logic mode |
+| **updatekey** | ❌ | ✅ | ✅ | ❌ | - |
 
 ---
 

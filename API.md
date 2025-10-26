@@ -64,9 +64,6 @@ The profile API provides programmatic access to all profile-related operations.
 import { profiles } from 'sfdx-easy-sources';
 // or
 const { profiles } = require('sfdx-easy-sources');
-
-// You can also import individual functions
-import { profileSplit, profileMerge } from 'sfdx-easy-sources';
 ```
 
 #### Common Types
@@ -358,9 +355,9 @@ const result = await profiles.clean({
     input: 'Admin,Standard User'
 });
 
-// Interactive mode for confirmation
+// log mode 
 const result = await profiles.clean({
-    mode: 'interactive',
+    mode: 'log',
     target: 'both'
 });
 ```

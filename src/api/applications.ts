@@ -1,4 +1,5 @@
 import { AnyJson } from '@salesforce/ts-types';
+import { PathOptions } from './paths';
 import { applicationSplit } from '../commands/easysources/applications/split';
 import { applicationUpsert } from '../commands/easysources/applications/upsert';
 import { applicationMerge } from '../commands/easysources/applications/merge';
@@ -9,12 +10,8 @@ import { applicationUpdateKey } from '../commands/easysources/applications/updat
  * Interface for Application operation options.
  * All properties are optional and will be resolved automatically from easysources-settings.json if not provided.
  */
-export interface ApplicationOptions {
-  /** Path to Salesforce XML metadata files */
-  'sf-xml'?: string;
-  /** Path to EasySources CSV files */
-  'es-csv'?: string;
-  /** Input path override */
+export interface ApplicationOptions extends PathOptions {
+  /** Input applications (comma-separated) */
   input?: string;
   /** Sort output (default: 'true') */
   sort?: 'true' | 'false';
@@ -96,14 +93,4 @@ export const applications = {
   }
 };
 
-// Export individual functions for more granular imports
-export { applicationSplit };
-export { applicationUpsert };
-export { applicationMerge };
-export { applicationAreAligned };
-export { applicationUpdateKey };
-export { applicationSplit as split };
-export { applicationUpsert as upsert };
-export { applicationMerge as merge };
-export { applicationAreAligned as areAligned };
-export { applicationUpdateKey as updateKey };
+

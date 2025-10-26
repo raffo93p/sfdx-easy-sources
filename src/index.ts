@@ -8,112 +8,55 @@
 // Export all profile functionality
 export {
     profiles,
-    ProfileOptions,
-    profileSplit,
-    profileUpsert,
-    profileMerge,
-    profileClearEmpty,
-    profileAreAligned,
-    profileUpdateKey,
-    profileMinify,
-    profileDelete,
-    profileClean
+    ProfileOptions
 } from './api/profiles';
 
 // Export all permission set functionality
 export {
     permissionsets,
-    PermissionsetOptions,
-    permissionsetSplit,
-    permissionsetUpsert,
-    permissionsetMerge,
-    permissionsetClearEmpty,
-    permissionsetAreAligned,
-    permissionsetUpdateKey,
-    permissionsetMinify,
-    permissionsetDelete,
-    permissionsetClean
+    PermissionsetOptions
 } from './api/permissionsets';
 
 // Export all label functionality
 export {
     labels,
-    LabelOptions,
-    labelSplit,
-    labelUpsert,
-    labelMerge,
-    labelAreAligned,
-    labelUpdateKey
+    LabelOptions
 } from './api/labels';
 
 // Export all application functionality
 export {
     applications,
-    ApplicationOptions,
-    applicationSplit,
-    applicationUpsert,
-    applicationMerge,
-    applicationAreAligned,
-    applicationUpdateKey
+    ApplicationOptions
 } from './api/applications';
 
 // Export all global value set functionality
 export {
     globalValueSets,
-    GlobalValueSetOptions,
-    globalValueSetSplit,
-    globalValueSetUpsert,
-    globalValueSetMerge,
-    globalValueSetAreAligned,
-    globalValueSetUpdateKey
+    GlobalValueSetOptions
 } from './api/globalvaluesets';
 
 // Export all global value set translation functionality
 export {
     globalValueSetTranslations,
-    GlobalValueSetTranslationOptions,
-    globalValueSetTranslationSplit,
-    globalValueSetTranslationUpsert,
-    globalValueSetTranslationMerge,
-    globalValueSetTranslationAreAligned,
-    globalValueSetTranslationUpdateKey
+    GlobalValueSetTranslationOptions
 } from './api/globalvaluesettranslations';
 
 // Export all translation functionality
 export {
     translations,
-    TranslationOptions,
-    translationSplit,
-    translationUpsert,
-    translationMerge,
-    translationAreAligned,
-    translationMinify,
-    translationClearEmpty
+    TranslationOptions
 } from './api/translations';
 
 // Export all record type functionality
 export {
     recordtypes,
-    RecordTypeOptions,
-    recordTypeSplit,
-    recordTypeUpsert,
-    recordTypeMerge,
-    recordTypeAreAligned,
-    recordTypeUpdateKey,
-    recordTypeDelete,
-    recordTypeClean
+    RecordTypeOptions
 } from './api/recordtypes';
 
 // Export all object translation functionality
 export {
     objectTranslations,
-    ObjectTranslationOptions,
-    objectTranslationSplit,
-    objectTranslationUpsert,
-    objectTranslationMerge,
-    objectTranslationClearEmpty,
-    objectTranslationAreAligned,
-    objectTranslationMinify
+    ObjectTranslationOptions
 } from './api/objecttranslations';
 
 // Export all path functionality
