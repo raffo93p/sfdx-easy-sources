@@ -1,6 +1,7 @@
 import { calcCsvFilename, readXmlFromFile, removeExtension, writeXmlToFile } from '../filesUtils'
 import { generateTagId } from '../utils'
 import { format } from 'fast-csv';
+import { FastCsvWriter } from './fast-csv-native';
 import { join } from "path";
 
 /**
@@ -28,7 +29,7 @@ function processJsonData(data: any[], headers: any[]): any[] {
         }
         
         // Aggiungi valori di default per i campi mancanti
-        headers.forEach((header, index) => {
+        headers.forEach((header) => {
             if (typeof header === 'object' && header.value && header.default !== undefined) {
                 const fieldName = header.value;
                 if (processedRow[fieldName] === undefined || processedRow[fieldName] === null) {
@@ -49,7 +50,13 @@ import { arrayToFlat } from '../flatArrayUtils';
 
 const settings = loadSettings();
 
-export async function split(flags, file_subpath, file_extension, file_root_tag, file_items) {
+export enum CsvEngine {
+    FAST_CSV = 'fast-csv',
+    NATIVE_FAST = 'native-fast',
+    JSON2CSV = 'json2csv' // per backward compatibility
+}
+
+export async function splitWithEngine(flags, file_subpath, file_extension, file_root_tag, file_items, engine: CsvEngine = CsvEngine.FAST_CSV) {
 
     const baseInputDir = join((flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), file_subpath) as string;
     const baseOutputDir = join((flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), file_subpath) as string;
@@ -72,7 +79,7 @@ export async function split(flags, file_subpath, file_extension, file_root_tag, 
 
     for (const filename of fileList) {
         const fullFilename = filename.endsWith(file_extension) ? filename : filename + file_extension;
-        console.log('Splitting: ' + fullFilename);
+        console.log('Splitting: ' + fullFilename + ' (engine: ' + engine + ')');
 
         const inputFile = join(baseInputDir, fullFilename);
         const xmlFileContent = (await readXmlFromFile(inputFile)) ?? {};
@@ -122,26 +129,51 @@ export async function split(flags, file_subpath, file_extension, file_root_tag, 
             }
 
             try {
-                // Usa fast-csv che è molto più performante
-                const csvContent = await new Promise<string>((resolve, reject) => {
-                    let result = '';
-                    const csvStream = format({ 
-                        headers: fields, 
-                        includeEndRowDelimiter: false,  // Non aggiungere newline finale
-                        quote: '"',
-                        quoteColumns: true,  // Forza le virgolette su tutte le colonne
-                        quoteHeaders: true   // Forza le virgolette sui header
-                    });
-                    
-                    csvStream
-                        .on('data', (data) => result += data)
-                        .on('end', () => resolve(result))
-                        .on('error', reject);
-                    
-                    // Scrivi ogni riga con i dati processati
-                    processedData.forEach(row => csvStream.write(row));
-                    csvStream.end();
-                });
+                let csvContent: string;
+
+                // Scegli il motore CSV in base alla configurazione
+                switch (engine) {
+                    case CsvEngine.NATIVE_FAST:
+                        // Implementazione nativa ultra-veloce
+                        const nativeWriter = new FastCsvWriter({ 
+                            headers: fields, 
+                            includeHeaders: true 
+                        });
+                        csvContent = Array.from(nativeWriter.stream(processedData)).join('');
+                        break;
+
+                    case CsvEngine.FAST_CSV:
+                    default:
+                        // Usa fast-csv (default)
+                        csvContent = await new Promise<string>((resolve, reject) => {
+                            let result = '';
+                            const csvStream = format({ 
+                                headers: fields, 
+                                includeEndRowDelimiter: false,  // Non aggiungere newline finale
+                                quote: '"',
+                                quoteColumns: true,  // Forza le virgolette su tutte le colonne
+                                quoteHeaders: true   // Forza le virgolette sui header
+                            });
+                            
+                            csvStream
+                                .on('data', (data) => result += data)
+                                .on('end', () => resolve(result))
+                                .on('error', reject);
+                            
+                            // Scrivi ogni riga con i dati processati
+                            processedData.forEach(row => csvStream.write(row));
+                            csvStream.end();
+                        });
+                        break;
+
+                    case CsvEngine.JSON2CSV:
+                        // Fallback al vecchio json2csv se necessario (usa gli header originali con unwind)
+                        const { Parser, transforms: { unwind } } = require('json2csv');
+                        const transforms = [unwind({ paths: headers })];
+                        const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
+                        csvContent = parser.parse(myjson);
+                        break;
+                }
                 
                 fs.writeFileSync(outputFileCSV, csvContent.replace(/&#xD;/g, ""), { flag: 'w+' });
                 // file written successfully
@@ -159,4 +191,10 @@ export async function split(flags, file_subpath, file_extension, file_root_tag, 
     }
 
     return { outputString: 'OK' };
+}
+
+// Backward compatibility - usa fast-csv per default
+export async function split(flags, file_subpath, file_extension, file_root_tag, file_items) {
+    const engine = settings['csv-engine'] as CsvEngine || CsvEngine.FAST_CSV;
+    return splitWithEngine(flags, file_subpath, file_extension, file_root_tag, file_items, engine);
 }

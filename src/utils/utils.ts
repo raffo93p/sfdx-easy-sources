@@ -56,7 +56,8 @@ export function sortByKey(myArray) {
 }
 
 export function setDefault(header) {
-	return {value: header, default: ''};
+	return header;
+	//return {value: header, default: ''};
 	// var newHeaders = [];
 	// for (var field of headers) {
 	// 	newHeaders.push({ value: field, default: 'a' });

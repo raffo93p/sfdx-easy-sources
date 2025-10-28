@@ -10,8 +10,9 @@ import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import { PROFILE_ITEMS, PROFILES_EXTENSION, PROFILES_ROOT_TAG, PROFILES_SUBPATH } from '../../../utils/constants/constants_profiles';
 import Performance from '../../../utils/performance';
-import { split } from '../../../utils/commands/splitter';
+//import { split } from '../../../utils/commands/splitter';
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
+import { CsvEngine, splitWithEngine } from '../../../utils/commands/splitter-enhanced';
 
 
 // Initialize Messages with the current plugin directory
@@ -52,7 +53,13 @@ export default class Split extends SfdxCommand {
             description: messages.getMessage('ignoreuserpermFlagDescription', ['false']),
             options: ['true', 'false'],
             default: 'false',
-        })
+        }),
+        csvengine: flags.enum({
+            char: 'e',
+            description: messages.getMessage('csvEngineFlagDescription', ['fast-csv']),
+            options: ['fast-csv', 'native-fast', 'json2csv'],
+            default: 'fast-csv',
+        }),
     };
 
 
@@ -74,5 +81,20 @@ export default class Split extends SfdxCommand {
  * @returns Promise with split operation result
  */
 export async function profileSplit(options: any): Promise<any> {
-    return await split(options, PROFILES_SUBPATH, PROFILES_EXTENSION, PROFILES_ROOT_TAG, PROFILE_ITEMS);
+    // Mappa il valore del flag csvengine all'enum corrispondente
+    let engine: CsvEngine;
+    switch (options.csvengine) {
+        case 'native-fast':
+            engine = CsvEngine.NATIVE_FAST;
+            break;
+        case 'json2csv':
+            engine = CsvEngine.JSON2CSV;
+            break;
+        case 'fast-csv':
+        default:
+            engine = CsvEngine.FAST_CSV;
+            break;
+    }
+    
+    return await splitWithEngine(options, PROFILES_SUBPATH, PROFILES_EXTENSION, PROFILES_ROOT_TAG, PROFILE_ITEMS, engine);
 }
