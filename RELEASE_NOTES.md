@@ -1,5 +1,8 @@
 # Release Notes
 
+## Version 0.8.1
+- **Bug Fix: Fixed `recordtypes:arealigned` command** - Resolved a critical bug in the `recordtypes:arealigned` command that was causing "ENOENT: no such file or directory" errors when processing temporary files. The issue was caused by a missing `await` keyword in the file writing operation, which caused the command to attempt reading temporary files before they were fully written. The command now works correctly and properly validates record type alignment between XML and CSV files.
+
 ## Version 0.8.0
 - **Major Enhancement: Complete Programmatic API for All Metadata Types** - Added comprehensive programmatic API support with automatic path resolution! You can now use all operations for every supported metadata types directly in your Node.js scripts with **57 total API operations** across 9 metadata types (Profiles, Permission Sets, Custom Labels, Applications, Global Value Sets, Global Value Set Translations, Translations, Object Translations, Record Types).
   - **Automatic Path Resolution**: All methods auto-resolve paths from `easysources-settings.json` - specify only what you need to override

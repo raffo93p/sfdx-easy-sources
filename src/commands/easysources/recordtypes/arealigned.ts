@@ -232,7 +232,7 @@ async function compareStringsForRecord(
         const mergedXml = await mergeRecordTypeFromCsv(recordTypeName, recordTypeCsvDir, options);
         const tempDir = tmpdir();
         const tempFile = join(tempDir, `temp_${recordTypeName}_${Date.now()}.xml`);
-        writeXmlToFile(tempFile, mergedXml);
+        await writeXmlToFile(tempFile, mergedXml);
 
         const reconstructedXmlString = await readStringFromFile(tempFile);
 
