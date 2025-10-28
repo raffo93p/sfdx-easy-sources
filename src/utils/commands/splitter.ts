@@ -1,6 +1,5 @@
 import { calcCsvFilename, readXmlFromFile, removeExtension, writeXmlToFile } from '../filesUtils'
 import { generateTagId } from '../utils'
-import { format } from 'fast-csv';
 import { join } from "path";
 const fs = require('fs-extra');
 import { sortByKey } from "../utils"
@@ -8,16 +7,15 @@ import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../c
 import { PROFILE_USERPERM_ROOT, PROFILES_SUBPATH } from '../constants/constants_profiles';
 import { loadSettings } from '../localSettings';
 import { arrayToFlat } from '../flatArrayUtils';
+import CsvWriter, { CsvEngine } from '../csvWriter';
 
 const settings = loadSettings();
 
-export enum CsvEngine {
-    FAST_CSV = 'fast-csv',
-    JSON2CSV = 'json2csv' // per backward compatibility
-}
 
-export async function split(flags, file_subpath, file_extension, file_root_tag, file_items, engine: CsvEngine = CsvEngine.FAST_CSV) {
 
+export async function split(flags, file_subpath, file_extension, file_root_tag, file_items) {
+    const engine = settings['csv-engine'] === 'json2csv' ? CsvEngine.JSON2CSV : CsvEngine.FAST_CSV;
+    
     const baseInputDir = join((flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), file_subpath) as string;
     const baseOutputDir = join((flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), file_subpath) as string;
     const ignoreUserPerm = (file_subpath === PROFILES_SUBPATH && (flags.ignoreuserperm === 'true' || settings['ignore-user-permissions']) || false) as boolean;
@@ -75,9 +73,6 @@ export async function split(flags, file_subpath, file_extension, file_root_tag, 
             }
 
             const headers = file_items[tag_section].headers;
-            
-            var fields = [...headers, '_tagid'];
-
             const outputFileCSV = join(outputDir, calcCsvFilename(fileName, tag_section));
 
             if (!fs.existsSync(outputDir)) {
@@ -85,43 +80,8 @@ export async function split(flags, file_subpath, file_extension, file_root_tag, 
             }
 
             try {
-                let csvContent: string;
-
-                // Scegli il motore CSV in base alla configurazione
-                switch (engine) {
-                    case CsvEngine.FAST_CSV:
-                    default:
-                        // Usa fast-csv (default)
-                        csvContent = await new Promise<string>((resolve, reject) => {
-                            let result = '';
-                            const csvStream = format({ 
-                                headers: fields, 
-                                includeEndRowDelimiter: false,  // Non aggiungere newline finale
-                                quote: '"',
-                                quoteColumns: true,  // Forza le virgolette su tutte le colonne
-                                quoteHeaders: true   // Forza le virgolette sui header
-                            });
-                            
-                            csvStream
-                                .on('data', (data) => result += data)
-                                .on('end', () => resolve(result))
-                                .on('error', reject);
-                            
-                            // Scrivi ogni riga con i dati processati
-                            myjson.forEach(row => csvStream.write(row));
-                            csvStream.end();
-                        });
-                        break;
-
-                    case CsvEngine.JSON2CSV:
-                        // Fallback al vecchio json2csv se necessario (usa gli header originali con unwind)
-                        const { Parser, transforms: { unwind } } = require('json2csv');
-                        const transforms = [unwind({ paths: headers })];
-                        const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
-                        csvContent = parser.parse(myjson);
-                        break;
-                }
-                fs.writeFileSync(outputFileCSV, csvContent.replace(/&#xD;/g, ""), { flag: 'w+' });
+                const csvContent = await new CsvWriter().toCsv(myjson, headers, engine);
+                fs.writeFileSync(outputFileCSV, csvContent, { flag: 'w+' });
                 // file written successfully
             } catch (err) {
                 console.error(err);

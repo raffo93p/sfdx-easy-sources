@@ -5,7 +5,6 @@
   "inputFlagDescription": "Specify a profile file in input. Example: Admin",
   "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
   "ignoreuserpermFlagDescription": "Specify if user permission must be ignored. Default '%s'",
-  "csvEngineFlagDescription": "Specify which CSV engine to use. Default: '%s'",
   "nameFlagDescription": "WTF",
   "forceFlagDescription": "WTF",
   "examples": [

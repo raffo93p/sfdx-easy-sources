@@ -12,7 +12,7 @@ import { PROFILE_ITEMS, PROFILES_EXTENSION, PROFILES_ROOT_TAG, PROFILES_SUBPATH 
 import Performance from '../../../utils/performance';
 //import { split } from '../../../utils/commands/splitter';
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
-import { CsvEngine, split } from '../../../utils/commands/splitter';
+import { split } from '../../../utils/commands/splitter';
 
 
 // Initialize Messages with the current plugin directory
@@ -81,17 +81,5 @@ export default class Split extends SfdxCommand {
  * @returns Promise with split operation result
  */
 export async function profileSplit(options: any): Promise<any> {
-    // Mappa il valore del flag csvengine all'enum corrispondente
-    let engine: CsvEngine;
-    switch (options.csvengine) {
-        case 'json2csv':
-            engine = CsvEngine.JSON2CSV;
-            break;
-        case 'fast-csv':
-        default:
-            engine = CsvEngine.FAST_CSV;
-            break;
-    }
-    
-    return await split(options, PROFILES_SUBPATH, PROFILES_EXTENSION, PROFILES_ROOT_TAG, PROFILE_ITEMS, engine);
+    return await split(options, PROFILES_SUBPATH, PROFILES_EXTENSION, PROFILES_ROOT_TAG, PROFILE_ITEMS);
 }
