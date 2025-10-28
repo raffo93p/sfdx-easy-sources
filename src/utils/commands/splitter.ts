@@ -2,44 +2,6 @@ import { calcCsvFilename, readXmlFromFile, removeExtension, writeXmlToFile } fro
 import { generateTagId } from '../utils'
 import { format } from 'fast-csv';
 import { join } from "path";
-
-/**
- * Processa gli headers che contengono oggetti setDefault per estrarre solo i nomi dei campi
- */
-function processHeaders(headers: any[]): string[] {
-    return headers.map(header => {
-        if (typeof header === 'object' && header.value) {
-            return header.value;
-        }
-        return header;
-    });
-}
-
-/**
- * Processa i dati JSON per gestire correttamente i campi con valori di default
- */
-function processJsonData(data: any[], headers: any[]): any[] {
-    return data.map(row => {
-        const processedRow = {};
-        
-        // Copia tutti i campi esistenti
-        for (const key in row) {
-            processedRow[key] = row[key];
-        }
-        
-        // Aggiungi valori di default per i campi mancanti
-        headers.forEach((header, index) => {
-            if (typeof header === 'object' && header.value && header.default !== undefined) {
-                const fieldName = header.value;
-                if (processedRow[fieldName] === undefined || processedRow[fieldName] === null) {
-                    processedRow[fieldName] = header.default;
-                }
-            }
-        });
-        
-        return processedRow;
-    });
-}
 const fs = require('fs-extra');
 import { sortByKey } from "../utils"
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../constants/constants';
@@ -49,7 +11,12 @@ import { arrayToFlat } from '../flatArrayUtils';
 
 const settings = loadSettings();
 
-export async function split(flags, file_subpath, file_extension, file_root_tag, file_items) {
+export enum CsvEngine {
+    FAST_CSV = 'fast-csv',
+    JSON2CSV = 'json2csv' // per backward compatibility
+}
+
+export async function split(flags, file_subpath, file_extension, file_root_tag, file_items, engine: CsvEngine = CsvEngine.FAST_CSV) {
 
     const baseInputDir = join((flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), file_subpath) as string;
     const baseOutputDir = join((flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), file_subpath) as string;
@@ -109,11 +76,7 @@ export async function split(flags, file_subpath, file_extension, file_root_tag, 
 
             const headers = file_items[tag_section].headers;
             
-            // Processa gli headers e i dati per gestire correttamente i setDefault
-            const processedHeaderNames = processHeaders(headers);
-            const processedData = processJsonData(myjson, headers);
-            
-            var fields = [...processedHeaderNames, '_tagid'];
+            var fields = [...headers, '_tagid'];
 
             const outputFileCSV = join(outputDir, calcCsvFilename(fileName, tag_section));
 
@@ -122,27 +85,42 @@ export async function split(flags, file_subpath, file_extension, file_root_tag, 
             }
 
             try {
-                // Usa fast-csv che è molto più performante
-                const csvContent = await new Promise<string>((resolve, reject) => {
-                    let result = '';
-                    const csvStream = format({ 
-                        headers: fields, 
-                        includeEndRowDelimiter: false,  // Non aggiungere newline finale
-                        quote: '"',
-                        quoteColumns: true,  // Forza le virgolette su tutte le colonne
-                        quoteHeaders: true   // Forza le virgolette sui header
-                    });
-                    
-                    csvStream
-                        .on('data', (data) => result += data)
-                        .on('end', () => resolve(result))
-                        .on('error', reject);
-                    
-                    // Scrivi ogni riga con i dati processati
-                    processedData.forEach(row => csvStream.write(row));
-                    csvStream.end();
-                });
-                
+                let csvContent: string;
+
+                // Scegli il motore CSV in base alla configurazione
+                switch (engine) {
+                    case CsvEngine.FAST_CSV:
+                    default:
+                        // Usa fast-csv (default)
+                        csvContent = await new Promise<string>((resolve, reject) => {
+                            let result = '';
+                            const csvStream = format({ 
+                                headers: fields, 
+                                includeEndRowDelimiter: false,  // Non aggiungere newline finale
+                                quote: '"',
+                                quoteColumns: true,  // Forza le virgolette su tutte le colonne
+                                quoteHeaders: true   // Forza le virgolette sui header
+                            });
+                            
+                            csvStream
+                                .on('data', (data) => result += data)
+                                .on('end', () => resolve(result))
+                                .on('error', reject);
+                            
+                            // Scrivi ogni riga con i dati processati
+                            myjson.forEach(row => csvStream.write(row));
+                            csvStream.end();
+                        });
+                        break;
+
+                    case CsvEngine.JSON2CSV:
+                        // Fallback al vecchio json2csv se necessario (usa gli header originali con unwind)
+                        const { Parser, transforms: { unwind } } = require('json2csv');
+                        const transforms = [unwind({ paths: headers })];
+                        const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
+                        csvContent = parser.parse(myjson);
+                        break;
+                }
                 fs.writeFileSync(outputFileCSV, csvContent.replace(/&#xD;/g, ""), { flag: 'w+' });
                 // file written successfully
             } catch (err) {
@@ -160,3 +138,42 @@ export async function split(flags, file_subpath, file_extension, file_root_tag, 
 
     return { outputString: 'OK' };
 }
+
+
+// /**
+//  * Processa gli headers che contengono oggetti setDefault per estrarre solo i nomi dei campi
+//  */
+// function processHeaders(headers: any[]): string[] {
+//     return headers.map(header => {
+//         if (typeof header === 'object' && header.value) {
+//             return header.value;
+//         }
+//         return header;
+//     });
+// }
+
+// /**
+//  * Processa i dati JSON per gestire correttamente i campi con valori di default
+//  */
+// function processJsonData(data: any[], headers: any[]): any[] {
+//     return data.map(row => {
+//         const processedRow = {};
+        
+//         // Copia tutti i campi esistenti
+//         for (const key in row) {
+//             processedRow[key] = row[key];
+//         }
+        
+//         // Aggiungi valori di default per i campi mancanti
+//         headers.forEach((header, index) => {
+//             if (typeof header === 'object' && header.value && header.default !== undefined) {
+//                 const fieldName = header.value;
+//                 if (processedRow[fieldName] === undefined || processedRow[fieldName] === null) {
+//                     processedRow[fieldName] = header.default;
+//                 }
+//             }
+//         });
+        
+//         return processedRow;
+//     });
+// }
