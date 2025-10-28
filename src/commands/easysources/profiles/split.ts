@@ -54,12 +54,6 @@ export default class Split extends SfdxCommand {
             options: ['true', 'false'],
             default: 'false',
         }),
-        csvengine: flags.enum({
-            char: 'e',
-            description: messages.getMessage('csvEngineFlagDescription', ['fast-csv']),
-            options: ['fast-csv', 'json2csv'],
-            default: 'fast-csv',
-        }),
     };
 
 

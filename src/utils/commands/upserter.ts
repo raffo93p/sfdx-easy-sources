@@ -1,16 +1,17 @@
 import { readXmlFromFile, readCsvToJsonMap, jsonArrayCsvToMap, removeExtension, writeXmlToFile, calcCsvFilename } from '../filesUtils'
 import { sortByKey, generateTagId } from "../utils"
 import { split } from './splitter'
-const { Parser, transforms: { unwind } } = require('json2csv');
 import { join } from "path";
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../constants/constants';
 import { PROFILE_USERPERM_ROOT, PROFILES_SUBPATH } from '../constants/constants_profiles';
 import { loadSettings } from '../localSettings';
+import CsvWriter, { CsvEngine } from '../csvWriter';
 const fs = require('fs-extra');
 
 const settings = loadSettings();
 
 export async function upsert(flags, file_subpath, file_extension, file_root_tag, file_items) {
+    const engine = settings['csv-engine'] === 'json2csv' ? CsvEngine.JSON2CSV : CsvEngine.FAST_CSV;
     
     const baseInputDir = join((flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), file_subpath) as string;
     const baseOutputDir = join((flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), file_subpath) as string;
@@ -104,10 +105,6 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
             generateTagId(jsonArrayNew, file_items[tag_section].key, file_items[tag_section].headers)
 
             const headers = file_items[tag_section].headers;
-            const transforms = [unwind({ paths: headers })];
-            const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
-
-
             const outputFile = join(outputDir, calcCsvFilename(fileName, tag_section));
 
             if (!fs.existsSync(outputDir)) {
@@ -150,12 +147,13 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
             }
 
             try {
-                const csv = parser.parse(jsonArrayNew);
-                fs.writeFileSync(outputFile, csv.replaceAll("&#xD;", ""), { flag: 'w+' });
+                const csvContent = await new CsvWriter().toCsv(jsonArrayNew, headers, engine);
+                fs.writeFileSync(outputFile, csvContent, { flag: 'w+' });
                 // file written successfully
             } catch (err) {
                 console.error(err);
             }
+
             xmlFileContent[file_root_tag][tag_section] = null;
             
         }

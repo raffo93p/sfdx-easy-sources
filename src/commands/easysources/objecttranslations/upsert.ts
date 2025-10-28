@@ -10,7 +10,6 @@ import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import { readXmlFromFile, readCsvToJsonMap, jsonArrayCsvToMap, writeXmlToFile, calcCsvFilename, checkDirOrErrorSync, checkDirOrCreateSync } from '../../../utils/filesUtils'
 import { generateTagId, sortByKey } from '../../../utils/utils'
-const { Parser, transforms: { unwind } } = require('json2csv');
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../../../utils/constants/constants';
 import Performance from '../../../utils/performance';
 import { join } from "path";
@@ -18,6 +17,7 @@ import { loadSettings } from '../../../utils/localSettings';
 import { OBJTRANSL_CFIELDTRANSL_ROOT, OBJTRANSL_CFIELDTRANSL_ROOT_TAG, OBJTRANSL_EXTENSION, OBJTRANSL_ITEMS, OBJTRANSL_LAYOUT_ROOT, OBJTRANSL_ROOT_TAG, OBJTRANSL_SUBPATH } from '../../../utils/constants/constants_objecttranslations';
 import { getFieldTranslationFiles, transformFieldXMLtoCSV, transformLayoutXMLtoCSV } from '../../../utils/utils_objtransl';
 import { executeCommand } from '../../../utils/commands/utils';
+import CsvWriter, { CsvEngine } from '../../../utils/csvWriter';
 const fs = require('fs-extra');
 
 const settings = loadSettings();
@@ -72,6 +72,7 @@ export default class Upsert extends SfdxCommand {
 
 // Export object translation-specific upsert function for programmatic API
 export async function objectTranslationUpsert(options: any = {}): Promise<{ outputString: string }> {
+    const engine = settings['csv-engine'] === 'json2csv' ? CsvEngine.JSON2CSV : CsvEngine.FAST_CSV;
 
     const baseInputDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), OBJTRANSL_SUBPATH) as string;
     const baseOutputDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), OBJTRANSL_SUBPATH) as string;
@@ -147,9 +148,6 @@ export async function objectTranslationUpsert(options: any = {}): Promise<{ outp
             generateTagId(myjson, OBJTRANSL_ITEMS[tag_section].key, OBJTRANSL_ITEMS[tag_section].headers)
 
             const headers = OBJTRANSL_ITEMS[tag_section].headers;
-            const transforms = [unwind({ paths: headers })];
-            const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
-
             const outputFile = join(outputDir, calcCsvFilename(objTrName, tag_section));
 
             checkDirOrCreateSync(outputDir);
@@ -172,8 +170,8 @@ export async function objectTranslationUpsert(options: any = {}): Promise<{ outp
             }
 
             try {
-                const csv = parser.parse(myjson);
-                fs.writeFileSync(outputFile, csv, { flag: 'w+' });
+                const csvContent = await new CsvWriter().toCsv(myjson, headers, engine);
+                fs.writeFileSync(outputFile, csvContent, { flag: 'w+' });
                 // file written successfully
             } catch (err) {
                 console.error(err);

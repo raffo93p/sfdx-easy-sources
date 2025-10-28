@@ -10,7 +10,6 @@ import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import { readXmlFromFile, readCsvToJsonMap, jsonArrayCsvToMap, removeExtension, writeXmlToFile, calcCsvFilename } from '../../../utils/filesUtils'
 import { generateTagId, sortByKey } from '../../../utils/utils'
-const { Parser, transforms: { unwind } } = require('json2csv');
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../../../utils/constants/constants';
 import Performance from '../../../utils/performance';
 import { join } from "path";
@@ -18,6 +17,7 @@ import { RECORDTYPES_EXTENSION, RECORDTYPES_ROOT_TAG, RECORDTYPES_SUBPATH, RECOR
 import { transformXMLtoCSV } from '../../../utils/utils_recordtypes';
 import { loadSettings } from '../../../utils/localSettings';
 import { executeCommand } from '../../../utils/commands/utils';
+import CsvWriter, { CsvEngine } from '../../../utils/csvWriter';
 const fs = require('fs-extra');
 
 const settings = loadSettings();
@@ -76,6 +76,7 @@ export default class Upsert extends SfdxCommand {
 
 // Export function for programmatic API
 export async function recordTypeUpsert(options: any = {}): Promise<AnyJson> {
+    const engine = settings['csv-engine'] === 'json2csv' ? CsvEngine.JSON2CSV : CsvEngine.FAST_CSV;
     
     const baseInputDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), RECORDTYPES_SUBPATH) as string;
     const baseOutputDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
@@ -145,9 +146,6 @@ export async function recordTypeUpsert(options: any = {}): Promise<AnyJson> {
                 generateTagId(jsonArrayNew, RECORDTYPE_ITEMS[tag_section].key, RECORDTYPE_ITEMS[tag_section].headers)
 
                 const headers = RECORDTYPE_ITEMS[tag_section].headers;
-                const transforms = [unwind({ paths: headers })];
-                const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
-
                 const outputFile = join(outputDir, calcCsvFilename(recordtypeName, tag_section));
 
                 if (!fs.existsSync(outputDir)) {
@@ -172,11 +170,13 @@ export async function recordTypeUpsert(options: any = {}): Promise<AnyJson> {
                 }
 
                 try {
-                    const csv = parser.parse(jsonArrayNew);
-                    fs.writeFileSync(outputFile, csv, { flag: 'w+' });
+                    const csvContent = await new CsvWriter().toCsv(jsonArrayNew, headers, engine);
+                    fs.writeFileSync(outputFile, csvContent, { flag: 'w+' });
+                    // file written successfully
                 } catch (err) {
                     console.error(err);
                 }
+
                 xmlFileContent[RECORDTYPES_ROOT_TAG][tag_section] = null;
             }
 

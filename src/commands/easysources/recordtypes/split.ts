@@ -152,8 +152,6 @@ export async function recordTypeSplit(options: any = {}): Promise<AnyJson> {
                     console.error(err);
                 }
 
-                
-
                 xmlFileContent[RECORDTYPES_ROOT_TAG][tag_section] = null;
             }
             
