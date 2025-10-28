@@ -17,7 +17,7 @@ import { globalValueSets } from '../../api/globalvaluesets';
 import { applications } from '../../api/applications';
 
 export async function retrieveAllMetadataPackageOrg(orgname, manifestDir){
-	var cmdString = SF_CMD + ' ' + MANIFEST_CREATE_CMD + ' --fromorg ' + orgname + ' --manifestname='+DEFAULT_PACKAGE_ORG+' --outputdir=' + manifestDir + " -c managed";
+	var cmdString = SF_CMD + ' ' + MANIFEST_CREATE_CMD + ' --fromorg ' + orgname + ' --manifestname='+DEFAULT_PACKAGE_ORG+' --outputdir=' + manifestDir + " -c unlocked managed";
 	console.log(cmdString);
 	await exec(cmdString);
 }

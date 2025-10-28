@@ -1,5 +1,8 @@
 # Release Notes
 
+## Version 0.8.2
+- **Enhancement: Clean command now checks unlocked packages** - The `clean` command has been improved to also compare and process metadata from unlocked packages. This ensures that cleaning operations are comprehensive and include all relevant metadata, not just standard or managed packages.
+
 ## Version 0.8.1
 - **Bug Fix: Fixed `recordtypes:arealigned` command** - Resolved a critical bug in the `recordtypes:arealigned` command that was causing "ENOENT: no such file or directory" errors when processing temporary files. The issue was caused by a missing `await` keyword in the file writing operation, which caused the command to attempt reading temporary files before they were fully written. The command now works correctly and properly validates record type alignment between XML and CSV files.
 
