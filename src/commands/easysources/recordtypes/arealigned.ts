@@ -13,7 +13,7 @@ import Performance from '../../../utils/performance';
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
 const fs = require('fs-extra');
 import { join } from "path";
-import { readXmlFromFile, writeXmlToFile, readStringFromFile } from "../../../utils/filesUtils";
+import { readXmlFromFile, writeXmlToFile, readStringNormalizedFromFile } from "../../../utils/filesUtils";
 import { loadSettings } from "../../../utils/localSettings";
 import { tmpdir } from "os";
 import { mergeRecordTypeFromCsv } from './merge';
@@ -218,7 +218,7 @@ async function compareStringsForRecord(
             };
         }
 
-        const originalXmlString = await readStringFromFile(originalXmlPath);
+        const originalXmlString = await readStringNormalizedFromFile(originalXmlPath);
         const recordTypeCsvDir = join(csvDir, recordTypeName);
         if (!fs.existsSync(recordTypeCsvDir)) {
             return {
@@ -234,7 +234,7 @@ async function compareStringsForRecord(
         const tempFile = join(tempDir, `temp_${recordTypeName}_${Date.now()}.xml`);
         await writeXmlToFile(tempFile, mergedXml);
 
-        const reconstructedXmlString = await readStringFromFile(tempFile);
+        const reconstructedXmlString = await readStringNormalizedFromFile(tempFile);
 
         try {
             fs.unlinkSync(tempFile);

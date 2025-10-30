@@ -1,5 +1,8 @@
 # Release Notes
 
+## Version 0.8.3
+- **Bug Fix: XML normalization in `arealigned` commands** - Fixed a bug in both `recordtypes:arealigned` and `objecttranslations:arealigned` commands where XML file comparisons could fail due to formatting differences. The commands now properly normalize XML files before comparing them, ensuring accurate alignment validation regardless of whitespace, indentation, or other formatting variations between the original XML files and those reconstructed from CSV.
+
 ## Version 0.8.2
 - **Enhancement: Clean command now checks unlocked packages** - The `clean` command has been improved to also compare and process metadata from unlocked packages. This ensures that cleaning operations are comprehensive and include all relevant metadata, not just standard or managed packages.
 
