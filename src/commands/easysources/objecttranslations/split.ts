@@ -16,7 +16,7 @@ import { join } from "path";
 import { calcCsvFilename, checkDirOrErrorSync, readXmlFromFile, writeXmlToFile } from '../../../utils/filesUtils';
 import { generateTagId, sortByKey } from '../../../utils/utils';
 import {  getFieldTranslationFiles, transformFieldXMLtoCSV, transformLayoutXMLtoCSV } from '../../../utils/utils_objtransl';
-import CsvWriter, { CsvEngine } from '../../../utils/csvWriter';
+import CsvWriter from '../../../utils/csvWriter';
 const fs = require('fs-extra');
 
 
@@ -71,7 +71,7 @@ export default class Split extends SfdxCommand {
 
 // Export function for programmatic API
 export async function objectTranslationSplit(options: any = {}): Promise<AnyJson> {
-    const engine = settings['csv-engine'] === 'json2csv' ? CsvEngine.JSON2CSV : CsvEngine.FAST_CSV;
+    const csvWriter = new CsvWriter();
 
     const baseInputDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), OBJTRANSL_SUBPATH) as string;
     const baseOutputDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), OBJTRANSL_SUBPATH) as string;
@@ -150,7 +150,7 @@ export async function objectTranslationSplit(options: any = {}): Promise<AnyJson
             }
 
             try {
-                const csvContent = await new CsvWriter().toCsv(myjson, headers, engine);
+                const csvContent = await csvWriter.toCsv(myjson, headers);
                 fs.writeFileSync(outputFileCSV, csvContent, { flag: 'w+' });
                 // file written successfully
             } catch (err) {

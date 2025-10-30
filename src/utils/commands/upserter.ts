@@ -5,14 +5,14 @@ import { join } from "path";
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../constants/constants';
 import { PROFILE_USERPERM_ROOT, PROFILES_SUBPATH } from '../constants/constants_profiles';
 import { loadSettings } from '../localSettings';
-import CsvWriter, { CsvEngine } from '../csvWriter';
+import CsvWriter from '../csvWriter';
 const fs = require('fs-extra');
 
 const settings = loadSettings();
 
 export async function upsert(flags, file_subpath, file_extension, file_root_tag, file_items) {
-    const engine = settings['csv-engine'] === 'json2csv' ? CsvEngine.JSON2CSV : CsvEngine.FAST_CSV;
-    
+    const csvWriter = new CsvWriter();
+
     const baseInputDir = join((flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), file_subpath) as string;
     const baseOutputDir = join((flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), file_subpath) as string;
     const ignoreUserPerm = (file_subpath === PROFILES_SUBPATH && (flags.ignoreuserperm === 'true' || settings['ignore-user-permissions']) || false) as boolean;
@@ -147,7 +147,7 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
             }
 
             try {
-                const csvContent = await new CsvWriter().toCsv(jsonArrayNew, headers, engine);
+                const csvContent = await csvWriter.toCsv(jsonArrayNew, headers);
                 fs.writeFileSync(outputFile, csvContent, { flag: 'w+' });
                 // file written successfully
             } catch (err) {

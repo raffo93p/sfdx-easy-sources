@@ -17,7 +17,7 @@ import { loadSettings } from '../../../utils/localSettings';
 import { OBJTRANSL_CFIELDTRANSL_ROOT, OBJTRANSL_CFIELDTRANSL_ROOT_TAG, OBJTRANSL_EXTENSION, OBJTRANSL_ITEMS, OBJTRANSL_LAYOUT_ROOT, OBJTRANSL_ROOT_TAG, OBJTRANSL_SUBPATH } from '../../../utils/constants/constants_objecttranslations';
 import { getFieldTranslationFiles, transformFieldXMLtoCSV, transformLayoutXMLtoCSV } from '../../../utils/utils_objtransl';
 import { executeCommand } from '../../../utils/commands/utils';
-import CsvWriter, { CsvEngine } from '../../../utils/csvWriter';
+import CsvWriter from '../../../utils/csvWriter';
 const fs = require('fs-extra');
 
 const settings = loadSettings();
@@ -72,7 +72,7 @@ export default class Upsert extends SfdxCommand {
 
 // Export object translation-specific upsert function for programmatic API
 export async function objectTranslationUpsert(options: any = {}): Promise<{ outputString: string }> {
-    const engine = settings['csv-engine'] === 'json2csv' ? CsvEngine.JSON2CSV : CsvEngine.FAST_CSV;
+    const csvWriter = new CsvWriter();
 
     const baseInputDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), OBJTRANSL_SUBPATH) as string;
     const baseOutputDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), OBJTRANSL_SUBPATH) as string;
@@ -170,7 +170,7 @@ export async function objectTranslationUpsert(options: any = {}): Promise<{ outp
             }
 
             try {
-                const csvContent = await new CsvWriter().toCsv(myjson, headers, engine);
+                const csvContent = await csvWriter.toCsv(myjson, headers);
                 fs.writeFileSync(outputFile, csvContent, { flag: 'w+' });
                 // file written successfully
             } catch (err) {

@@ -4,13 +4,13 @@ import { generateTagId } from '../utils'
 import { join } from "path";
 import { DEFAULT_ESCSV_PATH } from '../constants/constants';
 import { loadSettings } from '../localSettings';
-import CsvWriter, { CsvEngine } from '../csvWriter';
+import CsvWriter from '../csvWriter';
 const fs = require('fs-extra');
 
 const settings = loadSettings();
 
 export async function updatekey(flags, file_subpath, file_items) {
-    const engine = settings['csv-engine'] === 'json2csv' ? CsvEngine.JSON2CSV : CsvEngine.FAST_CSV;
+    const csvWriter = new CsvWriter();
     
     const baseInputDir = join((flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), file_subpath) as string;
     const inputFiles = (flags.input) as string;
@@ -51,7 +51,7 @@ export async function updatekey(flags, file_subpath, file_items) {
                 const headers = file_items[tag_section].headers;
 
                 try {
-                    const csvContent = await new CsvWriter().toCsv(jsonArray, headers, engine);
+                    const csvContent = await csvWriter.toCsv(jsonArray, headers);
                     fs.writeFileSync(csvFilePath, csvContent, { flag: 'w+' });
                     // file written successfully
                 } catch (err) {

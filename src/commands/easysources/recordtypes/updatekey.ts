@@ -15,7 +15,7 @@ import Performance from '../../../utils/performance';
 import { join } from "path";
 import { RECORDTYPES_SUBPATH, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
 import { loadSettings } from '../../../utils/localSettings';
-import CsvWriter, { CsvEngine } from '../../../utils/csvWriter';
+import CsvWriter from '../../../utils/csvWriter';
 const fs = require('fs-extra');
 
 const settings = loadSettings();
@@ -68,8 +68,7 @@ export default class UpdateKey extends SfdxCommand {
 
 // Export function for API usage
 export async function recordTypeUpdateKey(options: any = {}): Promise<AnyJson> {
-    const engine = settings['csv-engine'] === 'json2csv' ? CsvEngine.JSON2CSV : CsvEngine.FAST_CSV;
-
+    const csvWriter = new CsvWriter();
     const baseInputDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
     const inputObject = (options.object) as string;
     const inputRecordType = (options.recordtype) as string;
@@ -119,7 +118,7 @@ export async function recordTypeUpdateKey(options: any = {}): Promise<AnyJson> {
                     const headers = RECORDTYPE_ITEMS[tag_section].headers;
 
                     try {
-                        const csvContent = await new CsvWriter().toCsv(jsonArray, headers, engine);
+                        const csvContent = await csvWriter.toCsv(jsonArray, headers);
                         fs.writeFileSync(csvFilePath, csvContent, { flag: 'w+' });
                         // file written successfully
                     } catch (err) {

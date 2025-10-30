@@ -16,7 +16,7 @@ import { generateTagId, sortByKey } from '../../../utils/utils';
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../../../utils/constants/constants';
 import { transformXMLtoCSV } from '../../../utils/utils_recordtypes';
 import { loadSettings } from '../../../utils/localSettings';
-import CsvWriter, { CsvEngine } from '../../../utils/csvWriter';
+import CsvWriter from '../../../utils/csvWriter';
 const fs = require('fs-extra');
 
 const settings = loadSettings();
@@ -73,7 +73,7 @@ export default class Split extends SfdxCommand {
 
 // Export function for programmatic API
 export async function recordTypeSplit(options: any = {}): Promise<AnyJson> {
-    const engine = settings['csv-engine'] === 'json2csv' ? CsvEngine.JSON2CSV : CsvEngine.FAST_CSV;
+    const csvWriter = new CsvWriter();
     
     const baseInputDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), RECORDTYPES_SUBPATH) as string;
     const baseOutputDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
@@ -145,7 +145,7 @@ export async function recordTypeSplit(options: any = {}): Promise<AnyJson> {
                 }
 
                 try {
-                    const csvContent = await new CsvWriter().toCsv(jsforcsv, headers, engine);
+                    const csvContent = await csvWriter.toCsv(jsforcsv, headers);
                     fs.writeFileSync(outputFileCSV, csvContent, { flag: 'w+' });
                     // file written successfully
                 } catch (err) {

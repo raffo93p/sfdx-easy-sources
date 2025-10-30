@@ -1,4 +1,5 @@
 import { format } from "fast-csv";
+import { loadSettings } from "./localSettings";
 
 export enum CsvEngine {
     FAST_CSV = 'fast-csv',
@@ -6,9 +7,15 @@ export enum CsvEngine {
 }
 
 export default class CsvWriter {
-    
-    constructor() { }
-    async toCsv(data: any[], headers: string[], engine: CsvEngine): Promise<string> {
+    private readonly settings: any;
+
+    constructor() {
+        this.settings = loadSettings();
+   
+    }
+    async toCsv(data: any[], headers: string[]): Promise<string> {
+        const engine = this.settings['csv-engine'] === 'json2csv' ? CsvEngine.JSON2CSV : CsvEngine.FAST_CSV;
+
         let csvContent: string;
         
         // Scegli il motore CSV in base alla configurazione
