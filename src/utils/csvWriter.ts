@@ -11,8 +11,8 @@ export default class CsvWriter {
 
     constructor() {
         this.settings = loadSettings();
-   
     }
+    
     async toCsv(data: any[], headers: string[]): Promise<string> {
         const engine = this.settings['csv-engine'] === 'json2csv' ? CsvEngine.JSON2CSV : CsvEngine.FAST_CSV;
 
