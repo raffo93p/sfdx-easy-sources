@@ -17,6 +17,7 @@ import { sortByKey, toArray } from "../../../utils/utils"
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
 import { loadSettings } from '../../../utils/localSettings';
 import { PERMSETS_SUBPATH, PERMSET_ITEMS, PERMSET_TAG_BOOL } from '../../../utils/constants/constants_permissionsets';
+import { jsonAndPrintError } from '../../../utils/commands/utils';
 
 const settings = loadSettings();
 
@@ -80,8 +81,16 @@ export async function permissionsetMinify(options: any): Promise<any> {
     
     const inputProfile = options.input as string;
 
-    checkDirOrErrorSync(csvDir);
-    checkDirOrErrorSync(xmlDir);
+    // Initialize result object
+    const result = { result: 'OK', items: {} };
+
+
+    try {
+        checkDirOrErrorSync(csvDir);
+        checkDirOrErrorSync(xmlDir);
+    } catch (error) {
+        return jsonAndPrintError(error.message);
+    }
 
     var profileList = [];
     if (inputProfile) {
@@ -96,48 +105,61 @@ export async function permissionsetMinify(options: any): Promise<any> {
     for (const profileName of profileList) {
         console.log('Minifying on: ' + profileName);
 
-        for (const tag_section in PERMSET_ITEMS) {
-            // tag_section is a profile section (applicationVisibilities, classAccess ecc)
+        try {
+            for (const tag_section in PERMSET_ITEMS) {
+                // tag_section is a profile section (applicationVisibilities, classAccess ecc)
 
-            const csvFilePath = join(csvDir, profileName, calcCsvFilename(profileName, tag_section));
-            if (fs.existsSync(csvFilePath)) {
+                const csvFilePath = join(csvDir, profileName, calcCsvFilename(profileName, tag_section));
+                if (fs.existsSync(csvFilePath)) {
 
-                // get the list of resources on the csv. eg. the list of apex classes
-                var resListCsv = await readCsvToJsonArray(csvFilePath)
+                    // get the list of resources on the csv. eg. the list of apex classes
+                    var resListCsv = await readCsvToJsonArray(csvFilePath)
 
-                
-                resListCsv = resListCsv.filter(function(res) {
-                    // return true to persist, false to delete
-                    if(PERMSET_TAG_BOOL[tag_section] == null) return true;
+                    
+                    resListCsv = resListCsv.filter(function(res) {
+                        // return true to persist, false to delete
+                        if(PERMSET_TAG_BOOL[tag_section] == null) return true;
 
-                    for(const boolName of toArray(PERMSET_TAG_BOOL[tag_section]) ){
-                        if(res[boolName] === 'true' || res[boolName] === 'FALSE') return true;
+                        for(const boolName of toArray(PERMSET_TAG_BOOL[tag_section]) ){
+                            if(res[boolName] === 'true' || res[boolName] === 'FALSE') return true;
+                        }
+
+                        return false;
+                    });
+                    
+                    
+                    // write the cleaned csv
+                    const headers = PERMSET_ITEMS[tag_section].headers;
+                    const transforms = [unwind({ paths: headers })];
+                    const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
+
+                    if (options.sort === 'true') {
+                        resListCsv = sortByKey(resListCsv);
                     }
 
-                    return false;
-                });
-                
-                
-                // write the cleaned csv
-                const headers = PERMSET_ITEMS[tag_section].headers;
-                const transforms = [unwind({ paths: headers })];
-                const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
-
-                if (options.sort === 'true') {
-                    resListCsv = sortByKey(resListCsv);
+                    const csv = parser.parse(resListCsv);
+                    try {
+                        fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
+                        // file written successfully
+                    } catch (err) {
+                        console.error(err);
+                        throw new Error(`Failed to write CSV file ${csvFilePath}: ${err.message}`);
+                    }
                 }
-
-                const csv = parser.parse(resListCsv);
-                try {
-                    fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
-                    // file written successfully
-                } catch (err) {
-                    console.error(err);
-                }
-                
             }
+
+            // Permission set processed successfully
+            result.items[profileName] = { result: 'OK' };
+
+        } catch (error) {
+            // Permission set processing failed
+            console.error(`Error minifying permission set ${profileName}:`, error);
+            result.items[profileName] = { 
+                result: 'KO', 
+                error: error.message || 'Unknown error occurred'
+            };
         }
     }
 
-    return { outputString: 'OK' };
+    return result;
 }

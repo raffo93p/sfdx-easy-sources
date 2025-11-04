@@ -144,3 +144,11 @@ export async function getDefaultOrgName(){
 	var res = await exec(cmdString);
 	return JSON.parse(res.stdout).result.alias;
 }
+
+export function jsonAndPrintError(err: string): {error: string; status: string} {
+	console.error(err);
+	return {
+		error: err || 'Unknown error',
+		status: 'ERROR'
+	};
+}

@@ -17,6 +17,7 @@ import { calcCsvFilename, checkDirOrErrorSync, readCsvToJsonArray } from "../../
 import { isBlank, sortByKey, toArray } from "../../../utils/utils"
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
 import { loadSettings } from '../../../utils/localSettings';
+import { jsonAndPrintError } from '../../../utils/commands/utils';
 
 const settings = loadSettings();
 
@@ -77,8 +78,16 @@ export async function translationMinify(options: any = {}): Promise<AnyJson> {
 
     const inputTranslation = (options.input) as string;
 
-    checkDirOrErrorSync(csvDir);
-    checkDirOrErrorSync(xmlDir);
+    // Initialize result object
+    const result = { result: 'OK', items: {} };
+
+    try {
+        checkDirOrErrorSync(csvDir);
+        checkDirOrErrorSync(xmlDir);
+    } catch (error) {
+        Performance.getInstance().end();
+        return jsonAndPrintError(error.message);
+    }
 
     var transationList = [];
     if (inputTranslation) {
@@ -93,47 +102,61 @@ export async function translationMinify(options: any = {}): Promise<AnyJson> {
     for (const translationName of transationList) {
         console.log('Minifying on: ' + translationName);
 
-        for (const tag_section in TRANSLATION_ITEMS) {
-                // tag_section is a profile section (applicationVisibilities, classAccess ecc)
-            const csvFilePath = join(csvDir, translationName, calcCsvFilename(translationName, tag_section));
-            if (fs.existsSync(csvFilePath)) {
+        try {
+            for (const tag_section in TRANSLATION_ITEMS) {
+                    // tag_section is a profile section (applicationVisibilities, classAccess ecc)
+                const csvFilePath = join(csvDir, translationName, calcCsvFilename(translationName, tag_section));
+                if (fs.existsSync(csvFilePath)) {
 
-                    // get the list of resources on the csv. eg. the list of apex classes
-                var resListCsv = await readCsvToJsonArray(csvFilePath)
+                        // get the list of resources on the csv. eg. the list of apex classes
+                    var resListCsv = await readCsvToJsonArray(csvFilePath)
 
-                resListCsv = resListCsv.filter(function(res) {
-                        // return true to persist, false to delete
-                    if(TRANSLAT_TAG_BOOL[tag_section] == null) return true;
+                    resListCsv = resListCsv.filter(function(res) {
+                            // return true to persist, false to delete
+                        if(TRANSLAT_TAG_BOOL[tag_section] == null) return true;
 
-                    for(const boolName of toArray(TRANSLAT_TAG_BOOL[tag_section]) ){
-                        if(!isBlank(res[boolName])) return true;
+                        for(const boolName of toArray(TRANSLAT_TAG_BOOL[tag_section]) ){
+                            if(!isBlank(res[boolName])) return true;
+                        }
+
+                        return false;
+                    });
+                    
+                        // write the cleaned csv
+                    const headers = TRANSLATION_ITEMS[tag_section].headers;
+                    const transforms = [unwind({ paths: headers })];
+                    const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
+
+                    if (options.sort === 'true') {
+                        resListCsv = sortByKey(resListCsv);
                     }
 
-                    return false;
-                });
-                
-                    // write the cleaned csv
-                const headers = TRANSLATION_ITEMS[tag_section].headers;
-                const transforms = [unwind({ paths: headers })];
-                const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
-
-                if (options.sort === 'true') {
-                    resListCsv = sortByKey(resListCsv);
-                }
-
-                const csv = parser.parse(resListCsv);
-                try {
-                    fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
-                } catch (err) {
-                    console.error(err);
+                    const csv = parser.parse(resListCsv);
+                    try {
+                        fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
+                    } catch (err) {
+                        console.error(err);
+                        throw new Error(`Failed to write CSV file ${csvFilePath}: ${err.message}`);
+                    }
                 }
             }
+
+            // Translation processed successfully
+            result.items[translationName] = { result: 'OK' };
+
+        } catch (error) {
+            // Translation processing failed
+            console.error(`Error minifying translation ${translationName}:`, error);
+            result.items[translationName] = { 
+                result: 'KO', 
+                error: error.message || 'Unknown error occurred'
+            };
         }
     }
     
     Performance.getInstance().end();
 
     
-    return { outputString: 'OK' };
+    return result;
 }
 

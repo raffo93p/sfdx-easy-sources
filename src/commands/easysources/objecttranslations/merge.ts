@@ -17,6 +17,7 @@ import { calcCsvFilename, checkDirOrErrorSync, readCsvToJsonArrayWithNulls, read
 import { sortByKey } from '../../../utils/utils';
 import { getFieldTranslationFiles, removeEmpyOptionalTags, transformFieldCSVtoXMLs } from '../../../utils/utils_objtransl';
 import { flatToArray } from '../../../utils/flatArrayUtils';
+import { jsonAndPrintError } from '../../../utils/commands/utils';
 
 const fs = require('fs-extra');
 
@@ -72,13 +73,21 @@ export default class Merge extends SfdxCommand {
 }
 
 // Export object translation-specific merge function for programmatic API
-export async function objectTranslationMerge(options: any = {}): Promise<{ outputString: string }> {
+export async function objectTranslationMerge(options: any = {}): Promise<any> {
 
     const baseInputDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), OBJTRANSL_SUBPATH) as string;
     const baseOutputDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), OBJTRANSL_SUBPATH) as string;
     const inputObject = (options.input) as string;
 
-    checkDirOrErrorSync(baseInputDir);
+    // Initialize result object
+    const result = { result: 'OK', items: {} };
+
+
+    try {
+        checkDirOrErrorSync(baseInputDir);
+    } catch (error) {
+        return jsonAndPrintError(error.message);
+    }
 
     var objectList = [];
     if (inputObject) {
@@ -90,41 +99,65 @@ export async function objectTranslationMerge(options: any = {}): Promise<{ outpu
     }
 
     for (const obj of objectList) {
-        if (!fs.existsSync(join(baseInputDir, obj, 'csv'))) continue;
+        if (!fs.existsSync(join(baseInputDir, obj, 'csv'))) {
+            result[obj] = { 
+                result: 'KO', 
+                error: `CSV directory does not exist for object ${obj}`
+            };
+            continue;
+        }
+        
         const inputXML = join(baseInputDir, obj, 'csv', obj) + XML_PART_EXTENSION;
 
         if(!fs.existsSync(inputXML)){
             console.log('Skipping  ' + obj +'; File ' + inputXML + ' does not exist!');
+            result[obj] = { 
+                result: 'KO', 
+                error: `File ${inputXML} does not exist`
+            };
             continue;
         }
 
         console.log('Merging: ' + obj);
 
-        // Use the exported merge function
-        const mergedXml = await mergeObjectTranslationFromCsv(obj, join(baseInputDir, obj, 'csv'), options);
-        const outputDir = join(baseOutputDir, obj);
-        const outputFile = join(outputDir, obj + OBJTRANSL_EXTENSION);
-        
-        if (!fs.existsSync(outputDir)) {
-            fs.mkdirSync(outputDir);
-        }
-        await writeXmlToFile(outputFile, mergedXml);
-
-        // Handle fieldTranslations using the exported function
-        const fieldXmlArray = await getFieldTranslationsFromCsv(obj, join(baseInputDir, obj, 'csv'));
-        
-        if (fieldXmlArray.length > 0) {
-            deleteFieldTranslationsXmls(baseOutputDir, obj);
-
-            for (const entry of fieldXmlArray) {
-                await writeXmlToFile(join(baseOutputDir, obj, entry.name + OBJTRANSL_FIELDTRANSL_EXTENSION), 
-                    { [OBJTRANSL_CFIELDTRANSL_ROOT_TAG]: entry }
-                );
+        try {
+            // Use the exported merge function
+            const mergedXml = await mergeObjectTranslationFromCsv(obj, join(baseInputDir, obj, 'csv'), options);
+            const outputDir = join(baseOutputDir, obj);
+            const outputFile = join(outputDir, obj + OBJTRANSL_EXTENSION);
+            
+            if (!fs.existsSync(outputDir)) {
+                fs.mkdirSync(outputDir);
             }
+            await writeXmlToFile(outputFile, mergedXml);
+
+            // Handle fieldTranslations using the exported function
+            const fieldXmlArray = await getFieldTranslationsFromCsv(obj, join(baseInputDir, obj, 'csv'));
+            
+            if (fieldXmlArray.length > 0) {
+                deleteFieldTranslationsXmls(baseOutputDir, obj);
+
+                for (const entry of fieldXmlArray) {
+                    await writeXmlToFile(join(baseOutputDir, obj, entry.name + OBJTRANSL_FIELDTRANSL_EXTENSION), 
+                        { [OBJTRANSL_CFIELDTRANSL_ROOT_TAG]: entry }
+                    );
+                }
+            }
+
+            // Object processed successfully
+            result.items[obj] = { result: 'OK' };
+
+        } catch (error) {
+            // Object processing failed
+            console.error(`Error merging object ${obj}:`, error);
+            result.items[obj] = { 
+                result: 'KO', 
+                error: error.message || 'Unknown error occurred'
+            };
         }
     }
     
-    return { outputString: 'OK' };
+    return result;
 }
 
 /**

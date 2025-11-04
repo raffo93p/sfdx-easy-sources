@@ -17,7 +17,7 @@ import { join } from "path";
 import { loadSettings } from '../../../utils/localSettings';
 import { OBJTRANSL_CFIELDTRANSL_ROOT, OBJTRANSL_CFIELDTRANSL_ROOT_TAG, OBJTRANSL_EXTENSION, OBJTRANSL_ITEMS, OBJTRANSL_LAYOUT_ROOT, OBJTRANSL_ROOT_TAG, OBJTRANSL_SUBPATH } from '../../../utils/constants/constants_objecttranslations';
 import { getFieldTranslationFiles, transformFieldXMLtoCSV, transformLayoutXMLtoCSV } from '../../../utils/utils_objtransl';
-import { executeCommand } from '../../../utils/commands/utils';
+import { executeCommand, jsonAndPrintError } from '../../../utils/commands/utils';
 const fs = require('fs-extra');
 
 const settings = loadSettings();
@@ -71,13 +71,21 @@ export default class Upsert extends SfdxCommand {
 }
 
 // Export object translation-specific upsert function for programmatic API
-export async function objectTranslationUpsert(options: any = {}): Promise<{ outputString: string }> {
+export async function objectTranslationUpsert(options: any = {}): Promise<any> {
 
     const baseInputDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), OBJTRANSL_SUBPATH) as string;
     const baseOutputDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), OBJTRANSL_SUBPATH) as string;
     const inputObject = (options.input) as string;
 
-    checkDirOrErrorSync(baseInputDir);
+    // Initialize result object
+    const result = { result: 'OK', items: {} };
+
+
+    try {
+        checkDirOrErrorSync(baseInputDir);
+    } catch (error) {
+        return jsonAndPrintError(error.message);
+    }
 
     var objectTList = [];
     if (inputObject) {
@@ -95,110 +103,130 @@ export async function objectTranslationUpsert(options: any = {}): Promise<{ outp
 
         if (!fs.existsSync(inputFile)) {
             console.log('Skipping  ' + objTrName +'; File ' + inputFile + ' does not exist!');
+            result.items[objTrName] = { 
+                result: 'KO', 
+                error: `File ${inputFile} does not exist`
+            };
             continue;
         }
 
         console.log('Upserting: ' + objTrName);
 
-        const outputDir = join(baseOutputDir, objTrName, 'csv');
-        const inputFilePart = join(baseOutputDir, objTrName, 'csv', objTrName + XML_PART_EXTENSION);
+        try {
+            const outputDir = join(baseOutputDir, objTrName, 'csv');
+            const inputFilePart = join(baseOutputDir, objTrName, 'csv', objTrName + XML_PART_EXTENSION);
 
-        // If outputDir or inputFilePart doesn't exist, run split command instead
-        if (!fs.existsSync(outputDir) || !fs.existsSync(inputFilePart)) {
-            console.log('⚠️ Output csv directory or -part.xml file not found. Running split command for: ' + objTrName);
-            // Create flags for split command with just the current object
-            const splitFlags = {
-                ...options,
-                input: objTrName
-            };
-            await executeCommand(splitFlags, 'split', 'objecttranslations');
-            continue;
-        }
-
-        const xmlFileContent = (await readXmlFromFile(inputFile)) ?? {};
-        const objTranslProperties = xmlFileContent[OBJTRANSL_ROOT_TAG] ?? {};
-
-        for (const tag_section in OBJTRANSL_ITEMS) {
-
-            var myjson = objTranslProperties[tag_section];
-
-            // skip when tag is not found in the xml
-            if ((myjson == undefined || myjson == '') && tag_section !== OBJTRANSL_CFIELDTRANSL_ROOT) continue;
-            // fixes scenarios when the tag is one, since it would be read as object and not array
-            if (!Array.isArray(myjson)) myjson = [myjson];
-
-            if(tag_section === OBJTRANSL_LAYOUT_ROOT){
-                myjson = transformLayoutXMLtoCSV(myjson);
+            // If outputDir or inputFilePart doesn't exist, run split command instead
+            if (!fs.existsSync(outputDir) || !fs.existsSync(inputFilePart)) {
+                console.log('⚠️ Output csv directory or -part.xml file not found. Running split command for: ' + objTrName);
+                // Create flags for split command with just the current object
+                const splitFlags = {
+                    ...options,
+                    input: objTrName
+                };
+                // TODO mettere chiamata diretta a api e aggiustare result
+                await executeCommand(splitFlags, 'split', 'objecttranslations');
+                result.items[objTrName] = { result: 'OK' };
+                continue;
             }
 
-            if(tag_section === OBJTRANSL_CFIELDTRANSL_ROOT){
-                myjson = [];
+            const xmlFileContent = (await readXmlFromFile(inputFile)) ?? {};
+            const objTranslProperties = xmlFileContent[OBJTRANSL_ROOT_TAG] ?? {};
 
-                var fieldTrList = getFieldTranslationFiles(join(baseInputDir, objTrName));
+            for (const tag_section in OBJTRANSL_ITEMS) {
 
-                for(const fieldTrFilename of fieldTrList){
-                    const fieldTrPath = join(baseInputDir, objTrName, fieldTrFilename);
-                    const xmlFileContent = (await readXmlFromFile(fieldTrPath)) ?? {};
-                    const fieldTr = xmlFileContent[OBJTRANSL_CFIELDTRANSL_ROOT_TAG] ?? {};
-                    myjson.push(...transformFieldXMLtoCSV(fieldTr));
+                var myjson = objTranslProperties[tag_section];
+
+                // skip when tag is not found in the xml
+                if ((myjson == undefined || myjson == '') && tag_section !== OBJTRANSL_CFIELDTRANSL_ROOT) continue;
+                // fixes scenarios when the tag is one, since it would be read as object and not array
+                if (!Array.isArray(myjson)) myjson = [myjson];
+
+                if(tag_section === OBJTRANSL_LAYOUT_ROOT){
+                    myjson = transformLayoutXMLtoCSV(myjson);
+                }
+
+                if(tag_section === OBJTRANSL_CFIELDTRANSL_ROOT){
+                    myjson = [];
+
+                    var fieldTrList = getFieldTranslationFiles(join(baseInputDir, objTrName));
+
+                    for(const fieldTrFilename of fieldTrList){
+                        const fieldTrPath = join(baseInputDir, objTrName, fieldTrFilename);
+                        const xmlFileContent = (await readXmlFromFile(fieldTrPath)) ?? {};
+                        const fieldTr = xmlFileContent[OBJTRANSL_CFIELDTRANSL_ROOT_TAG] ?? {};
+                        myjson.push(...transformFieldXMLtoCSV(fieldTr));
+                    }
+                }
+
+                generateTagId(myjson, OBJTRANSL_ITEMS[tag_section].key, OBJTRANSL_ITEMS[tag_section].headers)
+
+                const headers = OBJTRANSL_ITEMS[tag_section].headers;
+                const transforms = [unwind({ paths: headers })];
+                const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
+
+                const outputFile = join(outputDir, calcCsvFilename(objTrName, tag_section));
+
+                checkDirOrCreateSync(outputDir);
+
+                if (fs.existsSync(outputFile)) {
+                    const csvFilePath = join(baseOutputDir, objTrName,  'csv', calcCsvFilename(objTrName, tag_section));
+
+                    var jsonMapOld = await readCsvToJsonMap(csvFilePath);
+                    var jsonMapNew = jsonArrayCsvToMap(myjson)
+
+                    jsonMapNew.forEach((value, key) => {
+                        jsonMapOld.set(key as string, value)
+                    });
+
+                    myjson = Array.from(jsonMapOld.values());
+                }
+
+                if (options.sort === 'true') {
+                    myjson = sortByKey(myjson);
+                }
+
+                try {
+                    const csv = parser.parse(myjson);
+                    fs.writeFileSync(outputFile, csv, { flag: 'w+' });
+                    // file written successfully
+                } catch (err) {
+                    console.error(err);
+                    throw new Error(`Failed to write CSV file ${outputFile}: ${err.message}`);
+                }
+
+                // writes the empty tag on the part file
+                // avoid writing for fieldTranslations, since they are separated files
+                if(tag_section !== OBJTRANSL_CFIELDTRANSL_ROOT) xmlFileContent[OBJTRANSL_ROOT_TAG][tag_section] = null;
+            }
+
+            if (fs.existsSync(inputFilePart)) {
+                const xmlFileContentPart = (await readXmlFromFile(inputFilePart)) ?? {};
+                const objTranslPropertiesPart = xmlFileContentPart[OBJTRANSL_ROOT_TAG] ?? {};
+
+                for (var k in objTranslProperties) {
+                    objTranslPropertiesPart[k] = objTranslProperties[k];
+                }
+
+                writeXmlToFile(inputFilePart, xmlFileContentPart);
+            } else {
+                if (fs.existsSync(join(baseInputDir, objTrName, objTrName))) {
+                    writeXmlToFile(inputFilePart, objTranslProperties);
                 }
             }
 
-            generateTagId(myjson, OBJTRANSL_ITEMS[tag_section].key, OBJTRANSL_ITEMS[tag_section].headers)
+            // Object processed successfully
+            result[objTrName] = { result: 'OK' };
 
-            const headers = OBJTRANSL_ITEMS[tag_section].headers;
-            const transforms = [unwind({ paths: headers })];
-            const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
-
-            const outputFile = join(outputDir, calcCsvFilename(objTrName, tag_section));
-
-            checkDirOrCreateSync(outputDir);
-
-            if (fs.existsSync(outputFile)) {
-                const csvFilePath = join(baseOutputDir, objTrName,  'csv', calcCsvFilename(objTrName, tag_section));
-
-                var jsonMapOld = await readCsvToJsonMap(csvFilePath);
-                var jsonMapNew = jsonArrayCsvToMap(myjson)
-
-                jsonMapNew.forEach((value, key) => {
-                    jsonMapOld.set(key as string, value)
-                });
-
-                myjson = Array.from(jsonMapOld.values());
-            }
-
-            if (options.sort === 'true') {
-                myjson = sortByKey(myjson);
-            }
-
-            try {
-                const csv = parser.parse(myjson);
-                fs.writeFileSync(outputFile, csv, { flag: 'w+' });
-                // file written successfully
-            } catch (err) {
-                console.error(err);
-            }
-
-            // writes the empty tag on the part file
-            // avoid writing for fieldTranslations, since they are separated files
-            if(tag_section !== OBJTRANSL_CFIELDTRANSL_ROOT) xmlFileContent[OBJTRANSL_ROOT_TAG][tag_section] = null;
-        }
-
-        if (fs.existsSync(inputFilePart)) {
-            const xmlFileContentPart = (await readXmlFromFile(inputFilePart)) ?? {};
-            const objTranslPropertiesPart = xmlFileContentPart[OBJTRANSL_ROOT_TAG] ?? {};
-
-            for (var k in objTranslProperties) {
-                objTranslPropertiesPart[k] = objTranslProperties[k];
-            }
-
-            writeXmlToFile(inputFilePart, xmlFileContentPart);
-        } else {
-            if (fs.existsSync(join(baseInputDir, objTrName, objTrName))) {
-                writeXmlToFile(inputFilePart, objTranslProperties);
-            }
+        } catch (error) {
+            // Object processing failed
+            console.error(`Error processing object ${objTrName}:`, error);
+            result[objTrName] = { 
+                result: 'KO', 
+                error: error.message || 'Unknown error occurred'
+            };
         }
     }
 
-    return { outputString: 'OK' };
+    return result;
 }

@@ -48,10 +48,23 @@ export default class Merge extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         Performance.getInstance().start();
 
-        await bulkExecuteCommands(this.flags, 'minify', this.flags.sequencial);
+        const result = await allMetaMinify(this.flags);
         
         Performance.getInstance().end();
 
-        return 'OK';
+        return result;
+    }
+}
+
+// Export function for programmatic API  
+export async function allMetaMinify(options: any = {}): Promise<any> {
+    try {
+        await bulkExecuteCommands(options, 'minify', options.sequencial);
+        return { result: 'OK' };
+    } catch (error) {
+        return { 
+            result: 'KO', 
+            error: error.message || 'Unknown error occurred' 
+        };
     }
 }
