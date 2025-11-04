@@ -1,5 +1,14 @@
 # Release Notes
 
+## Version 0.8.3
+- **Bug Fix: XML normalization in `arealigned` commands** - Fixed a bug in both `recordtypes:arealigned` and `objecttranslations:arealigned` commands where XML file comparisons could fail due to formatting differences. The commands now properly normalize XML files before comparing them, ensuring accurate alignment validation regardless of whitespace, indentation, or other formatting variations between the original XML files and those reconstructed from CSV.
+
+## Version 0.8.2
+- **Enhancement: Clean command now checks unlocked packages** - The `clean` command has been improved to also compare and process metadata from unlocked packages. This ensures that cleaning operations are comprehensive and include all relevant metadata, not just standard or managed packages.
+
+## Version 0.8.1
+- **Bug Fix: Fixed `recordtypes:arealigned` command** - Resolved a critical bug in the `recordtypes:arealigned` command that was causing "ENOENT: no such file or directory" errors when processing temporary files. The issue was caused by a missing `await` keyword in the file writing operation, which caused the command to attempt reading temporary files before they were fully written. The command now works correctly and properly validates record type alignment between XML and CSV files.
+
 ## Version 0.8.0
 - **Major Enhancement: Complete Programmatic API for All Metadata Types** - Added comprehensive programmatic API support with automatic path resolution! You can now use all operations for every supported metadata types directly in your Node.js scripts with **57 total API operations** across 9 metadata types (Profiles, Permission Sets, Custom Labels, Applications, Global Value Sets, Global Value Set Translations, Translations, Object Translations, Record Types).
   - **Automatic Path Resolution**: All methods auto-resolve paths from `easysources-settings.json` - specify only what you need to override

@@ -129,14 +129,15 @@ function normalizeString(xmlString: string): string {
 }
 
 export async function areFilesEqual(filea, fileb) {
-	const fileAContent = await readStringFromFile(filea);
-	const fileBContent = await readStringFromFile(fileb);
-	
-	// Normalize strings for comparison (remove whitespace differences)
-	const normalizedFileA = normalizeString(fileAContent);
-	const normalizedFileB = normalizeString(fileBContent);
+	const normalizedFileA = await readStringNormalizedFromFile(filea);
+	const normalizedFileB = await readStringNormalizedFromFile(fileb);
 	
 	return normalizedFileA === normalizedFileB;
+}
+
+export async function readStringNormalizedFromFile(file: string): Promise<any> {
+	const fileContent = await readStringFromFile(file);
+	return normalizeString(fileContent);
 }
 
 export async function readCsvToJsonArrayWithNulls(csvFilePath: string) {

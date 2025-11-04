@@ -24,7 +24,7 @@ import { join } from "path";
 import { 
     readXmlFromFile, 
     writeXmlToFile, 
-    readStringFromFile 
+    readStringNormalizedFromFile
 } from "../../../utils/filesUtils";
 import { loadSettings } from "../../../utils/localSettings";
 import { tmpdir } from "os";
@@ -106,21 +106,10 @@ export default class AreAligned extends SfdxCommand {
 
 // Export object translation-specific areAligned function for programmatic API
 export async function objectTranslationAreAligned(options: any = {}): Promise<ValidationSummary> {
-
-    let result;
-    if (options.mode === 'string') {
-        result = await areAlignedStringMode(options);
-    } else {
-        result = await validateAlignmentLogicMode(options);
-    }
-
-    return result;
-}
-
-async function validateAlignmentLogicMode(options: any): Promise<ValidationSummary> {
     const baseXmlDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), OBJTRANSL_SUBPATH) as string;
     const baseCsvDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), OBJTRANSL_SUBPATH) as string;
     const inputObjects = (options.input) as string;
+    const mode = options.mode || 'string';
 
     if (!fs.existsSync(baseXmlDir)) {
         console.log(`Missing XML directory: ${baseXmlDir}`);
@@ -147,72 +136,13 @@ async function validateAlignmentLogicMode(options: any): Promise<ValidationSumma
     let warningCount = 0;
 
     for (const objectName of objectList) {
-        const result = await validateSingleObjectTranslation(
-            objectName,
-            baseXmlDir,
-            baseCsvDir,
-            options
-        );
+        let result: ValidationResult;
         
-        results.push(result);
-        
-        if (result.isAligned) {
-            alignedCount++;
-            console.log(`✅ Object translation '${objectName}' is aligned`);
-        } else if (result.isWarning) {
-            warningCount++;
-            console.log(`⚠️  Object translation '${objectName}' has warnings:`);
-            result.differences.forEach(diff => console.log(`   - ${diff}`));
+        if (mode === 'string') {
+            result = await compareStringsForObject(objectName, baseXmlDir, baseCsvDir, options);
         } else {
-            console.log(`❌ Object translation '${objectName}' is not aligned:`);
-            result.differences.forEach(diff => console.log(`   - ${diff}`));
+            result = await validateSingleObjectTranslation(objectName, baseXmlDir, baseCsvDir, options);
         }
-    }
-
-    const summary: ValidationSummary = {
-        totalItems: results.length,
-        alignedItems: alignedCount,
-        misalignedItems: results.length - alignedCount - warningCount,
-        warningItems: warningCount,
-        results: results
-    };
-
-    console.log(`\n📊 Validation Summary: ${summary.totalItems} total, ${summary.alignedItems} aligned, ${summary.misalignedItems} misaligned, ${summary.warningItems} warnings`);
-    
-    return summary;
-}
-
-async function areAlignedStringMode(options: any): Promise<ValidationSummary> {
-    // String comparison mode - compare the actual XML files
-    const baseXmlDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), OBJTRANSL_SUBPATH) as string;
-    const baseCsvDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), OBJTRANSL_SUBPATH) as string;
-    const inputObjects = (options.input) as string;
-
-    if (!fs.existsSync(baseXmlDir)) {
-        console.log(`Missing XML directory: ${baseXmlDir}`);
-        return { totalItems: 0, alignedItems: 0, misalignedItems: 0, warningItems: 0, results: [] };
-    }
-
-    if (!fs.existsSync(baseCsvDir)) {
-        console.log(`Missing CSV directory: ${baseCsvDir}`);
-        return { totalItems: 0, alignedItems: 0, misalignedItems: 0, warningItems: 0, results: [] };
-    }
-
-    var objectList = [];
-    if (inputObjects) {
-        objectList = inputObjects.split(',');
-    } else {
-        objectList = fs.readdirSync(baseXmlDir, { withFileTypes: true })
-            .filter(item => item.isDirectory())
-            .map(item => item.name);
-    }
-
-    const results: ValidationResult[] = [];
-    let alignedCount = 0;
-    let warningCount = 0;
-
-    for (const objectName of objectList) {
-        const result = await compareStringsForObject(objectName, baseXmlDir, baseCsvDir, options);
         
         results.push(result);
         
@@ -257,7 +187,7 @@ async function validateSingleObjectTranslation(
             return {
                 itemName: objectName,
                 isAligned: false,
-                differences: [`Main XML file not found: ${xmlFilePath}`],
+                differences: [`XML file not found: ${xmlFilePath}`],
                 isWarning: true
             };
         }
@@ -407,18 +337,16 @@ async function compareStringsForObject(
     options: any
 ): Promise<ValidationResult> {
     try {
-        // Read original XML files as strings
-        const originalXmlPath = join(xmlDir, objectName, objectName + OBJTRANSL_EXTENSION);
-        if (!fs.existsSync(originalXmlPath)) {
+        // Check main object translation XML
+        const xmlFilePath = join(xmlDir, objectName, objectName + OBJTRANSL_EXTENSION);
+        if (!fs.existsSync(xmlFilePath)) {
             return {
                 itemName: objectName,
                 isAligned: false,
-                differences: [`XML file not found: ${originalXmlPath}`],
+                differences: [`XML file not found: ${xmlFilePath}`],
                 isWarning: true
             };
         }
-
-        const originalXmlString = await readStringFromFile(originalXmlPath);
 
         // Check CSV directory
         const objectCsvDir = join(csvDir, objectName, 'csv');
@@ -431,6 +359,8 @@ async function compareStringsForObject(
             };
         }
 
+        const originalXmlString = await readStringNormalizedFromFile(xmlFilePath);
+
         // Reconstruct XML from CSV using shared merge logic
         const mergedXml = await mergeObjectTranslationFromCsv(objectName, objectCsvDir, options);
 
@@ -440,7 +370,7 @@ async function compareStringsForObject(
         await writeXmlToFile(tempFile, mergedXml);
 
         // Read reconstructed XML as string
-        const reconstructedXmlString = await readStringFromFile(tempFile);
+        const reconstructedXmlString = await readStringNormalizedFromFile(tempFile);
 
         // Clean up temp file
         try {
@@ -494,14 +424,14 @@ async function compareFieldTranslationsStringsForObject(
             const expectedFilePath = join(objectXmlDir, fieldEntry.name + OBJTRANSL_FIELDTRANSL_EXTENSION);
             
             if (fs.existsSync(expectedFilePath)) {
-                const originalString = await readStringFromFile(expectedFilePath);
+                const originalString = await readStringNormalizedFromFile(expectedFilePath);
                 
                 // Create temp file for reconstructed content
                 const tempDir = tmpdir();
                 const tempFile = join(tempDir, `temp_field_${fieldEntry.name}_${Date.now()}.xml`);
                 
                 await writeXmlToFile(tempFile, { [OBJTRANSL_CFIELDTRANSL_ROOT_TAG]: fieldEntry });
-                const reconstructedString = await readStringFromFile(tempFile);
+                const reconstructedString = await readStringNormalizedFromFile(tempFile);
                 
                 // Clean up
                 try {
