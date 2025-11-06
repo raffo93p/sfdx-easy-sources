@@ -11,7 +11,6 @@ import { AnyJson } from '@salesforce/ts-types';
 const fs = require('fs-extra');
 import { join } from "path";
 import Performance from '../../../utils/performance';
-const { Parser, transforms: { unwind } } = require('json2csv');
 import { calcCsvFilename, checkDirOrCreateSync, checkDirOrErrorSync, jsonArrayPackageToMap, readCsvToJsonArray, readXmlFromFile } from "../../../utils/filesUtils"
 import { sortByKey, toArray } from "../../../utils/utils"
 import { DEFAULT_ESCSV_PATH, DEFAULT_LOG_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
@@ -19,6 +18,7 @@ import { loadSettings } from '../../../utils/localSettings';
 import { getDefaultOrgName, retrieveAllMetadataPackageLocal, retrieveAllMetadataPackageOrg } from '../../../utils/commands/utils';
 import { DEFAULT_PACKAGE_LOC_EXT, DEFAULT_PACKAGE_ORG_EXT, TYPES_PICKVAL_ROOT, TYPES_ROOT_TAG } from '../../../utils/constants/constants_sourcesdownload';
 import { PERMSETS_SUBPATH, PERMSET_ITEMS, PERMSET_KEY_TYPE } from '../../../utils/constants/constants_permissionsets';
+import CsvWriter from '../../../utils/csvWriter';
 const _ = require('lodash') ;
 
 const settings = loadSettings();
@@ -124,6 +124,8 @@ export default class Clean extends SfdxCommand {
  * @returns Promise with clean operation result
  */
 export async function permissionsetClean(options: any): Promise<any> {
+    const csvWriter = new CsvWriter();
+
     const logdir = options['log-dir'] || settings['easysources-log-path'] || DEFAULT_LOG_PATH;
     const csvDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), PERMSETS_SUBPATH) as string;
     const xmlDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH)) as string;
@@ -246,16 +248,14 @@ export async function permissionsetClean(options: any): Promise<any> {
                 if(mode !== "log"){
                     // write the cleaned csv
                     const headers = PERMSET_ITEMS[tag_section].headers;
-                    const transforms = [unwind({ paths: headers })];
-                    const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
 
                     if (options.sort === 'true') {
                         resListCsv = sortByKey(resListCsv);
                     }
 
-                    const csv = parser.parse(resListCsv);
                     try {
-                        fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
+                        const csvContent = await csvWriter.toCsv(resListCsv, headers);
+                        fs.writeFileSync(csvFilePath, csvContent, { flag: 'w+' });
                         // file written successfully
                     } catch (err) {
                         console.error(err);

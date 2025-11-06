@@ -11,7 +11,6 @@ import { AnyJson } from '@salesforce/ts-types';
 const fs = require('fs-extra');
 import { join } from "path";
 import Performance from '../../../utils/performance';
-const { Parser, transforms: { unwind } } = require('json2csv');
 
 import { DEFAULT_ESCSV_PATH } from "../../../utils/constants/constants";
 
@@ -20,6 +19,7 @@ import { sortByKey } from "../../../utils/utils"
 
 import { RECORDTYPES_PICKVAL_ROOT, RECORDTYPES_SUBPATH, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
 import { loadSettings } from '../../../utils/localSettings';
+import CsvWriter from '../../../utils/csvWriter';
 
 const settings = loadSettings();
 
@@ -81,7 +81,8 @@ export default class Delete extends SfdxCommand {
 
 // Export function for programmatic API
 export async function recordTypeDelete(options: any = {}): Promise<AnyJson> {
-
+    const csvWriter = new CsvWriter();
+    
     const picklist = options.picklist;
     const apiname = (options.apiname) as string;
     if (!picklist) throw new SfError(messages.getMessage('errorNoPicklistFlag'));
@@ -142,16 +143,15 @@ export async function recordTypeDelete(options: any = {}): Promise<AnyJson> {
                 var jsonArray = Array.from(jsonMap.values());
 
                 const headers = RECORDTYPE_ITEMS[RECORDTYPES_PICKVAL_ROOT].headers;
-                const transforms = [unwind({ paths: headers })];
-                const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
 
                 if (options.sort === 'true') {
                     jsonArray = sortByKey(jsonArray);
                 }
 
-                const csv = parser.parse(jsonArray);
                 try {
-                    fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
+                    const csvContent = await csvWriter.toCsv(jsonArray, headers);
+                    fs.writeFileSync(csvFilePath, csvContent, { flag: 'w+' });
+                    // file written successfully
                 } catch (err) {
                     console.error(err);
                 }

@@ -52,7 +52,7 @@ export default class Split extends SfdxCommand {
             description: messages.getMessage('ignoreuserpermFlagDescription', ['false']),
             options: ['true', 'false'],
             default: 'false',
-        })
+        }),
     };
 
 

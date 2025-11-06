@@ -1,18 +1,20 @@
 import { readXmlFromFile, readCsvToJsonMap, jsonArrayCsvToMap, removeExtension, writeXmlToFile, calcCsvFilename } from '../filesUtils'
 import { sortByKey, generateTagId } from "../utils"
 import { split } from './splitter'
-const { Parser, transforms: { unwind } } = require('json2csv');
 import { join } from "path";
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../constants/constants';
 import { PROFILE_USERPERM_ROOT, PROFILES_SUBPATH } from '../constants/constants_profiles';
 import { loadSettings } from '../localSettings';
 import { jsonAndPrintError } from './utils';
+import CsvWriter from '../csvWriter';
+import { sortObjectKeys } from './utils';
 const fs = require('fs-extra');
 
 const settings = loadSettings();
 
 export async function upsert(flags, file_subpath, file_extension, file_root_tag, file_items) {
-    
+    const csvWriter = new CsvWriter();
+
     const baseInputDir = join((flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), file_subpath) as string;
     const baseOutputDir = join((flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), file_subpath) as string;
     const ignoreUserPerm = (file_subpath === PROFILES_SUBPATH && (flags.ignoreuserperm === 'true' || settings['ignore-user-permissions']) || false) as boolean;
@@ -68,10 +70,10 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
                 // If we're targeting specific types or tagids, skip this file since split would create all types
                 if (flags.type || flags.tagid) {
                     console.log(`⚠️ Skipping ${fullFilename}: Output csv directory or -part.xml file not found and specific type/tagid filtering is active`);
-                    result.items[fileName] = { 
-                        status: 'KO', 
-                        error: 'Output csv directory or -part.xml file not found and specific type/tagid filtering is active'
-                    };
+                        result.items[fileName] = { 
+                            status: 'KO', 
+                            error: 'Output csv directory or -part.xml file not found and specific type/tagid filtering is active'
+                        };
                     continue;
                 }
                 
@@ -81,12 +83,12 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
                     ...flags,
                     input: fullFilename
                 };
-                const splitResult = await split(splitFlags, file_subpath, file_extension, file_root_tag, file_items);
-                if ('items' in splitResult && splitResult.items[fileName]) {
-                    result.items[fileName] = { status: splitResult.items[fileName].status, error: splitResult.items[fileName].error };
-                } else {
-                    result.items[fileName] = { status: 'KO', error: 'Split operation failed' };
-                }
+                    const splitResult = await split(splitFlags, file_subpath, file_extension, file_root_tag, file_items);
+                    if ('items' in splitResult && splitResult.items[fileName]) {
+                        result.items[fileName] = { status: splitResult.items[fileName].status, error: splitResult.items[fileName].error };
+                    } else {
+                        result.items[fileName] = { status: 'KO', error: 'Split operation failed' };
+                    }
                 continue;
             }
 
@@ -115,9 +117,6 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
                 generateTagId(jsonArrayNew, file_items[tag_section].key, file_items[tag_section].headers)
 
                 const headers = file_items[tag_section].headers;
-                const transforms = [unwind({ paths: headers })];
-                const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
-
                 const outputFile = join(outputDir, calcCsvFilename(fileName, tag_section));
 
                 if (!fs.existsSync(outputDir)) {
@@ -160,14 +159,16 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
                 }
 
                 try {
-                    const csv = parser.parse(jsonArrayNew);
-                    fs.writeFileSync(outputFile, csv.replaceAll("&#xD;", ""), { flag: 'w+' });
+                    const csvContent = await csvWriter.toCsv(jsonArrayNew, headers);
+                    fs.writeFileSync(outputFile, csvContent, { flag: 'w+' });
                     // file written successfully
                 } catch (err) {
                     console.error(err);
-                    throw new Error(`Failed to write CSV file ${outputFile}: ${err.message}`);
+                        throw new Error(`Failed to write CSV file ${outputFile}: ${err.message}`);
                 }
+
                 xmlFileContent[file_root_tag][tag_section] = null;
+                
             }
 
             // Only update the -part.xml file if we're not doing targeted upsert
@@ -180,8 +181,11 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
                         filePropertiesPart[k] = fileProperties[k];
                     }
 
+                    xmlFileContentPart[file_root_tag] = filePropertiesPart;
+                    xmlFileContentPart[file_root_tag] = sortObjectKeys(xmlFileContentPart[file_root_tag]);
                     writeXmlToFile(inputFilePart, xmlFileContentPart);
                 } else {
+                    fileProperties[file_root_tag] = sortObjectKeys(fileProperties[file_root_tag]);
                     writeXmlToFile(inputFilePart, fileProperties);
                 }
             }

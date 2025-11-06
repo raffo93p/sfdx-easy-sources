@@ -10,14 +10,14 @@ import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import { readXmlFromFile, readCsvToJsonMap, jsonArrayCsvToMap, removeExtension, writeXmlToFile, calcCsvFilename } from '../../../utils/filesUtils'
 import { generateTagId, sortByKey } from '../../../utils/utils'
-const { Parser, transforms: { unwind } } = require('json2csv');
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../../../utils/constants/constants';
 import Performance from '../../../utils/performance';
 import { join } from "path";
 import { RECORDTYPES_EXTENSION, RECORDTYPES_ROOT_TAG, RECORDTYPES_SUBPATH, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
 import { transformXMLtoCSV } from '../../../utils/utils_recordtypes';
 import { loadSettings } from '../../../utils/localSettings';
-import { executeCommand, jsonAndPrintError } from '../../../utils/commands/utils';
+import { executeCommand, jsonAndPrintError, sortObjectKeys } from '../../../utils/commands/utils';
+import CsvWriter from '../../../utils/csvWriter';
 const fs = require('fs-extra');
 
 const settings = loadSettings();
@@ -76,7 +76,8 @@ export default class Upsert extends SfdxCommand {
 
 // Export function for programmatic API
 export async function recordTypeUpsert(options: any = {}): Promise<AnyJson> {
-    
+    const csvWriter = new CsvWriter();
+
     const baseInputDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), RECORDTYPES_SUBPATH) as string;
     const baseOutputDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
     const inputObject = (options.object) as string;
@@ -151,9 +152,6 @@ export async function recordTypeUpsert(options: any = {}): Promise<AnyJson> {
                     generateTagId(jsonArrayNew, RECORDTYPE_ITEMS[tag_section].key, RECORDTYPE_ITEMS[tag_section].headers)
 
                     const headers = RECORDTYPE_ITEMS[tag_section].headers;
-                    const transforms = [unwind({ paths: headers })];
-                    const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
-
                     const outputFile = join(outputDir, calcCsvFilename(recordtypeName, tag_section));
 
                     if (!fs.existsSync(outputDir)) {
@@ -178,8 +176,9 @@ export async function recordTypeUpsert(options: any = {}): Promise<AnyJson> {
                     }
 
                     try {
-                        const csv = parser.parse(jsonArrayNew);
-                        fs.writeFileSync(outputFile, csv, { flag: 'w+' });
+                        const csvContent = await csvWriter.toCsv(jsonArrayNew, headers);
+                        fs.writeFileSync(outputFile, csvContent, { flag: 'w+' });
+                        // file written successfully
                     } catch (err) {
                         console.error(err);
                         throw new Error(`Failed to write CSV file ${outputFile}: ${err.message}`);
@@ -194,10 +193,12 @@ export async function recordTypeUpsert(options: any = {}): Promise<AnyJson> {
                     for (var k in recordtypeProperties) {
                         recordtypePropertiesPart[k] = recordtypeProperties[k];
                     }
-
+                    xmlFileContentPart[RECORDTYPES_ROOT_TAG] = recordtypePropertiesPart;
+                    xmlFileContentPart[RECORDTYPES_ROOT_TAG] = sortObjectKeys(xmlFileContentPart[RECORDTYPES_ROOT_TAG]);
                     writeXmlToFile(inputFilePart, xmlFileContentPart);
                 } else {
                     if (fs.existsSync(join(baseInputDir, obj, 'recordTypes', recordtypeName))) {
+                        recordtypeProperties[RECORDTYPES_ROOT_TAG] = sortObjectKeys(recordtypeProperties[RECORDTYPES_ROOT_TAG]);
                         writeXmlToFile(inputFilePart, recordtypeProperties);
                     }
                 }

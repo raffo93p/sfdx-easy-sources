@@ -11,13 +11,13 @@ import { AnyJson } from '@salesforce/ts-types';
 const fs = require('fs-extra');
 import { join } from "path";
 import Performance from '../../../utils/performance';
-const { Parser, transforms: { unwind } } = require('json2csv');
 import { PROFILE_ITEMS, PROFILE_TAG_BOOL, PROFILES_SUBPATH } from "../../../utils/constants/constants_profiles";
 import { calcCsvFilename, checkDirOrErrorSync, readCsvToJsonArray } from "../../../utils/filesUtils"
 import { sortByKey, toArray } from "../../../utils/utils"
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
 import { loadSettings } from '../../../utils/localSettings';
 import { jsonAndPrintError } from '../../../utils/commands/utils';
+import CsvWriter from '../../../utils/csvWriter';
 
 const settings = loadSettings();
 
@@ -70,6 +70,7 @@ export default class Clean extends SfdxCommand {
 
 // Export a profile-specific minify function that encapsulates profile constants
 export async function profileMinify(options: any): Promise<any> {
+    const csvWriter = new CsvWriter();
     const csvDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), PROFILES_SUBPATH) as string;
     const xmlDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH)) as string;
     
@@ -122,28 +123,25 @@ export async function profileMinify(options: any): Promise<any> {
                     
                     
                     // write the cleaned csv
-                    const headers = PROFILE_ITEMS[tag_section].headers;
-                    const transforms = [unwind({ paths: headers })];
-                    const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
+                    // write the cleaned csv
+                const headers = PROFILE_ITEMS[tag_section].headers;
 
-                    if (options.sort === 'true') {
-                        resListCsv = sortByKey(resListCsv);
-                    }
-
-                    const csv = parser.parse(resListCsv);
-                    try {
-                        fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
-                        // file written successfully
-                    } catch (err) {
-                        console.error(err);
-                        throw new Error(`Failed to write CSV file ${csvFilePath}: ${err.message}`);
-                    }
+                if (options.sort === 'true') {
+                    resListCsv = sortByKey(resListCsv);
                 }
+
+                try {
+                    const csvContent = await csvWriter.toCsv(resListCsv, headers);
+                    fs.writeFileSync(csvFilePath, csvContent, { flag: 'w+' });
+                    // file written successfully
+                } catch (err) {
+                    console.error(err);
+                }
+                
             }
-
-            // Profile processed successfully
-            result.items[profileName] = { result: 'OK' };
-
+                // Profile processed successfully
+                result.items[profileName] = { result: 'OK' };
+            }
         } catch (error) {
             // Profile processing failed
             console.error(`Error processing profile ${profileName}:`, error);

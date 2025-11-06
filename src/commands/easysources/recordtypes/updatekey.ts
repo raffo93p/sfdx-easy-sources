@@ -10,13 +10,13 @@ import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import { calcCsvFilename, readCsvToJsonArray } from '../../../utils/filesUtils'
 import { generateTagId, sortByKey } from '../../../utils/utils'
-const { Parser, transforms: { unwind } } = require('json2csv');
 import { DEFAULT_ESCSV_PATH } from '../../../utils/constants/constants';
 import Performance from '../../../utils/performance';
 import { join } from "path";
 import { RECORDTYPES_SUBPATH, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
 import { loadSettings } from '../../../utils/localSettings';
 import { jsonAndPrintError } from '../../../utils/commands/utils';
+import CsvWriter from '../../../utils/csvWriter';
 const fs = require('fs-extra');
 
 const settings = loadSettings();
@@ -69,7 +69,7 @@ export default class UpdateKey extends SfdxCommand {
 
 // Export function for API usage
 export async function recordTypeUpdateKey(options: any = {}): Promise<AnyJson> {
-
+    const csvWriter = new CsvWriter();
     const baseInputDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
     const inputObject = (options.object) as string;
     const inputRecordType = (options.recordtype) as string;
@@ -123,12 +123,11 @@ export async function recordTypeUpdateKey(options: any = {}): Promise<AnyJson> {
                         }
 
                         const headers = RECORDTYPE_ITEMS[tag_section].headers;
-                        const transforms = [unwind({ paths: headers })];
-                        const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
-                        const csv = parser.parse(jsonArray);
 
                         try {
-                            fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
+                            const csvContent = await csvWriter.toCsv(jsonArray, headers);
+                            fs.writeFileSync(csvFilePath, csvContent, { flag: 'w+' });
+                            // file written successfully
                         } catch (err) {
                             console.error(err);
                             throw new Error(`Failed to write CSV file ${csvFilePath}: ${err.message}`);
