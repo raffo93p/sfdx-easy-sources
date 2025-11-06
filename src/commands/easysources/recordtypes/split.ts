@@ -17,6 +17,7 @@ import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../.
 import { transformXMLtoCSV } from '../../../utils/utils_recordtypes';
 import { loadSettings } from '../../../utils/localSettings';
 import CsvWriter from '../../../utils/csvWriter';
+import { sortObjectKeys } from '../../../utils/commands/utils';
 const fs = require('fs-extra');
 
 const settings = loadSettings();
@@ -157,6 +158,7 @@ export async function recordTypeSplit(options: any = {}): Promise<AnyJson> {
             
             if (fs.existsSync(outputDir)) {
                 const outputFileXML = join(outputDir, recordTypeName + XML_PART_EXTENSION);
+                xmlFileContent[RECORDTYPES_ROOT_TAG] = sortObjectKeys(xmlFileContent[RECORDTYPES_ROOT_TAG]);
                 writeXmlToFile(outputFileXML, xmlFileContent);
             }
         }

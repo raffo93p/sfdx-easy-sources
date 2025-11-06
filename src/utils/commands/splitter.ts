@@ -8,6 +8,7 @@ import { PROFILE_USERPERM_ROOT, PROFILES_SUBPATH } from '../constants/constants_
 import { loadSettings } from '../localSettings';
 import { arrayToFlat } from '../flatArrayUtils';
 import CsvWriter from '../csvWriter';
+import { sortObjectKeys } from './utils';
 
 const settings = loadSettings();
 
@@ -92,48 +93,10 @@ export async function split(flags, file_subpath, file_extension, file_root_tag, 
         }
         if (fs.existsSync(outputDir)) {
             const outputFileXML = join(outputDir, fileName + XML_PART_EXTENSION);
+            xmlFileContent[file_root_tag] = sortObjectKeys(xmlFileContent[file_root_tag]);
             writeXmlToFile(outputFileXML, xmlFileContent);
         }
     }
 
     return { outputString: 'OK' };
 }
-
-
-// /**
-//  * Processa gli headers che contengono oggetti setDefault per estrarre solo i nomi dei campi
-//  */
-// function processHeaders(headers: any[]): string[] {
-//     return headers.map(header => {
-//         if (typeof header === 'object' && header.value) {
-//             return header.value;
-//         }
-//         return header;
-//     });
-// }
-
-// /**
-//  * Processa i dati JSON per gestire correttamente i campi con valori di default
-//  */
-// function processJsonData(data: any[], headers: any[]): any[] {
-//     return data.map(row => {
-//         const processedRow = {};
-        
-//         // Copia tutti i campi esistenti
-//         for (const key in row) {
-//             processedRow[key] = row[key];
-//         }
-        
-//         // Aggiungi valori di default per i campi mancanti
-//         headers.forEach((header, index) => {
-//             if (typeof header === 'object' && header.value && header.default !== undefined) {
-//                 const fieldName = header.value;
-//                 if (processedRow[fieldName] === undefined || processedRow[fieldName] === null) {
-//                     processedRow[fieldName] = header.default;
-//                 }
-//             }
-//         });
-        
-//         return processedRow;
-//     });
-// }

@@ -16,7 +16,7 @@ import { join } from "path";
 import { loadSettings } from '../../../utils/localSettings';
 import { OBJTRANSL_CFIELDTRANSL_ROOT, OBJTRANSL_CFIELDTRANSL_ROOT_TAG, OBJTRANSL_EXTENSION, OBJTRANSL_ITEMS, OBJTRANSL_LAYOUT_ROOT, OBJTRANSL_ROOT_TAG, OBJTRANSL_SUBPATH } from '../../../utils/constants/constants_objecttranslations';
 import { getFieldTranslationFiles, transformFieldXMLtoCSV, transformLayoutXMLtoCSV } from '../../../utils/utils_objtransl';
-import { executeCommand } from '../../../utils/commands/utils';
+import { executeCommand, sortObjectKeys } from '../../../utils/commands/utils';
 import CsvWriter from '../../../utils/csvWriter';
 const fs = require('fs-extra');
 
@@ -190,9 +190,12 @@ export async function objectTranslationUpsert(options: any = {}): Promise<{ outp
                 objTranslPropertiesPart[k] = objTranslProperties[k];
             }
 
+            xmlFileContentPart[OBJTRANSL_ROOT_TAG] = objTranslPropertiesPart;
+            xmlFileContentPart[OBJTRANSL_ROOT_TAG] = sortObjectKeys(xmlFileContentPart[OBJTRANSL_ROOT_TAG]);
             writeXmlToFile(inputFilePart, xmlFileContentPart);
         } else {
             if (fs.existsSync(join(baseInputDir, objTrName, objTrName))) {
+                objTranslProperties[OBJTRANSL_ROOT_TAG] = sortObjectKeys(objTranslProperties[OBJTRANSL_ROOT_TAG]);
                 writeXmlToFile(inputFilePart, objTranslProperties);
             }
         }

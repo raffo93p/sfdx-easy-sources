@@ -144,3 +144,23 @@ export async function getDefaultOrgName(){
 	var res = await exec(cmdString);
 	return JSON.parse(res.stdout).result.alias;
 }
+
+/**
+ * Sorts the keys of an object in alphabetical order.
+ * @param obj The object to sort.
+ * @returns A new object with sorted keys.
+ */
+export function sortObjectKeys(obj: any): any {
+	if (obj === null || obj === undefined || typeof obj !== 'object' || Array.isArray(obj)) {
+		return obj;
+	}
+	
+	const sortedObj = {};
+	const sortedKeys = Object.keys(obj).sort();
+
+	for (const key of sortedKeys) {
+		sortedObj[key] = obj[key];
+	}
+
+	return sortedObj;
+}

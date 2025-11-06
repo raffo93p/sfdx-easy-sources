@@ -17,6 +17,7 @@ import { calcCsvFilename, checkDirOrErrorSync, readXmlFromFile, writeXmlToFile }
 import { generateTagId, sortByKey } from '../../../utils/utils';
 import {  getFieldTranslationFiles, transformFieldXMLtoCSV, transformLayoutXMLtoCSV } from '../../../utils/utils_objtransl';
 import CsvWriter from '../../../utils/csvWriter';
+import { sortObjectKeys } from '../../../utils/commands/utils';
 const fs = require('fs-extra');
 
 
@@ -164,6 +165,7 @@ export async function objectTranslationSplit(options: any = {}): Promise<AnyJson
         }
         if (fs.existsSync(outputDir)) {
             const outputFileXML = join(outputDir, objTrName + XML_PART_EXTENSION);
+            xmlFileContent[OBJTRANSL_ROOT_TAG] = sortObjectKeys(xmlFileContent[OBJTRANSL_ROOT_TAG]);
             writeXmlToFile(outputFileXML, xmlFileContent);
         }
         

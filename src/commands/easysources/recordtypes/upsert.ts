@@ -16,7 +16,7 @@ import { join } from "path";
 import { RECORDTYPES_EXTENSION, RECORDTYPES_ROOT_TAG, RECORDTYPES_SUBPATH, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
 import { transformXMLtoCSV } from '../../../utils/utils_recordtypes';
 import { loadSettings } from '../../../utils/localSettings';
-import { executeCommand } from '../../../utils/commands/utils';
+import { executeCommand, sortObjectKeys } from '../../../utils/commands/utils';
 import CsvWriter from '../../../utils/csvWriter';
 const fs = require('fs-extra');
 
@@ -187,10 +187,12 @@ export async function recordTypeUpsert(options: any = {}): Promise<AnyJson> {
                 for (var k in recordtypeProperties) {
                     recordtypePropertiesPart[k] = recordtypeProperties[k];
                 }
-
+                xmlFileContentPart[RECORDTYPES_ROOT_TAG] = recordtypePropertiesPart;
+                xmlFileContentPart[RECORDTYPES_ROOT_TAG] = sortObjectKeys(xmlFileContentPart[RECORDTYPES_ROOT_TAG]);
                 writeXmlToFile(inputFilePart, xmlFileContentPart);
             } else {
                 if (fs.existsSync(join(baseInputDir, obj, 'recordTypes', recordtypeName))) {
+                    recordtypeProperties[RECORDTYPES_ROOT_TAG] = sortObjectKeys(recordtypeProperties[RECORDTYPES_ROOT_TAG]);
                     writeXmlToFile(inputFilePart, recordtypeProperties);
                 }
             }

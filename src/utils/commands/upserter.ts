@@ -6,6 +6,7 @@ import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../c
 import { PROFILE_USERPERM_ROOT, PROFILES_SUBPATH } from '../constants/constants_profiles';
 import { loadSettings } from '../localSettings';
 import CsvWriter from '../csvWriter';
+import { sortObjectKeys } from './utils';
 const fs = require('fs-extra');
 
 const settings = loadSettings();
@@ -168,8 +169,11 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
                     filePropertiesPart[k] = fileProperties[k];
                 }
 
+                xmlFileContentPart[file_root_tag] = filePropertiesPart;
+                xmlFileContentPart[file_root_tag] = sortObjectKeys(xmlFileContentPart[file_root_tag]);
                 writeXmlToFile(inputFilePart, xmlFileContentPart);
             } else {
+                fileProperties[file_root_tag] = sortObjectKeys(fileProperties[file_root_tag]);
                 writeXmlToFile(inputFilePart, fileProperties);
             }
         }
