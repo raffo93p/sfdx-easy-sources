@@ -1,7 +1,7 @@
 {
   "name": "sfdx-easy-sources",
   "description": "This plugin provides tools to simplify Salesforce sources",
-  "version": "0.8.3",
+  "version": "0.9.0",
   "author": "Raffaele Prudenzano @raffo93p",
   "bugs": "https://github.com/raffo93p/sfdx-easy-sources/issues",
   "main": "lib/index.js",
@@ -13,6 +13,7 @@
     "csv": "^6.2.1",
     "csvtojson": "^2.0.10",
     "dottie": "^2.0.2",
+    "fast-csv": "^5.0.5",
     "fs-extra": "^10.1.0",
     "json2csv": "^5.0.7",
     "prompt-sync": "^4.2.0",
@@ -74,7 +75,7 @@
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "eslint src/**/*.ts test/**/*.ts",
     "prepack": "rm -rf lib && tsc -b && oclif manifest && oclif readme",
-    "test": "rm -rf test_tmp && mkdir test_tmp && cd test_tmp && nyc --extension .ts --require ts-node/register mocha --forbid-only \"../test/**/*.test.ts\"",
+    "test": "rm -rf test_tmp && mkdir test_tmp && pwd && cp test/resources/easysources-settings.json test_tmp && cd test_tmp && nyc --extension .ts --require ts-node/register mocha --forbid-only \"../test/**/*.test.ts\"",
     "version": "oclif readme && git add README.md",
     "link": "npm install && npm run build && sf plugins link"
   },

@@ -1,5 +1,9 @@
 # Release Notes
 
+## Version 0.9.0
+- **Enhancement: fast-csv library integration** - Added support for the fast-csv library, which provides significantly better performance for CSV operations. The deprecated json2csv library support will be removed in future releases as we transition to the more efficient fast-csv implementation.
+- **Enhancement: XML tag sorting in part files** - Added automatic sorting of XML tags in `-part.xml` files to ensure consistent file structure and improve readability of the generated XML metadata files.
+
 ## Version 0.8.3
 - **Bug Fix: XML normalization in `arealigned` commands** - Fixed a bug in both `recordtypes:arealigned` and `objecttranslations:arealigned` commands where XML file comparisons could fail due to formatting differences. The commands now properly normalize XML files before comparing them, ensuring accurate alignment validation regardless of whitespace, indentation, or other formatting variations between the original XML files and those reconstructed from CSV.
 

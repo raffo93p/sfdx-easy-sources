@@ -1,6 +1,5 @@
 import { calcCsvFilename, readXmlFromFile, removeExtension, writeXmlToFile } from '../filesUtils'
 import { generateTagId } from '../utils'
-const { Parser, transforms: { unwind } } = require('json2csv');
 import { join } from "path";
 const fs = require('fs-extra');
 import { sortByKey } from "../utils"
@@ -8,11 +7,16 @@ import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../c
 import { PROFILE_USERPERM_ROOT, PROFILES_SUBPATH } from '../constants/constants_profiles';
 import { loadSettings } from '../localSettings';
 import { arrayToFlat } from '../flatArrayUtils';
+import CsvWriter from '../csvWriter';
+import { sortObjectKeys } from './utils';
 
 const settings = loadSettings();
 
-export async function split(flags, file_subpath, file_extension, file_root_tag, file_items) {
 
+
+export async function split(flags, file_subpath, file_extension, file_root_tag, file_items) {
+    const csvWriter = new CsvWriter();
+    
     const baseInputDir = join((flags["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), file_subpath) as string;
     const baseOutputDir = join((flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), file_subpath) as string;
     const ignoreUserPerm = (file_subpath === PROFILES_SUBPATH && (flags.ignoreuserperm === 'true' || settings['ignore-user-permissions']) || false) as boolean;
@@ -70,14 +74,6 @@ export async function split(flags, file_subpath, file_extension, file_root_tag, 
             }
 
             const headers = file_items[tag_section].headers;
-            const transforms = [unwind({ paths: headers })];
-            var fields = [...headers, '_tagid'];
-
-            const parser = new Parser({ fields: fields, transforms });
-            const csv = parser.parse(myjson);
-
-            
-
             const outputFileCSV = join(outputDir, calcCsvFilename(fileName, tag_section));
 
             if (!fs.existsSync(outputDir)) {
@@ -85,7 +81,8 @@ export async function split(flags, file_subpath, file_extension, file_root_tag, 
             }
 
             try {
-                fs.writeFileSync(outputFileCSV, csv.replaceAll("&#xD;", ""), { flag: 'w+' });
+                const csvContent = await csvWriter.toCsv(myjson, headers);
+                fs.writeFileSync(outputFileCSV, csvContent, { flag: 'w+' });
                 // file written successfully
             } catch (err) {
                 console.error(err);
@@ -96,6 +93,7 @@ export async function split(flags, file_subpath, file_extension, file_root_tag, 
         }
         if (fs.existsSync(outputDir)) {
             const outputFileXML = join(outputDir, fileName + XML_PART_EXTENSION);
+            xmlFileContent[file_root_tag] = sortObjectKeys(xmlFileContent[file_root_tag]);
             writeXmlToFile(outputFileXML, xmlFileContent);
         }
     }

@@ -1,3 +1,5 @@
+import { loadSettings } from "./localSettings";
+
 export function generateTagId(myArray, key, headers) {
 
 	if (Array.isArray(key)) {
@@ -56,7 +58,13 @@ export function sortByKey(myArray) {
 }
 
 export function setDefault(header) {
-	return {value: header, default: ''};
+	const settings = loadSettings();
+	if(settings['csv-engine'] === 'json2csv'){
+		return {value: header, default: ''};
+	} else {
+		return header;
+	}
+
 	// var newHeaders = [];
 	// for (var field of headers) {
 	// 	newHeaders.push({ value: field, default: 'a' });

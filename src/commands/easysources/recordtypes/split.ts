@@ -9,8 +9,6 @@ import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import { calcCsvFilename, readXmlFromFile, removeExtension, writeXmlToFile } from '../../../utils/filesUtils'
-// import { generateTagId } from '../../../utils/utils'
-const { Parser } = require('json2csv');
 import { RECORDTYPES_EXTENSION, RECORDTYPES_PICKVAL_ROOT, RECORDTYPES_ROOT_TAG, RECORDTYPES_SUBPATH, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
 import Performance from '../../../utils/performance';
 import { join } from "path";
@@ -18,6 +16,8 @@ import { generateTagId, sortByKey } from '../../../utils/utils';
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../../../utils/constants/constants';
 import { transformXMLtoCSV } from '../../../utils/utils_recordtypes';
 import { loadSettings } from '../../../utils/localSettings';
+import CsvWriter from '../../../utils/csvWriter';
+import { sortObjectKeys } from '../../../utils/commands/utils';
 const fs = require('fs-extra');
 
 const settings = loadSettings();
@@ -74,7 +74,8 @@ export default class Split extends SfdxCommand {
 
 // Export function for programmatic API
 export async function recordTypeSplit(options: any = {}): Promise<AnyJson> {
-
+    const csvWriter = new CsvWriter();
+    
     const baseInputDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), RECORDTYPES_SUBPATH) as string;
     const baseOutputDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
 
@@ -131,16 +132,13 @@ export async function recordTypeSplit(options: any = {}): Promise<AnyJson> {
 
                 var jsforcsv = transformXMLtoCSV(myjson);
 
-                    // generate _tagId column
+                // generate _tagId column
                 generateTagId(jsforcsv, RECORDTYPE_ITEMS[tag_section].key, RECORDTYPE_ITEMS[tag_section].headers);
                 if (options.sort === 'true') {
                     jsforcsv = sortByKey(jsforcsv);
                 }
 
                 const headers = RECORDTYPE_ITEMS[tag_section].headers;
-                const parser = new Parser({ fields: [...headers, '_tagid'] });
-                const csv = parser.parse(jsforcsv);
-
                 const outputFileCSV = join(outputDir, calcCsvFilename(recordTypeName, tag_section));
 
                 if (!fs.existsSync(outputDir)) {
@@ -148,7 +146,9 @@ export async function recordTypeSplit(options: any = {}): Promise<AnyJson> {
                 }
 
                 try {
-                    fs.writeFileSync(outputFileCSV, csv, { flag: 'w+' });
+                    const csvContent = await csvWriter.toCsv(jsforcsv, headers);
+                    fs.writeFileSync(outputFileCSV, csvContent, { flag: 'w+' });
+                    // file written successfully
                 } catch (err) {
                     console.error(err);
                 }
@@ -158,6 +158,7 @@ export async function recordTypeSplit(options: any = {}): Promise<AnyJson> {
             
             if (fs.existsSync(outputDir)) {
                 const outputFileXML = join(outputDir, recordTypeName + XML_PART_EXTENSION);
+                xmlFileContent[RECORDTYPES_ROOT_TAG] = sortObjectKeys(xmlFileContent[RECORDTYPES_ROOT_TAG]);
                 writeXmlToFile(outputFileXML, xmlFileContent);
             }
         }

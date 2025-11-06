@@ -11,12 +11,12 @@ import { AnyJson } from '@salesforce/ts-types';
 const fs = require('fs-extra');
 import { join } from "path";
 import Performance from '../../../utils/performance';
-const { Parser, transforms: { unwind } } = require('json2csv');
 import { PROFILES_SUBPATH, PROFILE_ITEMS } from "../../../utils/constants/constants_profiles";
 import { calcCsvFilename, readCsvToJsonMap } from "../../../utils/filesUtils"
 import { sortByKey } from "../../../utils/utils"
 import { DEFAULT_ESCSV_PATH } from '../../../utils/constants/constants';
 import { loadSettings } from '../../../utils/localSettings';
+import CsvWriter from '../../../utils/csvWriter';
 
 const settings = loadSettings();
 
@@ -72,6 +72,8 @@ export default class Delete extends SfdxCommand {
 
 // Export a profile-specific delete function that encapsulates profile constants
 export async function profileDelete(options: any): Promise<any> {
+    const csvWriter = new CsvWriter();
+    
     const type = options.type;
     const tagid = options.tagid;
     
@@ -102,7 +104,7 @@ export async function profileDelete(options: any): Promise<any> {
         // type is a profile section (applicationVisibilities, classAccess ecc)
         const csvFilePath = join(baseInputDir, dir, calcCsvFilename(dir, type));
         if (fs.existsSync(csvFilePath)) {
-            var jsonMap = await readCsvToJsonMap(csvFilePath)
+            var jsonMap = await readCsvToJsonMap(csvFilePath);
 
             for (var k of tagid.split(',')) {
                 jsonMap.delete(k);
@@ -110,20 +112,19 @@ export async function profileDelete(options: any): Promise<any> {
             var jsonArray = Array.from(jsonMap.values());
 
             const headers = PROFILE_ITEMS[type].headers;
-            const transforms = [unwind({ paths: headers })];
-            const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
 
             if (options.sort === 'true') {
                 jsonArray = sortByKey(jsonArray);
             }
 
-            const csv = parser.parse(jsonArray);
             try {
-                fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
+                const csvContent = await csvWriter.toCsv(jsonArray, headers);
+                fs.writeFileSync(csvFilePath, csvContent, { flag: 'w+' });
                 // file written successfully
             } catch (err) {
                 console.error(err);
             }
+
         }
     }
 

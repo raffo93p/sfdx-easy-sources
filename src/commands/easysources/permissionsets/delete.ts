@@ -11,12 +11,12 @@ import { AnyJson } from '@salesforce/ts-types';
 const fs = require('fs-extra');
 import { join } from "path";
 import Performance from '../../../utils/performance';
-const { Parser, transforms: { unwind } } = require('json2csv');
 import { PERMSETS_SUBPATH, PERMSET_ITEMS } from "../../../utils/constants/constants_permissionsets";
 import { calcCsvFilename, readCsvToJsonMap } from "../../../utils/filesUtils"
 import { sortByKey } from "../../../utils/utils"
 import { DEFAULT_ESCSV_PATH } from '../../../utils/constants/constants';
 import { loadSettings } from '../../../utils/localSettings';
+import CsvWriter from '../../../utils/csvWriter';
 
 const settings = loadSettings();
 
@@ -80,6 +80,8 @@ export default class Delete extends SfdxCommand {
  * @returns Promise with delete operation result
  */
 export async function permissionsetDelete(options: any): Promise<any> {
+    const csvWriter = new CsvWriter();
+
     const type = options.type;
     const tagid = options.tagid;
     if (!type) throw new SfError(messages.getMessage('errorNoTypeFlag'));
@@ -118,16 +120,14 @@ export async function permissionsetDelete(options: any): Promise<any> {
             var jsonArray = Array.from(jsonMap.values());
 
             const headers = PERMSET_ITEMS[type].headers;
-            const transforms = [unwind({ paths: headers })];
-            const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
 
             if (options.sort === 'true') {
                 jsonArray = sortByKey(jsonArray);
             }
 
-            const csv = parser.parse(jsonArray);
             try {
-                fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
+                const csvContent = await csvWriter.toCsv(jsonArray, headers);
+                fs.writeFileSync(csvFilePath, csvContent, { flag: 'w+' });
                 // file written successfully
             } catch (err) {
                 console.error(err);

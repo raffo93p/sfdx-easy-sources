@@ -1,15 +1,17 @@
 import { calcCsvFilename, readCsvToJsonArray } from '../filesUtils'
 import { sortByKey } from "../utils"
 import { generateTagId } from '../utils'
-const { Parser, transforms: { unwind } } = require('json2csv');
 import { join } from "path";
 import { DEFAULT_ESCSV_PATH } from '../constants/constants';
 import { loadSettings } from '../localSettings';
+import CsvWriter from '../csvWriter';
 const fs = require('fs-extra');
 
 const settings = loadSettings();
 
 export async function updatekey(flags, file_subpath, file_items) {
+    const csvWriter = new CsvWriter();
+    
     const baseInputDir = join((flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), file_subpath) as string;
     const inputFiles = (flags.input) as string;
 
@@ -47,12 +49,10 @@ export async function updatekey(flags, file_subpath, file_items) {
                 }
 
                 const headers = file_items[tag_section].headers;
-                const transforms = [unwind({ paths: headers })];
-                const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
-                const csv = parser.parse(jsonArray);
 
                 try {
-                    fs.writeFileSync(csvFilePath, csv.replaceAll("&#xD;", ""), { flag: 'w+' });
+                    const csvContent = await csvWriter.toCsv(jsonArray, headers);
+                    fs.writeFileSync(csvFilePath, csvContent, { flag: 'w+' });
                     // file written successfully
                 } catch (err) {
                     console.error(err);

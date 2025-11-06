@@ -11,7 +11,6 @@ import { AnyJson } from '@salesforce/ts-types';
 const fs = require('fs-extra');
 import { join } from "path";
 import Performance from '../../../utils/performance';
-const { Parser, transforms: { unwind } } = require('json2csv');
 import { calcCsvFilename, checkDirOrCreateSync, checkDirOrErrorSync, jsonArrayPackageToMap, readCsvToJsonArray, readXmlFromFile } from "../../../utils/filesUtils"
 import { sortByKey } from "../../../utils/utils"
 import { DEFAULT_ESCSV_PATH, DEFAULT_LOG_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
@@ -19,6 +18,7 @@ import { loadSettings } from '../../../utils/localSettings';
 import { getDefaultOrgName, retrieveAllMetadataPackageLocal, retrieveAllMetadataPackageOrg } from '../../../utils/commands/utils';
 import { DEFAULT_PACKAGE_LOC_EXT, DEFAULT_PACKAGE_ORG_EXT, TYPES_PICKVAL_ROOT, TYPES_ROOT_TAG } from '../../../utils/constants/constants_sourcesdownload';
 import { RECORDTYPE_ITEMS, RECORDTYPES_PICKVAL_ROOT, RECORDTYPES_SUBPATH } from '../../../utils/constants/constants_recordtypes';
+import CsvWriter from '../../../utils/csvWriter';
 const _ = require('lodash') ;
 
 const settings = loadSettings();
@@ -108,6 +108,7 @@ export default class Clean extends SfdxCommand {
 
 // Export function for API usage  
 export async function recordTypeClean(options: any = {}): Promise<AnyJson> {
+    const csvWriter = new CsvWriter();
     
     const logdir = options['log-dir'] || settings['easysources-log-path'] || DEFAULT_LOG_PATH;
     const csvDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
@@ -214,16 +215,15 @@ export async function recordTypeClean(options: any = {}): Promise<AnyJson> {
                 
                 if (mode !== "log") {
                     const headers = RECORDTYPE_ITEMS[RECORDTYPES_PICKVAL_ROOT].headers;
-                    const transforms = [unwind({ paths: headers })];
-                    const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
 
                     if (options.sort === 'true' || options.sort === true || options.sort === undefined) {
                         resListCsv = sortByKey(resListCsv);
                     }
 
-                    const csv = parser.parse(resListCsv);
                     try {
-                        fs.writeFileSync(csvFilePath, csv, { flag: 'w+' });
+                        const csvContent = await csvWriter.toCsv(resListCsv, headers);
+                        fs.writeFileSync(csvFilePath, csvContent, { flag: 'w+' });
+                        // file written successfully
                     } catch (err) {
                         console.error(err);
                     }
