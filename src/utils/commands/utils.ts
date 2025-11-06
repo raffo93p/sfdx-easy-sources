@@ -147,6 +147,7 @@ export async function getDefaultOrgName(){
 
 /**
  * Sorts the keys of an object in alphabetical order.
+ * If 'fullName' key is present, it will be placed first.
  * @param obj The object to sort.
  * @returns A new object with sorted keys.
  */
@@ -156,9 +157,19 @@ export function sortObjectKeys(obj: any): any {
 	}
 	
 	const sortedObj = {};
-	const sortedKeys = Object.keys(obj).sort();
+	const allKeys = Object.keys(obj);
 
-	for (const key of sortedKeys) {
+	// Se esiste la chiave 'fullName', mettila per prima
+	if(allKeys.includes('fullName')){
+		sortedObj['fullName'] = obj['fullName'];
+	}
+
+	// Ordina le altre chiavi alfabeticamente
+	const otherKeys = allKeys
+		.filter(key => key !== 'fullName')
+		.sort();
+
+	for (const key of otherKeys) {
 		sortedObj[key] = obj[key];
 	}
 
