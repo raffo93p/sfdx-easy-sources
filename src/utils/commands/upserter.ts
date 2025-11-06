@@ -83,12 +83,13 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
                     ...flags,
                     input: fullFilename
                 };
-                    const splitResult = await split(splitFlags, file_subpath, file_extension, file_root_tag, file_items);
-                    if ('items' in splitResult && splitResult.items[fileName]) {
-                        result.items[fileName] = { status: splitResult.items[fileName].status, error: splitResult.items[fileName].error };
-                    } else {
-                        result.items[fileName] = { status: 'KO', error: 'Split operation failed' };
-                    }
+                const splitResult = await split(splitFlags, file_subpath, file_extension, file_root_tag, file_items);
+                if ('items' in splitResult && splitResult.items[fileName]) {
+                    // result.items[fileName] = { status: splitResult.items[fileName].status, error: splitResult.items[fileName].error };
+                    result.items[fileName] = splitResult.items[fileName];
+                } else {
+                    result.items[fileName] = { status: 'KO', error: 'Split operation failed' };
+                }
                 continue;
             }
 

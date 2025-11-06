@@ -16,8 +16,9 @@ import { join } from "path";
 import { loadSettings } from '../../../utils/localSettings';
 import { OBJTRANSL_CFIELDTRANSL_ROOT, OBJTRANSL_CFIELDTRANSL_ROOT_TAG, OBJTRANSL_EXTENSION, OBJTRANSL_ITEMS, OBJTRANSL_LAYOUT_ROOT, OBJTRANSL_ROOT_TAG, OBJTRANSL_SUBPATH } from '../../../utils/constants/constants_objecttranslations';
 import { getFieldTranslationFiles, transformFieldXMLtoCSV, transformLayoutXMLtoCSV } from '../../../utils/utils_objtransl';
-import { executeCommand, jsonAndPrintError, sortObjectKeys } from '../../../utils/commands/utils';
+import { jsonAndPrintError, sortObjectKeys } from '../../../utils/commands/utils';
 import CsvWriter from '../../../utils/csvWriter';
+import { objectTranslationSplit } from './split';
 const fs = require('fs-extra');
 
 const settings = loadSettings();
@@ -125,9 +126,14 @@ export async function objectTranslationUpsert(options: any = {}): Promise<any> {
                     ...options,
                     input: objTrName
                 };
-                // TODO mettere chiamata diretta a api e aggiustare result
-                await executeCommand(splitFlags, 'split', 'objecttranslations');
-                result.items[objTrName] = { result: 'OK' };
+                
+                // Call split function directly and handle its result
+                const splitResult = await objectTranslationSplit(splitFlags) as any;
+                if (splitResult.items && splitResult.items[objTrName]) {
+                    result.items[objTrName] = splitResult.items[objTrName];
+                } else {
+                    result.items[objTrName] = { status: 'KO', error: 'Split operation failed' };
+                }
                 continue;
             }
 
@@ -218,12 +224,12 @@ export async function objectTranslationUpsert(options: any = {}): Promise<any> {
             }
 
             // Object processed successfully
-            result[objTrName] = { result: 'OK' };
+            result.items[objTrName] = { result: 'OK' };
 
         } catch (error) {
             // Object processing failed
             console.error(`Error processing object ${objTrName}:`, error);
-            result[objTrName] = { 
+            result.items[objTrName] = { 
                 result: 'KO', 
                 error: error.message || 'Unknown error occurred'
             };

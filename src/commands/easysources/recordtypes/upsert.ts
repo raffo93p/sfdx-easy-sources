@@ -16,8 +16,9 @@ import { join } from "path";
 import { RECORDTYPES_EXTENSION, RECORDTYPES_ROOT_TAG, RECORDTYPES_SUBPATH, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
 import { transformXMLtoCSV } from '../../../utils/utils_recordtypes';
 import { loadSettings } from '../../../utils/localSettings';
-import { executeCommand, jsonAndPrintError, sortObjectKeys } from '../../../utils/commands/utils';
+import { jsonAndPrintError, sortObjectKeys } from '../../../utils/commands/utils';
 import CsvWriter from '../../../utils/csvWriter';
+import { recordTypeSplit } from './split';
 const fs = require('fs-extra');
 
 const settings = loadSettings();
@@ -134,8 +135,14 @@ export async function recordTypeUpsert(options: any = {}): Promise<AnyJson> {
                         object: obj,
                         recordtype: filename
                     };
-                    await executeCommand(splitFlags, 'split', 'recordtypes');
-                    result[fileKey] = { result: 'OK' };
+                    
+                    // Call split function and handle its result
+                    const splitResult = await recordTypeSplit(splitFlags) as any;
+                    if (splitResult.items && splitResult.items[fileKey]) {
+                        result.items[fileKey] = splitResult.items[fileKey];
+                    } else {
+                        result.items[fileKey] = { status: 'KO', error: 'Split operation failed' };
+                    }
                     continue;
                 }
 
