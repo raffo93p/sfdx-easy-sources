@@ -132,7 +132,7 @@ export async function objectTranslationUpsert(options: any = {}): Promise<any> {
                 if (splitResult.items && splitResult.items[objTrName]) {
                     result.items[objTrName] = splitResult.items[objTrName];
                 } else {
-                    result.items[objTrName] = { status: 'KO', error: 'Split operation failed' };
+                    result.items[objTrName] = { result: 'KO', error: 'Split operation failed' };
                 }
                 continue;
             }

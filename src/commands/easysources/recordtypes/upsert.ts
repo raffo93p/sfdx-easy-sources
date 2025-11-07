@@ -141,7 +141,7 @@ export async function recordTypeUpsert(options: any = {}): Promise<AnyJson> {
                     if (splitResult.items && splitResult.items[fileKey]) {
                         result.items[fileKey] = splitResult.items[fileKey];
                     } else {
-                        result.items[fileKey] = { status: 'KO', error: 'Split operation failed' };
+                        result.items[fileKey] = { result: 'KO', error: 'Split operation failed' };
                     }
                     continue;
                 }

@@ -145,11 +145,11 @@ export async function getDefaultOrgName(){
 	return JSON.parse(res.stdout).result.alias;
 }
 
-export function jsonAndPrintError(err: string): {error: string; status: string} {
+export function jsonAndPrintError(err: string): {error: string; result: string} {
 	console.error(err);
 	return {
 		error: err || 'Unknown error',
-		status: 'ERROR'
+		result: 'ERROR'
 	};
 }
 

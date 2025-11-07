@@ -71,7 +71,7 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
                 if (flags.type || flags.tagid) {
                     console.log(`⚠️ Skipping ${fullFilename}: Output csv directory or -part.xml file not found and specific type/tagid filtering is active`);
                         result.items[fileName] = { 
-                            status: 'KO', 
+                            result: 'KO', 
                             error: 'Output csv directory or -part.xml file not found and specific type/tagid filtering is active'
                         };
                     continue;
@@ -85,10 +85,10 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
                 };
                 const splitResult = await split(splitFlags, file_subpath, file_extension, file_root_tag, file_items);
                 if ('items' in splitResult && splitResult.items[fileName]) {
-                    // result.items[fileName] = { status: splitResult.items[fileName].status, error: splitResult.items[fileName].error };
+                    // result.items[fileName] = { result: splitResult.items[fileName].status, error: splitResult.items[fileName].error };
                     result.items[fileName] = splitResult.items[fileName];
                 } else {
-                    result.items[fileName] = { status: 'KO', error: 'Split operation failed' };
+                    result.items[fileName] = { result: 'KO', error: 'Split operation failed' };
                 }
                 continue;
             }
