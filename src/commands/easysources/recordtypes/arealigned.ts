@@ -17,6 +17,7 @@ import { readXmlFromFile, writeXmlToFile, readStringNormalizedFromFile } from ".
 import { loadSettings } from "../../../utils/localSettings";
 import { tmpdir } from "os";
 import { mergeRecordTypeFromCsv } from './merge';
+import { jsonAndPrintError } from '../../../utils/commands/utils';
 
 const settings = loadSettings();
 
@@ -34,13 +35,21 @@ interface ValidationResult {
     isWarning?: boolean;
 }
 
+interface ItemResult {
+    result: 'OK' | 'KO' | 'WARN';
+    error?: string;
+}
+
 interface ValidationSummary {
-    totalItems: number;
-    alignedItems: number;
-    misalignedItems: number;
-    warningItems: number;
-    results: ValidationResult[];
-    [key: string]: any;
+    result: 'OK';
+    summary: {
+        totalItems: number;
+        alignedItems: number;
+        misalignedItems: number;
+        warningItems: number;
+    };
+    items: { [itemName: string]: ItemResult };
+    [key: string]: any; // For AnyJson compatibility
 }
 
 export default class AreAligned extends SfdxCommand {
@@ -105,13 +114,11 @@ export async function recordTypeAreAligned(options: any = {}): Promise<AnyJson> 
     const mode = options.mode || 'string';
 
     if (!fs.existsSync(baseXmlDir)) {
-        console.log(messages.getMessage('missingXmlFile', [baseXmlDir]));
-        return { totalItems: 0, alignedItems: 0, misalignedItems: 0, warningItems: 0, results: [] };
+        return jsonAndPrintError('Folder '+ baseXmlDir +' does not exist!');
     }
 
     if (!fs.existsSync(baseCsvDir)) {
-        console.log(messages.getMessage('missingCsvDirectory', [baseCsvDir]));
-        return { totalItems: 0, alignedItems: 0, misalignedItems: 0, warningItems: 0, results: [] };
+        return jsonAndPrintError('Folder '+ baseCsvDir +' does not exist!');
     }
 
     var objectList = [];
@@ -123,9 +130,10 @@ export async function recordTypeAreAligned(options: any = {}): Promise<AnyJson> 
             .map(item => item.name);
     }
 
-    const results: ValidationResult[] = [];
+    const items: { [itemName: string]: ItemResult } = {};
     let alignedCount = 0;
     let warningCount = 0;
+    let totalItems = 0;
 
     for (const objectName of objectList) {
         const objectXmlDir = join(baseXmlDir, objectName, 'recordTypes');
@@ -133,16 +141,16 @@ export async function recordTypeAreAligned(options: any = {}): Promise<AnyJson> 
 
         if (!fs.existsSync(objectXmlDir)) continue;
         if (!fs.existsSync(objectCsvDir)) {
-            const result: ValidationResult = {
-                itemName: `${objectName}/*`,
-                isAligned: false,
-                differences: [messages.getMessage('missingCsvDirectory', [objectCsvDir])],
-                isWarning: true
+            const itemKey = `${objectName}/*`;
+            const errorMsg = messages.getMessage('missingCsvDirectory', [objectCsvDir]);
+            items[itemKey] = { 
+                result: 'WARN', 
+                error: errorMsg 
             };
-            results.push(result);
             warningCount++;
-            console.log(`⚠️  ${result.itemName} has warnings:`);
-            result.differences.forEach(diff => console.log(`   - ${diff}`));
+            totalItems++;
+            console.log(`⚠️  ${itemKey} has warnings:`);
+            console.log(`   - ${errorMsg}`);
             continue;
         }
 
@@ -156,46 +164,59 @@ export async function recordTypeAreAligned(options: any = {}): Promise<AnyJson> 
         }
 
         for (const recordTypeName of recordTypeList) {
-            const fullName = `${objectName}.${recordTypeName}`;
-            let result: ValidationResult;
+            const itemKey = `${objectName}/${recordTypeName}`;
+            totalItems++;
+            
+            let validationResult: ValidationResult;
             
             if (mode === 'string') {
-                result = await compareStringsForRecord(objectName, recordTypeName, objectXmlDir, objectCsvDir, options);
+                validationResult = await compareStringsForRecord(objectName, recordTypeName, objectXmlDir, objectCsvDir, options);
             } else {
-                result = await validateSingleRecordTypeForRecord(objectName, recordTypeName, objectXmlDir, objectCsvDir, options);
+                validationResult = await validateSingleRecordTypeForRecord(objectName, recordTypeName, objectXmlDir, objectCsvDir, options);
             }
             
-            results.push(result);
-            
-            if (result.isAligned) {
+            // Convert ValidationResult to ItemResult format
+            if (validationResult.isAligned) {
+                items[itemKey] = { result: 'OK' };
                 alignedCount++;
-                console.log(messages.getMessage('validationSuccess', [fullName]));
-            } else if (result.isWarning) {
+                console.log(messages.getMessage('validationSuccess', [itemKey]));
+            } else if (validationResult.isWarning) {
+                items[itemKey] = { 
+                    result: 'WARN', 
+                    error: validationResult.differences.join('; ') 
+                };
                 warningCount++;
-                console.log(`⚠️  Record type '${fullName}' has warnings:`);
-                result.differences.forEach(diff => console.log(messages.getMessage('differenceFound', [diff])));
+                console.log(`⚠️  Record type '${itemKey}' has warnings:`);
+                validationResult.differences.forEach(diff => console.log(messages.getMessage('differenceFound', [diff])));
             } else {
-                console.log(messages.getMessage('validationError', [fullName]));
-                result.differences.forEach(diff => console.log(messages.getMessage('differenceFound', [diff])));
+                items[itemKey] = { 
+                    result: 'KO', 
+                    error: validationResult.differences.join('; ') 
+                };
+                console.log(messages.getMessage('validationError', [itemKey]));
+                validationResult.differences.forEach(diff => console.log(messages.getMessage('differenceFound', [diff])));
             }
         }
     }
 
-    const summary: ValidationSummary = {
-        totalItems: results.length,
-        alignedItems: alignedCount,
-        misalignedItems: results.length - alignedCount - warningCount,
-        warningItems: warningCount,
-        results: results
+    const result: ValidationSummary = {
+        result: 'OK',
+        summary: {
+            totalItems: totalItems,
+            alignedItems: alignedCount,
+            misalignedItems: totalItems - alignedCount - warningCount,
+            warningItems: warningCount
+        },
+        items: items
     };
 
     console.log(messages.getMessage('validationSummary', [
-        summary.totalItems,
-        summary.alignedItems,
-        summary.misalignedItems
+        result.summary.totalItems,
+        result.summary.alignedItems,
+        result.summary.misalignedItems
     ]));
 
-    return summary;
+    return result;
 }
 
 async function compareStringsForRecord(
@@ -205,13 +226,13 @@ async function compareStringsForRecord(
     csvDir: string,
     options: any
 ): Promise<ValidationResult> {
-    const fullName = `${objectName}.${recordTypeName}`;
+    const itemName = `${objectName}/${recordTypeName}`;
 
     try {
         const originalXmlPath = join(xmlDir, recordTypeName + RECORDTYPES_EXTENSION);
         if (!fs.existsSync(originalXmlPath)) {
             return {
-                itemName: fullName,
+                itemName: itemName,
                 isAligned: false,
                 differences: [`XML file not found: ${originalXmlPath}`],
                 isWarning: true
@@ -222,7 +243,7 @@ async function compareStringsForRecord(
         const recordTypeCsvDir = join(csvDir, recordTypeName);
         if (!fs.existsSync(recordTypeCsvDir)) {
             return {
-                itemName: fullName,
+                itemName: itemName,
                 isAligned: false,
                 differences: [`CSV directory not found: ${recordTypeCsvDir}`],
                 isWarning: true
@@ -248,14 +269,14 @@ async function compareStringsForRecord(
         }
 
         return {
-            itemName: fullName,
+            itemName: itemName,
             isAligned: differences.length === 0,
             differences: differences
         };
 
     } catch (error) {
         return {
-            itemName: fullName,
+            itemName: itemName,
             isAligned: false,
             differences: [`Error processing: ${error.message}`]
         };
@@ -269,14 +290,14 @@ async function validateSingleRecordTypeForRecord(
     csvDir: string,
     options: any
 ): Promise<ValidationResult> {
-    const fullName = `${objectName}.${recordTypeName}`;
+    const itemName = `${objectName}/${recordTypeName}`;
     const differences: string[] = [];
 
     try {
         const xmlFilePath = join(xmlDir, recordTypeName + RECORDTYPES_EXTENSION);
         if (!fs.existsSync(xmlFilePath)) {
             return {
-                itemName: fullName,
+                itemName: itemName,
                 isAligned: false,
                 differences: [`XML file not found: ${xmlFilePath}`],
                 isWarning: true
@@ -286,7 +307,7 @@ async function validateSingleRecordTypeForRecord(
         const originalXml = await readXmlFromFile(xmlFilePath);
         if (!originalXml || !originalXml[RECORDTYPES_ROOT_TAG]) {
             return {
-                itemName: fullName,
+                itemName: itemName,
                 isAligned: false,
                 differences: [`Invalid XML structure in: ${xmlFilePath}`]
             };
@@ -295,7 +316,7 @@ async function validateSingleRecordTypeForRecord(
         const recordTypeCsvDir = join(csvDir, recordTypeName);
         if (!fs.existsSync(recordTypeCsvDir)) {
             return {
-                itemName: fullName,
+                itemName: itemName,
                 isAligned: false,
                 differences: [`CSV directory not found: ${recordTypeCsvDir}`],
                 isWarning: true
@@ -331,14 +352,14 @@ async function validateSingleRecordTypeForRecord(
         }
 
         return {
-            itemName: fullName,
+            itemName: itemName,
             isAligned: differences.length === 0,
             differences: differences
         };
 
     } catch (error) {
         return {
-            itemName: fullName,
+            itemName: itemName,
             isAligned: false,
             differences: [`Error processing: ${error.message}`]
         };

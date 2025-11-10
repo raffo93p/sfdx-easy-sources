@@ -52,13 +52,21 @@ interface ValidationResult {
     isWarning?: boolean;
 }
 
+interface ItemResult {
+    result: 'OK' | 'KO' | 'WARN';
+    error?: string;
+}
+
 interface ValidationSummary {
-    totalItems: number;
-    alignedItems: number;
-    misalignedItems: number;
-    warningItems: number;
-    results: ValidationResult[];
-    [key: string]: any;
+    result: 'OK';
+    summary: {
+        totalItems: number;
+        alignedItems: number;
+        misalignedItems: number;
+        warningItems: number;
+    };
+    items: { [itemName: string]: ItemResult };
+    [key: string]: any; // For AnyJson compatibility
 }
 
 export default class AreAligned extends SfdxCommand {
@@ -113,12 +121,20 @@ export async function objectTranslationAreAligned(options: any = {}): Promise<Va
 
     if (!fs.existsSync(baseXmlDir)) {
         console.log(`Missing XML directory: ${baseXmlDir}`);
-        return { totalItems: 0, alignedItems: 0, misalignedItems: 0, warningItems: 0, results: [] };
+        return { 
+            result: 'OK', 
+            summary: { totalItems: 0, alignedItems: 0, misalignedItems: 0, warningItems: 0 }, 
+            items: {} 
+        };
     }
 
     if (!fs.existsSync(baseCsvDir)) {
         console.log(`Missing CSV directory: ${baseCsvDir}`);
-        return { totalItems: 0, alignedItems: 0, misalignedItems: 0, warningItems: 0, results: [] };
+        return { 
+            result: 'OK', 
+            summary: { totalItems: 0, alignedItems: 0, misalignedItems: 0, warningItems: 0 }, 
+            items: {} 
+        };
     }
 
     var objectList = [];
@@ -131,45 +147,56 @@ export async function objectTranslationAreAligned(options: any = {}): Promise<Va
             .map(item => item.name);
     }
 
-    const results: ValidationResult[] = [];
+    const items: { [itemName: string]: ItemResult } = {};
     let alignedCount = 0;
     let warningCount = 0;
 
     for (const objectName of objectList) {
-        let result: ValidationResult;
+        let validationResult: ValidationResult;
         
         if (mode === 'string') {
-            result = await compareStringsForObject(objectName, baseXmlDir, baseCsvDir, options);
+            validationResult = await compareStringsForObject(objectName, baseXmlDir, baseCsvDir, options);
         } else {
-            result = await validateSingleObjectTranslation(objectName, baseXmlDir, baseCsvDir, options);
+            validationResult = await validateSingleObjectTranslation(objectName, baseXmlDir, baseCsvDir, options);
         }
         
-        results.push(result);
-        
-        if (result.isAligned) {
+        // Convert ValidationResult to ItemResult format
+        if (validationResult.isAligned) {
+            items[objectName] = { result: 'OK' };
             alignedCount++;
             console.log(`✅ Object translation '${objectName}' is aligned`);
-        } else if (result.isWarning) {
+        } else if (validationResult.isWarning) {
+            items[objectName] = { 
+                result: 'WARN', 
+                error: validationResult.differences.join('; ') 
+            };
             warningCount++;
             console.log(`⚠️  Object translation '${objectName}' has warnings:`);
-            result.differences.forEach(diff => console.log(`   - ${diff}`));
+            validationResult.differences.forEach(diff => console.log(`   - ${diff}`));
         } else {
+            items[objectName] = { 
+                result: 'KO', 
+                error: validationResult.differences.join('; ') 
+            };
             console.log(`❌ Object translation '${objectName}' is not aligned:`);
-            result.differences.forEach(diff => console.log(`   - ${diff}`));
+            validationResult.differences.forEach(diff => console.log(`   - ${diff}`));
         }
     }
 
-    const summary: ValidationSummary = {
-        totalItems: results.length,
-        alignedItems: alignedCount,
-        misalignedItems: results.length - alignedCount - warningCount,
-        warningItems: warningCount,
-        results: results
+    const result: ValidationSummary = {
+        result: 'OK',
+        summary: {
+            totalItems: objectList.length,
+            alignedItems: alignedCount,
+            misalignedItems: objectList.length - alignedCount - warningCount,
+            warningItems: warningCount
+        },
+        items: items
     };
 
-    console.log(`\n📊 Validation Summary: ${summary.totalItems} total, ${summary.alignedItems} aligned, ${summary.misalignedItems} misaligned, ${summary.warningItems} warnings`);
+    console.log(`\n📊 Validation Summary: ${result.summary.totalItems} total, ${result.summary.alignedItems} aligned, ${result.summary.misalignedItems} misaligned, ${result.summary.warningItems} warnings`);
     
-    return summary;
+    return result;
 }
 
 async function validateSingleObjectTranslation(

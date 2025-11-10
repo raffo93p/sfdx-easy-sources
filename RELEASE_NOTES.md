@@ -1,5 +1,27 @@
 # Release Notes
 
+## Version 0.9.1
+- **Enhancement: JSON return format for all actions** - All commands now return a structured JSON object when executed, providing programmatic access to operation results. This enables better integration with CI/CD pipelines and automation scripts.
+- **⚠️ Breaking Change: Standardized `arealigned` command JSON format** - The `arealigned` command for all metadata types (profiles, permissionsets, recordtypes, objecttranslations, etc.) now returns a standardized JSON structure consistent with other commands. The new format includes:
+  ```json
+  {
+    "result": "OK",
+    "summary": {
+      "totalItems": number,
+      "alignedItems": number,  
+      "misalignedItems": number,
+      "warningItems": number
+    },
+    "items": {
+      "[itemName]": {
+        "result": "OK|KO|WARN",
+        "error": "description (only for KO/WARN)"
+      }
+    }
+  }
+  ```
+  **Important:** If you have automation or scripts that depend on the previous `arealigned` command output format, please review and update them after upgrading to this version.
+
 ## Version 0.9.0
 - **Enhancement: fast-csv library integration** - Added support for the fast-csv library, which provides significantly better performance for CSV operations. The deprecated json2csv library support will be removed in future releases as we transition to the more efficient fast-csv implementation.
 - **Enhancement: XML tag sorting in part files** - Added automatic sorting of XML tags in `-part.xml` files to ensure consistent file structure and improve readability of the generated XML metadata files.
