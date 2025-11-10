@@ -83,13 +83,12 @@ export async function recordTypeSplit(options: any = {}): Promise<AnyJson> {
     const inputObject = (options.object) as string;
     const inputRecordType = (options.recordtype) as string;
 
-    // Initialize result object
-    const result = { result: 'OK', items: {} };
-
-
     if (!fs.existsSync(baseInputDir)) {
         return jsonAndPrintError('Input folder ' + baseInputDir + ' does not exist!');
     }
+
+    // Initialize result object
+    const result = { result: 'OK', items: {} };
 
     var objectList = [];
     if (inputObject) {

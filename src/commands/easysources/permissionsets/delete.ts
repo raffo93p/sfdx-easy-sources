@@ -12,11 +12,12 @@ const fs = require('fs-extra');
 import { join } from "path";
 import Performance from '../../../utils/performance';
 import { PERMSETS_SUBPATH, PERMSET_ITEMS } from "../../../utils/constants/constants_permissionsets";
-import { calcCsvFilename, readCsvToJsonMap } from "../../../utils/filesUtils"
+import { calcCsvFilename, checkDirOrErrorSync, readCsvToJsonMap } from "../../../utils/filesUtils"
 import { sortByKey } from "../../../utils/utils"
 import { DEFAULT_ESCSV_PATH } from '../../../utils/constants/constants';
 import { loadSettings } from '../../../utils/localSettings';
 import CsvWriter from '../../../utils/csvWriter';
+import { jsonAndPrintError } from '../../../utils/commands/utils';
 
 const settings = loadSettings();
 
@@ -91,10 +92,14 @@ export async function permissionsetDelete(options: any): Promise<any> {
     const baseInputDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), PERMSETS_SUBPATH) as string;
     const inputProfile = options.input as string;
 
-    if (!fs.existsSync(baseInputDir)) {
-        console.log('Input folder ' + baseInputDir + ' does not exist!');
-        return { outputString: 'Input folder does not exist' };
+    try {
+        checkDirOrErrorSync(baseInputDir);
+    } catch (error) {
+        return jsonAndPrintError(error.message);
     }
+
+    // Initialize result object
+    const result = { result: 'OK', items: {} };
 
     var dirList = [];
     if (inputProfile) {
@@ -107,33 +112,45 @@ export async function permissionsetDelete(options: any): Promise<any> {
 
     // dir is the profile name without the extension
     for (const dir of dirList) {
-        console.log('Deleting on: ' + dir);
+        try {
+            console.log('Deleting on: ' + dir);
 
-        // type is a profile section (applicationVisibilities, classAccess ecc)
-        const csvFilePath = join(baseInputDir, dir, calcCsvFilename(dir, type));
-        if (fs.existsSync(csvFilePath)) {
-            var jsonMap = await readCsvToJsonMap(csvFilePath)
+            // type is a profile section (applicationVisibilities, classAccess ecc)
+            const csvFilePath = join(baseInputDir, dir, calcCsvFilename(dir, type));
+            if (fs.existsSync(csvFilePath)) {
+                var jsonMap = await readCsvToJsonMap(csvFilePath)
 
-            for (var k of tagid.split(',')) {
-                jsonMap.delete(k);
+                for (var k of tagid.split(',')) {
+                    jsonMap.delete(k);
+                }
+                var jsonArray = Array.from(jsonMap.values());
+
+                const headers = PERMSET_ITEMS[type].headers;
+
+                if (options.sort === 'true') {
+                    jsonArray = sortByKey(jsonArray);
+                }
+
+                try {
+                    const csvContent = await csvWriter.toCsv(jsonArray, headers);
+                    fs.writeFileSync(csvFilePath, csvContent, { flag: 'w+' });
+                    // file written successfully
+                } catch (err) {
+                    console.error(err);
+                    throw new Error(`Error writing cleaned CSV for permissionSet ${dir}, section ${type}`);
+                }
+
+                // PermissionSet processed successfully
+                result.items[dir] = { result: 'OK' };
             }
-            var jsonArray = Array.from(jsonMap.values());
-
-            const headers = PERMSET_ITEMS[type].headers;
-
-            if (options.sort === 'true') {
-                jsonArray = sortByKey(jsonArray);
-            }
-
-            try {
-                const csvContent = await csvWriter.toCsv(jsonArray, headers);
-                fs.writeFileSync(csvFilePath, csvContent, { flag: 'w+' });
-                // file written successfully
-            } catch (err) {
-                console.error(err);
-            }
+        } catch (error) {
+            console.error(`Error processing permissionSet ${dir}:`, error);
+            result.items[dir] = { 
+                result: 'KO', 
+                error: error.message || 'Unknown error occurred'
+            };
         }
     }
 
-    return { outputString: 'OK' };
+    return result;
 }

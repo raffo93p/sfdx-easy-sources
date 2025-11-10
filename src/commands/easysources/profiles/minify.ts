@@ -76,15 +76,15 @@ export async function profileMinify(options: any): Promise<any> {
     
     const inputProfile = options.input as string;
 
-    // Initialize result object
-    const result = { result: 'OK', items: {} };
-
     try {
         checkDirOrErrorSync(csvDir);
         checkDirOrErrorSync(xmlDir);
     } catch (error) {
         return jsonAndPrintError(error.message);
     }
+
+    // Initialize result object
+    const result = { result: 'OK', items: {} };
 
     var profileList = [];
     if (inputProfile) {
@@ -121,24 +121,23 @@ export async function profileMinify(options: any): Promise<any> {
                         return false;
                     });
                     
-                    
                     // write the cleaned csv
-                    // write the cleaned csv
-                const headers = PROFILE_ITEMS[tag_section].headers;
+                    const headers = PROFILE_ITEMS[tag_section].headers;
 
-                if (options.sort === 'true') {
-                    resListCsv = sortByKey(resListCsv);
+                    if (options.sort === 'true') {
+                        resListCsv = sortByKey(resListCsv);
+                    }
+
+                    try {
+                        const csvContent = await csvWriter.toCsv(resListCsv, headers);
+                        fs.writeFileSync(csvFilePath, csvContent, { flag: 'w+' });
+                        // file written successfully
+                    } catch (err) {
+                        console.error(err);
+                        throw new Error(`Error writing cleaned CSV for profile ${profileName}, section ${tag_section}`);
+                    }    
                 }
 
-                try {
-                    const csvContent = await csvWriter.toCsv(resListCsv, headers);
-                    fs.writeFileSync(csvFilePath, csvContent, { flag: 'w+' });
-                    // file written successfully
-                } catch (err) {
-                    console.error(err);
-                }
-                
-            }
                 // Profile processed successfully
                 result.items[profileName] = { result: 'OK' };
             }
