@@ -21,6 +21,7 @@
   }
   ```
   **Important:** If you have automation or scripts that depend on the previous `arealigned` command output format, please review and update them after upgrading to this version.
+- **Bug Fix: Targeted split on missing CSV during upsert for recordtypes and object translations** - When performing upsert, if the CSV folder is missing for a specific recordtype or object translation, the split command is now executed only for the missing resource instead of the entire set. This improves performance and avoids unnecessary operations on already existing resources.
 
 ## Version 0.9.0
 - **Enhancement: fast-csv library integration** - Added support for the fast-csv library, which provides significantly better performance for CSV operations. The deprecated json2csv library support will be removed in future releases as we transition to the more efficient fast-csv implementation.

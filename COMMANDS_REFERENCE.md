@@ -85,6 +85,8 @@ sf easysources profiles upsert --type "fieldPermissions,classAccesses" --tagid "
 **Flags**:
 - `--es-csv, -c`: CSV directory
 - `--input, -i`: Specific profile names (comma-separated)
+- `--type, -t`: Specific permission types (e.g., `fieldPermissions,classAccesses`)
+- `--tagid, -k`: Specific tag IDs (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
 ### `sf easysources profiles clean`
@@ -182,6 +184,8 @@ sf easysources permissionsets upsert --type "fieldPermissions" --tagid "Account.
 **Flags**:
 - `--es-csv, -c`: CSV directory
 - `--input, -i`: Specific permission set names (comma-separated)
+- `--type, -t`: Specific permission types (e.g., `fieldPermissions,objectPermissions`)
+- `--tagid, -k`: Specific tag IDs (comma-separated)
 - `--sort, -S`: Sort results (default: `true`)
 
 ### `sf easysources permissionsets clean`
