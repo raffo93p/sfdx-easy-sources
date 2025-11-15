@@ -1,6 +1,12 @@
 # Release Notes
 
 ## Version 0.9.1
+- **Enhancement: Wildcard support for delete commands** - Added wildcard pattern matching to the `--tagid` flag for both `profiles:delete` and `permissionsets:delete` commands. You can now use patterns to delete multiple items at once:
+  - `example*` - deletes all keys starting with "example"
+  - `*example` - deletes all keys ending with "example"
+  - `*example*` - deletes all keys containing "example"
+  - `example` - exact match (original behavior preserved)
+  This feature significantly improves efficiency when cleaning up multiple related permissions or settings in bulk.
 - **Enhancement: JSON return format for all actions** - All commands now return a structured JSON object when executed, providing programmatic access to operation results. This enables better integration with CI/CD pipelines and automation scripts.
 - **⚠️ Breaking Change: Standardized `arealigned` command JSON format** - The `arealigned` command for all metadata types (profiles, permissionsets, recordtypes, objecttranslations, etc.) now returns a standardized JSON structure consistent with other commands. The new format includes:
   ```json
