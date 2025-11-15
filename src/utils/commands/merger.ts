@@ -5,6 +5,7 @@ import { writeXmlToFile, readCsvToJsonArray, readXmlFromFile, calcCsvFilename } 
 import { sortByKey } from "../utils"
 import { loadSettings } from "../localSettings";
 import { flatToArray } from "../flatArrayUtils";
+import { jsonAndPrintError } from "./utils";
 
 const settings = loadSettings();
 
@@ -61,9 +62,11 @@ export async function merge(flags, file_subpath, file_extension, file_root_tag, 
     const inputProfile = (flags.input) as string;
 
     if (!fs.existsSync(baseInputDir)) {
-        console.log('Input folder ' + baseInputDir + ' does not exist!');
-        return;
+        return jsonAndPrintError(`Input folder ${baseInputDir} does not exist`);
     }
+
+    // Initialize result object
+    const result = { result: 'OK', items: {} };
 
     var dirList = [];
     if (inputProfile) {
@@ -86,11 +89,17 @@ export async function merge(flags, file_subpath, file_extension, file_root_tag, 
             const mergedXml = await mergeItemFromCsv(dir, csvDirPath, file_root_tag, file_items, flags);
             const outputFile = join(baseOutputDir, dir + file_extension);
             writeXmlToFile(outputFile, mergedXml);
+            
+            // Directory processed successfully
+            result.items[dir] = { result: 'OK' };
         } catch (error) {
             console.log(`Error merging ${dir}: ${error.message}. Skipping...`);
-            continue;
+            result.items[dir] = { 
+                result: 'KO', 
+                error: error.message || 'Unknown error occurred'
+            };
         }
     }
-    var result = 'OK';
-    return { result }
+    
+    return result;
 }

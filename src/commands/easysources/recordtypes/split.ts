@@ -16,6 +16,7 @@ import { generateTagId, sortByKey } from '../../../utils/utils';
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../../../utils/constants/constants';
 import { transformXMLtoCSV } from '../../../utils/utils_recordtypes';
 import { loadSettings } from '../../../utils/localSettings';
+import { jsonAndPrintError } from '../../../utils/commands/utils';
 import CsvWriter from '../../../utils/csvWriter';
 import { sortObjectKeys } from '../../../utils/commands/utils';
 const fs = require('fs-extra');
@@ -83,9 +84,11 @@ export async function recordTypeSplit(options: any = {}): Promise<AnyJson> {
     const inputRecordType = (options.recordtype) as string;
 
     if (!fs.existsSync(baseInputDir)) {
-        console.log('Input folder ' + baseInputDir + ' does not exist!');
-        return;
+        return jsonAndPrintError('Input folder ' + baseInputDir + ' does not exist!');
     }
+
+    // Initialize result object
+    const result = { result: 'OK', items: {} };
 
     var objectList = [];
     if (inputObject) {
@@ -111,59 +114,75 @@ export async function recordTypeSplit(options: any = {}): Promise<AnyJson> {
 
         for (const filename of recordTypeList) {
             const fullFilename = filename.endsWith(RECORDTYPES_EXTENSION) ? filename : filename + RECORDTYPES_EXTENSION;
+            const recordTypeName = removeExtension(fullFilename);
+            const fileKey = `${obj}/${recordTypeName}`;
+            
             console.log('Splitting: ' + join(obj, fullFilename));
 
-            const inputFile = join(baseInputDir, obj, 'recordTypes', fullFilename);
-            const xmlFileContent = (await readXmlFromFile(inputFile)) ?? {};
-            const recordtypeProperties = xmlFileContent[RECORDTYPES_ROOT_TAG] ?? {};
+            try {
+                const inputFile = join(baseInputDir, obj, 'recordTypes', fullFilename);
+                const xmlFileContent = (await readXmlFromFile(inputFile)) ?? {};
+                const recordtypeProperties = xmlFileContent[RECORDTYPES_ROOT_TAG] ?? {};
 
-            const recordTypeName = removeExtension(fullFilename);
-            const outputDir = join(baseOutputDir, obj, 'recordTypes', recordTypeName);
+                const outputDir = join(baseOutputDir, obj, 'recordTypes', recordTypeName);
 
                 // Delete outputDir if it exists to ensure a clean split
-            if (fs.existsSync(outputDir)) {
-                fs.removeSync(outputDir);
-            }
-
-            for (const tag_section in RECORDTYPE_ITEMS) {
-                var myjson = recordtypeProperties[RECORDTYPES_PICKVAL_ROOT];
-                if (myjson == undefined) continue;
-                if (!Array.isArray(myjson)) myjson = [myjson];
-
-                var jsforcsv = transformXMLtoCSV(myjson);
-
-                // generate _tagId column
-                generateTagId(jsforcsv, RECORDTYPE_ITEMS[tag_section].key, RECORDTYPE_ITEMS[tag_section].headers);
-                if (options.sort === 'true') {
-                    jsforcsv = sortByKey(jsforcsv);
+                if (fs.existsSync(outputDir)) {
+                    fs.removeSync(outputDir);
                 }
 
-                const headers = RECORDTYPE_ITEMS[tag_section].headers;
-                const outputFileCSV = join(outputDir, calcCsvFilename(recordTypeName, tag_section));
+                for (const tag_section in RECORDTYPE_ITEMS) {
+                    var myjson = recordtypeProperties[RECORDTYPES_PICKVAL_ROOT];
+                    if (myjson == undefined) continue;
+                    if (!Array.isArray(myjson)) myjson = [myjson];
 
-                if (!fs.existsSync(outputDir)) {
-                    fs.mkdirSync(outputDir, { recursive: true });
+                    var jsforcsv = transformXMLtoCSV(myjson);
+
+                    // generate _tagId column
+                    generateTagId(jsforcsv, RECORDTYPE_ITEMS[tag_section].key, RECORDTYPE_ITEMS[tag_section].headers);
+                    if (options.sort === 'true') {
+                        jsforcsv = sortByKey(jsforcsv);
+                    }
+
+                    const headers = RECORDTYPE_ITEMS[tag_section].headers;
+                    const outputFileCSV = join(outputDir, calcCsvFilename(recordTypeName, tag_section));
+
+                    if (!fs.existsSync(outputDir)) {
+                        fs.mkdirSync(outputDir, { recursive: true });
+                    }
+
+                    try {
+                        const csvContent = await csvWriter.toCsv(jsforcsv, headers);
+                        fs.writeFileSync(outputFileCSV, csvContent, { flag: 'w+' });
+                        // file written successfully
+                    } catch (err) {
+                        console.error(err);
+                        throw new Error(`Failed to write CSV file ${outputFileCSV}: ${err.message}`);
+                    }
+
+                    xmlFileContent[RECORDTYPES_ROOT_TAG][tag_section] = null;
+                }
+                
+                if (fs.existsSync(outputDir)) {
+                    const outputFileXML = join(outputDir, recordTypeName + XML_PART_EXTENSION);
+                    xmlFileContent[RECORDTYPES_ROOT_TAG] = sortObjectKeys(xmlFileContent[RECORDTYPES_ROOT_TAG]);
+                    writeXmlToFile(outputFileXML, xmlFileContent);
                 }
 
-                try {
-                    const csvContent = await csvWriter.toCsv(jsforcsv, headers);
-                    fs.writeFileSync(outputFileCSV, csvContent, { flag: 'w+' });
-                    // file written successfully
-                } catch (err) {
-                    console.error(err);
-                }
+                // File processed successfully
+                result.items[fileKey] = { result: 'OK' };
 
-                xmlFileContent[RECORDTYPES_ROOT_TAG][tag_section] = null;
-            }
-            
-            if (fs.existsSync(outputDir)) {
-                const outputFileXML = join(outputDir, recordTypeName + XML_PART_EXTENSION);
-                xmlFileContent[RECORDTYPES_ROOT_TAG] = sortObjectKeys(xmlFileContent[RECORDTYPES_ROOT_TAG]);
-                writeXmlToFile(outputFileXML, xmlFileContent);
+            } catch (error) {
+                // File processing failed
+                console.error(`Error processing file ${fullFilename}:`, error);
+                result.items[fileKey] = { 
+                    result: 'KO', 
+                    error: error.message || 'Unknown error occurred'
+                };
             }
         }
     }
     
-    return { outputString: 'OK' };
+    return result;
 }
 

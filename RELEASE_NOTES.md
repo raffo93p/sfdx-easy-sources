@@ -1,5 +1,34 @@
 # Release Notes
 
+## Version 0.9.1
+- **Enhancement: Wildcard support for delete commands** - Added wildcard pattern matching to the `--tagid` flag for both `profiles:delete` and `permissionsets:delete` commands. You can now use patterns to delete multiple items at once:
+  - `example*` - deletes all keys starting with "example"
+  - `*example` - deletes all keys ending with "example"
+  - `*example*` - deletes all keys containing "example"
+  - `example` - exact match (original behavior preserved)
+  This feature significantly improves efficiency when cleaning up multiple related permissions or settings in bulk.
+- **Enhancement: JSON return format for all actions** - All commands now return a structured JSON object when executed, providing programmatic access to operation results. This enables better integration with CI/CD pipelines and automation scripts.
+- **⚠️ Breaking Change: Standardized `arealigned` command JSON format** - The `arealigned` command for all metadata types (profiles, permissionsets, recordtypes, objecttranslations, etc.) now returns a standardized JSON structure consistent with other commands. The new format includes:
+  ```json
+  {
+    "result": "OK",
+    "summary": {
+      "totalItems": number,
+      "alignedItems": number,  
+      "misalignedItems": number,
+      "warningItems": number
+    },
+    "items": {
+      "[itemName]": {
+        "result": "OK|KO|WARN",
+        "error": "description (only for KO/WARN)"
+      }
+    }
+  }
+  ```
+  **Important:** If you have automation or scripts that depend on the previous `arealigned` command output format, please review and update them after upgrading to this version.
+- **Bug Fix: Targeted split on missing CSV during upsert for recordtypes and object translations** - When performing upsert, if the CSV folder is missing for a specific recordtype or object translation, the split command is now executed only for the missing resource instead of the entire set. This improves performance and avoids unnecessary operations on already existing resources.
+
 ## Version 0.9.0
 - **Enhancement: fast-csv library integration** - Added support for the fast-csv library, which provides significantly better performance for CSV operations. The deprecated json2csv library support will be removed in future releases as we transition to the more efficient fast-csv implementation.
 - **Enhancement: XML tag sorting in part files** - Added automatic sorting of XML tags in `-part.xml` files to ensure consistent file structure and improve readability of the generated XML metadata files.

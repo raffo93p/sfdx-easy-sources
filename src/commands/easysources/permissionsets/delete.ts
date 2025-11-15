@@ -6,19 +6,12 @@
  */
 import * as os from 'os';
 import { flags, SfdxCommand } from '@salesforce/command';
-import { Messages, SfError } from '@salesforce/core';
+import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
-const fs = require('fs-extra');
-import { join } from "path";
 import Performance from '../../../utils/performance';
 import { PERMSETS_SUBPATH, PERMSET_ITEMS } from "../../../utils/constants/constants_permissionsets";
-import { calcCsvFilename, readCsvToJsonMap } from "../../../utils/filesUtils"
-import { sortByKey } from "../../../utils/utils"
+import { deleteFromCsv } from '../../../utils/commands/deleter';
 import { DEFAULT_ESCSV_PATH } from '../../../utils/constants/constants';
-import { loadSettings } from '../../../utils/localSettings';
-import CsvWriter from '../../../utils/csvWriter';
-
-const settings = loadSettings();
 
 
 // Initialize Messages with the current plugin directory
@@ -80,60 +73,5 @@ export default class Delete extends SfdxCommand {
  * @returns Promise with delete operation result
  */
 export async function permissionsetDelete(options: any): Promise<any> {
-    const csvWriter = new CsvWriter();
-
-    const type = options.type;
-    const tagid = options.tagid;
-    if (!type) throw new SfError(messages.getMessage('errorNoTypeFlag'));
-    if (!tagid) throw new SfError(messages.getMessage('errorNoTagIdFlag'));
-    if (!Object.keys(PERMSET_ITEMS).includes(type)) throw new SfError(messages.getMessage('errorNoValidTypeFlag'));
-
-    const baseInputDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), PERMSETS_SUBPATH) as string;
-    const inputProfile = options.input as string;
-
-    if (!fs.existsSync(baseInputDir)) {
-        console.log('Input folder ' + baseInputDir + ' does not exist!');
-        return { outputString: 'Input folder does not exist' };
-    }
-
-    var dirList = [];
-    if (inputProfile) {
-        dirList = inputProfile.split(',');
-    } else {
-        dirList = fs.readdirSync(baseInputDir, { withFileTypes: true })
-            .filter(item => item.isDirectory())
-            .map(item => item.name)
-    }
-
-    // dir is the profile name without the extension
-    for (const dir of dirList) {
-        console.log('Deleting on: ' + dir);
-
-        // type is a profile section (applicationVisibilities, classAccess ecc)
-        const csvFilePath = join(baseInputDir, dir, calcCsvFilename(dir, type));
-        if (fs.existsSync(csvFilePath)) {
-            var jsonMap = await readCsvToJsonMap(csvFilePath)
-
-            for (var k of tagid.split(',')) {
-                jsonMap.delete(k);
-            }
-            var jsonArray = Array.from(jsonMap.values());
-
-            const headers = PERMSET_ITEMS[type].headers;
-
-            if (options.sort === 'true') {
-                jsonArray = sortByKey(jsonArray);
-            }
-
-            try {
-                const csvContent = await csvWriter.toCsv(jsonArray, headers);
-                fs.writeFileSync(csvFilePath, csvContent, { flag: 'w+' });
-                // file written successfully
-            } catch (err) {
-                console.error(err);
-            }
-        }
-    }
-
-    return { outputString: 'OK' };
+    return deleteFromCsv(options, PERMSETS_SUBPATH, PERMSET_ITEMS);
 }

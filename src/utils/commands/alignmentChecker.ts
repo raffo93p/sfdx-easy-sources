@@ -5,6 +5,7 @@ import { readXmlFromFile, writeXmlToFile, areFilesEqual } from "../filesUtils";
 import { loadSettings } from "../localSettings";
 import { tmpdir } from "os";
 import { mergeItemFromCsv } from "./merger";
+import { jsonAndPrintError } from "./utils";
 
 const settings = loadSettings();
 
@@ -15,13 +16,20 @@ export interface ValidationResult {
     isWarning?: boolean; // true when CSV directory is missing, false for actual alignment issues
 }
 
+export interface ItemResult {
+    result: 'OK' | 'KO' | 'WARN';
+    error?: string;
+}
+
 export interface ValidationSummary {
-    totalItems: number;
-    alignedItems: number;
-    misalignedItems: number;
-    warningItems: number;
-    results: ValidationResult[];
-    [key: string]: any;
+    result: 'OK';
+    summary: {
+        totalItems: number;
+        alignedItems: number;
+        misalignedItems: number;
+        warningItems: number;
+    };
+    items: { [itemName: string]: ItemResult };
 }
 
 /**
@@ -33,7 +41,7 @@ export async function areAligned(
     file_extension: string,
     file_root_tag: string,
     file_items: any
-): Promise<ValidationSummary> {
+): Promise<any> {
     const baseXmlDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH), file_subpath) as string;
     const baseCsvDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), file_subpath) as string;
     const inputItems = (options.input) as string;
@@ -41,17 +49,15 @@ export async function areAligned(
 
     // Validate mode parameter
     if (mode !== 'string' && mode !== 'logic') {
-        throw new Error(`Invalid mode '${mode}'. Mode must be either 'string' or 'logic'.`);
+        return jsonAndPrintError(`Invalid mode '${mode}'. Mode must be either 'string' or 'logic'.`);
     }
 
     if (!fs.existsSync(baseXmlDir)) {
-        console.log('XML folder ' + baseXmlDir + ' does not exist!');
-        return { totalItems: 0, alignedItems: 0, misalignedItems: 0, warningItems: 0, results: [] };
+        return jsonAndPrintError('XML folder ' + baseXmlDir + ' does not exist!');
     }
 
     if (!fs.existsSync(baseCsvDir)) {
-        console.log('CSV folder ' + baseCsvDir + ' does not exist!');
-        return { totalItems: 0, alignedItems: 0, misalignedItems: 0, warningItems: 0, results: [] };
+        return jsonAndPrintError('CSV folder ' + baseCsvDir + ' does not exist!');
     }
 
     var itemList = [];
@@ -63,7 +69,7 @@ export async function areAligned(
             .map(item => item.name.replace(file_extension, ''));
     }
 
-    const results: ValidationResult[] = [];
+    const items: { [itemName: string]: ItemResult } = {};
     let alignedCount = 0;
     let warningCount = 0;
 
@@ -76,10 +82,10 @@ export async function areAligned(
 
     try {
         for (const itemName of itemList) {
-            let result: ValidationResult;
+            let validationResult: ValidationResult;
             
             if (mode === 'string') {
-                result = await validateSingleItemWithStringComparison(
+                validationResult = await validateSingleItemWithStringComparison(
                     itemName,
                     baseXmlDir,
                     baseCsvDir,
@@ -90,7 +96,7 @@ export async function areAligned(
                     options
                 );
             } else if (mode === 'logic') {
-                result = await validateSingleItem(
+                validationResult = await validateSingleItem(
                     itemName,
                     baseXmlDir,
                     baseCsvDir,
@@ -100,18 +106,26 @@ export async function areAligned(
                 );
             }
             
-            results.push(result);
-            
-            if (result.isAligned) {
+            // Convert ValidationResult to ItemResult format
+            if (validationResult.isAligned) {
+                items[itemName] = { result: 'OK' };
                 alignedCount++;
                 console.log(`✅ Item '${itemName}' is properly aligned`);
-            } else if (result.isWarning) {
+            } else if (validationResult.isWarning) {
+                items[itemName] = { 
+                    result: 'WARN', 
+                    error: validationResult.differences.join('; ') 
+                };
                 warningCount++;
                 console.log(`⚠️  Item '${itemName}' has warnings:`);
-                result.differences.forEach(diff => console.log(`   - ${diff}`));
+                validationResult.differences.forEach(diff => console.log(`   - ${diff}`));
             } else {
+                items[itemName] = { 
+                    result: 'KO', 
+                    error: validationResult.differences.join('; ') 
+                };
                 console.log(`❌ Item '${itemName}' has misalignment:`);
-                result.differences.forEach(diff => console.log(`   - ${diff}`));
+                validationResult.differences.forEach(diff => console.log(`   - ${diff}`));
             }
         }
     } finally {
@@ -121,18 +135,21 @@ export async function areAligned(
         }
     }
 
-    const summary: ValidationSummary = {
-        totalItems: results.length,
-        alignedItems: alignedCount,
-        misalignedItems: results.length - alignedCount - warningCount,
-        warningItems: warningCount,
-        results: results
+    const result: ValidationSummary = {
+        result: 'OK',
+        summary: {
+            totalItems: itemList.length,
+            alignedItems: alignedCount,
+            misalignedItems: itemList.length - alignedCount - warningCount,
+            warningItems: warningCount
+        },
+        items: items
     };
 
     const modeLabel = mode === 'string' ? ' (String Comparison)' : '';
-    console.log(`\nValidation Summary${modeLabel}: ${summary.totalItems} items validated, ${summary.alignedItems} aligned, ${summary.misalignedItems} misaligned, ${summary.warningItems} warnings`);
+    console.log(`\nValidation Summary${modeLabel}: ${result.summary.totalItems} items validated, ${result.summary.alignedItems} aligned, ${result.summary.misalignedItems} misaligned, ${result.summary.warningItems} warnings`);
     
-    return summary;
+    return result;
 }
 
 async function validateSingleItem(

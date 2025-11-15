@@ -85,7 +85,31 @@ sf easysources profiles upsert --type "fieldPermissions,classAccesses" --tagid "
 **Flags**:
 - `--es-csv, -c`: CSV directory
 - `--input, -i`: Specific profile names (comma-separated)
+- `--type, -t`: Specific permission types (e.g., `fieldPermissions,classAccesses`)
+- `--tagid, -k`: Specific tag IDs (comma-separated). **Supports wildcard patterns**:
+  - `example` - exact match (deletes only "example")
+  - `example*` - starts with (deletes all keys starting with "example")
+  - `*example` - ends with (deletes all keys ending with "example")
+  - `*example*` - contains (deletes all keys containing "example")
 - `--sort, -S`: Sort results (default: `true`)
+
+**Examples**:
+```bash
+# Delete exact match
+sf easysources profiles delete --type "classAccesses" --tagid "MyClass"
+
+# Delete all entries starting with "Test"
+sf easysources profiles delete --type "classAccesses" --tagid "Test*"
+
+# Delete all entries ending with "Controller"
+sf easysources profiles delete --type "classAccesses" --tagid "*Controller"
+
+# Delete all entries containing "Utility"
+sf easysources profiles delete --type "classAccesses" --tagid "*Utility*"
+
+# Combine multiple patterns
+sf easysources profiles delete --type "fieldPermissions" --tagid "Account.*,Test*"
+```
 
 ### `sf easysources profiles clean`
 **Description**: Clean Profile CSV files
@@ -182,7 +206,28 @@ sf easysources permissionsets upsert --type "fieldPermissions" --tagid "Account.
 **Flags**:
 - `--es-csv, -c`: CSV directory
 - `--input, -i`: Specific permission set names (comma-separated)
+- `--type, -t`: Specific permission types (e.g., `fieldPermissions,objectPermissions`)
+- `--tagid, -k`: Specific tag IDs (comma-separated). **Supports wildcard patterns**:
+  - `example` - exact match (deletes only "example")
+  - `example*` - starts with (deletes all keys starting with "example")
+  - `*example` - ends with (deletes all keys ending with "example")
+  - `*example*` - contains (deletes all keys containing "example")
 - `--sort, -S`: Sort results (default: `true`)
+
+**Examples**:
+```bash
+# Delete exact match
+sf easysources permissionsets delete --type "objectPermissions" --tagid "Account"
+
+# Delete all entries starting with "Custom"
+sf easysources permissionsets delete --type "objectPermissions" --tagid "Custom*"
+
+# Delete all entries ending with "__c"
+sf easysources permissionsets delete --type "fieldPermissions" --tagid "*__c"
+
+# Delete all entries containing "Test"
+sf easysources permissionsets delete --type "classAccesses" --tagid "*Test*"
+```
 
 ### `sf easysources permissionsets clean`
 **Description**: Clean Permission Set CSV files
@@ -727,6 +772,11 @@ sf easysources profiles clearempty
 ## Notes
 
 - **Comma-separated values**: Most `--input` flags accept comma-separated values for processing multiple items
+- **Wildcard support in delete commands**: The `--tagid` flag in `profiles:delete` and `permissionsets:delete` commands supports wildcard patterns (`*`) for bulk deletions:
+  - `example*` - matches all keys starting with "example"
+  - `*example` - matches all keys ending with "example"  
+  - `*example*` - matches all keys containing "example"
+  - `example` - exact match (no wildcards)
 - **Type and TagID filtering**: Available in upsert commands for profiles and permission sets for precise control
 - **Sorting**: Most commands include a `--sort` flag to control output ordering
 - **Path flexibility**: All commands respect custom paths via flags or configuration file

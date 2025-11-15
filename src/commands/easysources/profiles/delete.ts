@@ -8,17 +8,10 @@ import * as os from 'os';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
-const fs = require('fs-extra');
-import { join } from "path";
 import Performance from '../../../utils/performance';
 import { PROFILES_SUBPATH, PROFILE_ITEMS } from "../../../utils/constants/constants_profiles";
-import { calcCsvFilename, readCsvToJsonMap } from "../../../utils/filesUtils"
-import { sortByKey } from "../../../utils/utils"
+import { deleteFromCsv } from '../../../utils/commands/deleter';
 import { DEFAULT_ESCSV_PATH } from '../../../utils/constants/constants';
-import { loadSettings } from '../../../utils/localSettings';
-import CsvWriter from '../../../utils/csvWriter';
-
-const settings = loadSettings();
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);
@@ -72,61 +65,5 @@ export default class Delete extends SfdxCommand {
 
 // Export a profile-specific delete function that encapsulates profile constants
 export async function profileDelete(options: any): Promise<any> {
-    const csvWriter = new CsvWriter();
-    
-    const type = options.type;
-    const tagid = options.tagid;
-    
-    if (!type) throw new Error('Type parameter is required');
-    if (!tagid) throw new Error('TagId parameter is required');
-    if (!Object.keys(PROFILE_ITEMS).includes(type)) throw new Error('Invalid type parameter');
-    
-    const baseInputDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), PROFILES_SUBPATH) as string;
-    const inputProfile = options.input as string;
-
-    if (!fs.existsSync(baseInputDir)) {
-        throw new Error(`Input folder ${baseInputDir} does not exist!`);
-    }
-
-    var dirList = [];
-    if (inputProfile) {
-        dirList = inputProfile.split(',');
-    } else {
-        dirList = fs.readdirSync(baseInputDir, { withFileTypes: true })
-            .filter(item => item.isDirectory())
-            .map(item => item.name)
-    }
-
-    // dir is the profile name without the extension
-    for (const dir of dirList) {
-        console.log('Deleting on: ' + dir);
-
-        // type is a profile section (applicationVisibilities, classAccess ecc)
-        const csvFilePath = join(baseInputDir, dir, calcCsvFilename(dir, type));
-        if (fs.existsSync(csvFilePath)) {
-            var jsonMap = await readCsvToJsonMap(csvFilePath);
-
-            for (var k of tagid.split(',')) {
-                jsonMap.delete(k);
-            }
-            var jsonArray = Array.from(jsonMap.values());
-
-            const headers = PROFILE_ITEMS[type].headers;
-
-            if (options.sort === 'true') {
-                jsonArray = sortByKey(jsonArray);
-            }
-
-            try {
-                const csvContent = await csvWriter.toCsv(jsonArray, headers);
-                fs.writeFileSync(csvFilePath, csvContent, { flag: 'w+' });
-                // file written successfully
-            } catch (err) {
-                console.error(err);
-            }
-
-        }
-    }
-
-    return { outputString: 'OK' };
+    return deleteFromCsv(options, PROFILES_SUBPATH, PROFILE_ITEMS);
 }

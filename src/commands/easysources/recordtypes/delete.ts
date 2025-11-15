@@ -20,6 +20,7 @@ import { sortByKey } from "../../../utils/utils"
 import { RECORDTYPES_PICKVAL_ROOT, RECORDTYPES_SUBPATH, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
 import { loadSettings } from '../../../utils/localSettings';
 import CsvWriter from '../../../utils/csvWriter';
+import { jsonAndPrintError } from '../../../utils/commands/utils';
 
 const settings = loadSettings();
 
@@ -92,9 +93,11 @@ export async function recordTypeDelete(options: any = {}): Promise<AnyJson> {
     const inputRecordType = (options.recordtype) as string;
 
     if (!fs.existsSync(baseInputDir)) {
-        console.log('Input folder ' + baseInputDir + ' does not exist!');
-        return;
+        return jsonAndPrintError('Input folder ' + baseInputDir + ' does not exist!');
     }
+
+    // Initialize result object
+    const result = { result: 'OK', items: {} };
 
     var objectList = [];
     if (inputObject) {
@@ -118,46 +121,60 @@ export async function recordTypeDelete(options: any = {}): Promise<AnyJson> {
 
             // dir is the recordtype name without the extension
         for (const dir of recordTypeList) {
-            console.log('Deleting on: ' + join(obj, dir));
+            const fileKey = `${obj}/${dir}`;
+            
+            console.log('Deleting on: ' + fileKey);
 
-            const csvFilePath = join(baseInputDir, obj, 'recordTypes', dir, calcCsvFilename(dir, RECORDTYPES_PICKVAL_ROOT));
+            try {
+                const csvFilePath = join(baseInputDir, obj, 'recordTypes', dir, calcCsvFilename(dir, RECORDTYPES_PICKVAL_ROOT));
 
-            if (fs.existsSync(csvFilePath)) {
-                var jsonMap = await readCsvToJsonMap(csvFilePath);
+                if (fs.existsSync(csvFilePath)) {
+                    var jsonMap = await readCsvToJsonMap(csvFilePath);
 
-                if (apiname) {
-                    for (var ap of apiname.split(',')) {
-                        var key = picklist + '/' + ap;
-                        jsonMap.delete(key);
-                    }
-                } else {
-                    for(var pick of picklist.split(',')){
-                        for (var key of jsonMap.keys()) {
-                            if (jsonMap.get(key).picklist === pick) {
-                                jsonMap.delete(key);
+                    if (apiname) {
+                        for (var ap of apiname.split(',')) {
+                            var key = picklist + '/' + ap;
+                            jsonMap.delete(key);
+                        }
+                    } else {
+                        for(var pick of picklist.split(',')){
+                            for (var key of jsonMap.keys()) {
+                                if (jsonMap.get(key).picklist === pick) {
+                                    jsonMap.delete(key);
+                                }
                             }
                         }
                     }
+
+                    var jsonArray = Array.from(jsonMap.values());
+
+                    const headers = RECORDTYPE_ITEMS[RECORDTYPES_PICKVAL_ROOT].headers;
+
+                    if (options.sort === 'true') {
+                        jsonArray = sortByKey(jsonArray);
+                    }
+
+                    try {
+                        const csvContent = await csvWriter.toCsv(jsonArray, headers);
+                        fs.writeFileSync(csvFilePath, csvContent, { flag: 'w+' });
+                        // file written successfully
+                    } catch (err) {
+                        console.error(err);
+                        throw new Error(`Failed to write CSV file ${csvFilePath}: ${err.message}`);
+                    }
+
+                    // File processed successfully
+                    result.items[fileKey] = { result: 'OK' };
                 }
-
-                var jsonArray = Array.from(jsonMap.values());
-
-                const headers = RECORDTYPE_ITEMS[RECORDTYPES_PICKVAL_ROOT].headers;
-
-                if (options.sort === 'true') {
-                    jsonArray = sortByKey(jsonArray);
-                }
-
-                try {
-                    const csvContent = await csvWriter.toCsv(jsonArray, headers);
-                    fs.writeFileSync(csvFilePath, csvContent, { flag: 'w+' });
-                    // file written successfully
-                } catch (err) {
-                    console.error(err);
-                }
+            } catch (error) {
+                console.error(`Error processing recordType ${fileKey}:`, error);
+                result.items[fileKey] = { 
+                    result: 'KO', 
+                    error: error.message || 'Unknown error occurred'
+                };
             }
         }
     }
     
-    return { outputString: 'OK' };
+    return result;
 }

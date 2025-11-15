@@ -15,6 +15,7 @@ import Performance from '../../../utils/performance';
 import { join } from "path";
 import { RECORDTYPES_SUBPATH, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
 import { loadSettings } from '../../../utils/localSettings';
+import { jsonAndPrintError } from '../../../utils/commands/utils';
 import CsvWriter from '../../../utils/csvWriter';
 const fs = require('fs-extra');
 
@@ -73,9 +74,12 @@ export async function recordTypeUpdateKey(options: any = {}): Promise<AnyJson> {
     const inputObject = (options.object) as string;
     const inputRecordType = (options.recordtype) as string;
 
+    // Initialize result object
+    const result = { result: 'OK', items: {} };
+
+
     if (!fs.existsSync(baseInputDir)) {
-        console.log('Input folder ' + baseInputDir + ' does not exist!');
-        return { outputString: 'ERROR: Input folder does not exist' };
+        return jsonAndPrintError('Input folder ' + baseInputDir + ' does not exist!');
     }
 
     var objectList = [];
@@ -102,32 +106,48 @@ export async function recordTypeUpdateKey(options: any = {}): Promise<AnyJson> {
 
             // dir is the record type name without the extension
         for (const dir of recordTypeList) {
+            const fileKey = `${obj}/${dir}`;
+            
             console.log('UpdateKey: ' + dir);
 
+            try {
                 // key is each profile section (applicationVisibilities, classAccess ecc)
-            for (const tag_section in RECORDTYPE_ITEMS) {
-                const csvFilePath = join(baseInputDir, obj, 'recordTypes', dir, calcCsvFilename(dir, tag_section));
-                if (fs.existsSync(csvFilePath)) {
-                    var jsonArray = await readCsvToJsonArray(csvFilePath)
-                    generateTagId(jsonArray, RECORDTYPE_ITEMS[tag_section].key, RECORDTYPE_ITEMS[tag_section].headers);
+                for (const tag_section in RECORDTYPE_ITEMS) {
+                    const csvFilePath = join(baseInputDir, obj, 'recordTypes', dir, calcCsvFilename(dir, tag_section));
+                    if (fs.existsSync(csvFilePath)) {
+                        var jsonArray = await readCsvToJsonArray(csvFilePath)
+                        generateTagId(jsonArray, RECORDTYPE_ITEMS[tag_section].key, RECORDTYPE_ITEMS[tag_section].headers);
 
-                    if (options.sort === 'true' || options.sort === true || options.sort === undefined) {
-                        jsonArray = sortByKey(jsonArray);
-                    }
+                        if (options.sort === 'true' || options.sort === true || options.sort === undefined) {
+                            jsonArray = sortByKey(jsonArray);
+                        }
 
-                    const headers = RECORDTYPE_ITEMS[tag_section].headers;
+                        const headers = RECORDTYPE_ITEMS[tag_section].headers;
 
-                    try {
-                        const csvContent = await csvWriter.toCsv(jsonArray, headers);
-                        fs.writeFileSync(csvFilePath, csvContent, { flag: 'w+' });
-                        // file written successfully
-                    } catch (err) {
-                        console.error(err);
+                        try {
+                            const csvContent = await csvWriter.toCsv(jsonArray, headers);
+                            fs.writeFileSync(csvFilePath, csvContent, { flag: 'w+' });
+                            // file written successfully
+                        } catch (err) {
+                            console.error(err);
+                            throw new Error(`Failed to write CSV file ${csvFilePath}: ${err.message}`);
+                        }
                     }
                 }
+
+                // Record type processed successfully
+                result.items[fileKey] = { result: 'OK' };
+
+            } catch (error) {
+                // Record type processing failed
+                console.error(`Error updating key for record type ${dir}:`, error);
+                result.items[fileKey] = { 
+                    result: 'KO', 
+                    error: error.message || 'Unknown error occurred'
+                };
             }
         }
     }
 
-    return { outputString: 'OK' };
+    return result;
 }

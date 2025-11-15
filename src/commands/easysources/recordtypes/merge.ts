@@ -29,6 +29,7 @@ import { writeXmlToFile, readCsvToJsonArray, readXmlFromFile, calcCsvFilename } 
 import { sortByKey } from "../../../utils/utils"
 import { transformCSVtoXML } from '../../../utils/utils_recordtypes';
 import { loadSettings } from '../../../utils/localSettings';
+import { jsonAndPrintError } from '../../../utils/commands/utils';
 
 const settings = loadSettings();
 
@@ -92,9 +93,12 @@ export async function recordTypeMerge(options: any = {}): Promise<AnyJson> {
     const inputObject = (options.object) as string;
     const inputRecordType = (options.recordtype) as string;
 
+    // Initialize result object
+    const result = { result: 'OK', items: {} };
+
+
     if (!fs.existsSync(baseInputDir)) {
-        console.log('Input folder ' + baseInputDir + ' does not exist!');
-        return { outputString: 'ERROR: Input folder does not exist' };
+        return jsonAndPrintError('Input folder ' + baseInputDir + ' does not exist!');
     }
 
     var objectList = [];
@@ -120,20 +124,35 @@ export async function recordTypeMerge(options: any = {}): Promise<AnyJson> {
         }
 
         for (const dir of recordTypeList) {
+            const fileKey = `${obj}/${dir}`;
+            
             console.log('Merging: ' + join(obj, dir));
 
-            const mergedXml = await mergeRecordTypeFromCsv(dir, join(baseInputDir, obj, 'recordTypes', dir), options);
-            const outputDir = join(baseOutputDir, obj, 'recordTypes');
-            const outputFile = join(outputDir, dir + RECORDTYPES_EXTENSION);
-            
-            if (!fs.existsSync(outputDir)) {
-                fs.mkdirSync(outputDir, { recursive: true });
+            try {
+                const mergedXml = await mergeRecordTypeFromCsv(dir, join(baseInputDir, obj, 'recordTypes', dir), options);
+                const outputDir = join(baseOutputDir, obj, 'recordTypes');
+                const outputFile = join(outputDir, dir + RECORDTYPES_EXTENSION);
+                
+                if (!fs.existsSync(outputDir)) {
+                    fs.mkdirSync(outputDir, { recursive: true });
+                }
+                writeXmlToFile(outputFile, mergedXml);
+
+                // Record type processed successfully
+                result.items[fileKey] = { result: 'OK' };
+
+            } catch (error) {
+                // Record type processing failed
+                console.error(`Error merging record type ${dir}:`, error);
+                result.items[fileKey] = { 
+                    result: 'KO', 
+                    error: error.message || 'Unknown error occurred'
+                };
             }
-            writeXmlToFile(outputFile, mergedXml);
         }
     }
 
-    return { outputString: 'OK' };
+    return result;
 }
 
 /**

@@ -145,6 +145,14 @@ export async function getDefaultOrgName(){
 	return JSON.parse(res.stdout).result.alias;
 }
 
+export function jsonAndPrintError(err: string): {error: string; result: string} {
+	console.error(err);
+	return {
+		error: err || 'Unknown error',
+		result: 'ERROR'
+	};
+}
+
 /**
  * Sorts the keys of an object in alphabetical order.
  * If 'fullName' key is present, it will be placed first.

@@ -17,6 +17,7 @@ import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants
 import { loadSettings } from '../../../utils/localSettings';
 import { OBJTRANSL_ITEMS, OBJTRANSL_SUBPATH, OBJTRANSL_TAG_BOOL } from '../../../utils/constants/constants_objecttranslations';
 import CsvWriter from '../../../utils/csvWriter';
+import { jsonAndPrintError } from '../../../utils/commands/utils';
 
 const settings = loadSettings();
 
@@ -68,15 +69,23 @@ export default class Clean extends SfdxCommand {
 }
 
 // Export object translation-specific minify function for programmatic API
-export async function objectTranslationMinify(options: any = {}): Promise<{ outputString: string }> {
+export async function objectTranslationMinify(options: any = {}): Promise<any> {
     const csvWriter = new CsvWriter();
     const csvDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), OBJTRANSL_SUBPATH) as string;
     const xmlDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH)) as string;
 
     const inputObject = (options.input) as string;
 
-    checkDirOrErrorSync(csvDir);
-    checkDirOrErrorSync(xmlDir);
+    // Initialize result object
+    const result = { result: 'OK', items: {} };
+
+
+    try {
+        checkDirOrErrorSync(csvDir);
+        checkDirOrErrorSync(xmlDir);
+    } catch (error) {
+        return jsonAndPrintError(error.message);
+    }
 
     var objTrList = [];
     if (inputObject) {
@@ -91,46 +100,63 @@ export async function objectTranslationMinify(options: any = {}): Promise<{ outp
     for (const objTrName of objTrList) {
         console.log('Minifying on: ' + objTrName);
 
-        for (const tag_section in OBJTRANSL_ITEMS) {
-            // tag_section is an object translation section (fieldTranslations, layouts, etc)
+        try {
+            for (const tag_section in OBJTRANSL_ITEMS) {
+                // tag_section is an object translation section (fieldTranslations, layouts, etc)
 
-            const csvFilePath = join(csvDir, objTrName, 'csv', calcCsvFilename(objTrName, tag_section));
+                const csvFilePath = join(csvDir, objTrName, 'csv', calcCsvFilename(objTrName, tag_section));
 
-            if (fs.existsSync(csvFilePath)) {
+                if (fs.existsSync(csvFilePath)) {
 
-                // get the list of resources on the csv. eg. the list of field translations
-                var resListCsv = await readCsvToJsonArrayWithNulls(csvFilePath)
+                    // get the list of resources on the csv. eg. the list of field translations
+                    var resListCsv = await readCsvToJsonArrayWithNulls(csvFilePath)
 
-                resListCsv = resListCsv.filter(function(res) {
-                    // return true to persist, false to delete
-                    if(OBJTRANSL_TAG_BOOL[tag_section] == null) return true;
+                    resListCsv = resListCsv.filter(function(res) {
+                        // return true to persist, false to delete
+                        if(OBJTRANSL_TAG_BOOL[tag_section] == null) return true;
 
-                    for(const boolName of toArray(OBJTRANSL_TAG_BOOL[tag_section]) ){
-                        if(!isBlank(res[boolName])) return true;
+                        for(const boolName of toArray(OBJTRANSL_TAG_BOOL[tag_section]) ){
+                            if(!isBlank(res[boolName])) return true;
+                        }
+
+                        return false;
+                    });
+                    
+                    // write the cleaned csv
+                    const headers = OBJTRANSL_ITEMS[tag_section].headers;
+
+                    if (options.sort === 'true' || options.sort === true || options.sort === undefined) {
+                        resListCsv = sortByKey(resListCsv);
                     }
 
-                    return false;
-                });
-                
-                // write the cleaned csv
-                const headers = OBJTRANSL_ITEMS[tag_section].headers;
 
-                if (options.sort === 'true' || options.sort === true || options.sort === undefined) {
-                    resListCsv = sortByKey(resListCsv);
+
+                    try {
+                        const csvContent = await csvWriter.toCsv(resListCsv, headers);
+                        fs.writeFileSync(csvFilePath, csvContent, { flag: 'w+' });
+                        // file written successfully
+                    } catch (err) {
+                        console.error(err);
+                        throw new Error(`Failed to write CSV file ${csvFilePath}: ${err.message}`);
+
+                    }
+
                 }
 
-                try {
-                    const csvContent = await csvWriter.toCsv(resListCsv, headers);
-                    fs.writeFileSync(csvFilePath, csvContent, { flag: 'w+' });
-                    // file written successfully
-                } catch (err) {
-                    console.error(err);
-                }
-
+                // Object translation processed successfully
+                result.items[objTrName] = { result: 'OK' };
             }
+
+        } catch (error) {
+            // Object translation processing failed
+            console.error(`Error minifying object translation ${objTrName}:`, error);
+            result.items[objTrName] = { 
+                result: 'KO', 
+                error: error.message || 'Unknown error occurred'
+            };
         }
     }
     
-    return { outputString: 'OK' };
+    return result;
 }
 
