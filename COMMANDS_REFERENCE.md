@@ -111,6 +111,44 @@ sf easysources profiles delete --type "classAccesses" --tagid "*Utility*"
 sf easysources profiles delete --type "fieldPermissions" --tagid "Account.*,Test*"
 ```
 
+### `sf easysources profiles customupsert`
+**Description**: Insert or update specific entries in Profile CSV files using JSON content
+
+**Flags**:
+- `--es-csv, -c`: CSV directory
+- `--input, -i`: Specific profile names (comma-separated). If omitted, all profiles are processed
+- `--type, -t`: Specific permission type (e.g., `fieldPermissions`, `classAccesses`) - **Required**
+- `--content, -j`: JSON content to insert/update - **Required**. Can be a single object or an array of objects
+- `--sort, -S`: Sort results (default: `true`)
+
+**Content Parameter Behavior**:
+- **Non-existent keys**: If the JSON contains keys that don't exist in the metadata type schema, they are **ignored**
+- **Omitted keys**: If existing keys are omitted from the JSON, they will have **empty values** in the resulting CSV
+- **Key calculation**: The `_tagid` is automatically calculated based on the metadata type's key configuration
+
+**Examples**:
+```bash
+# Insert/update a single class access
+sf easysources profiles customupsert -t classAccesses -j '{"apexClass":"MyClass","enabled":true}'
+
+# Insert/update multiple class accesses at once
+sf easysources profiles customupsert -t classAccesses -j '[{"apexClass":"Class1","enabled":true},{"apexClass":"Class2","enabled":false}]'
+
+# Update field permissions for a specific profile
+sf easysources profiles customupsert -i Admin -t fieldPermissions -j '{"field":"Account.CustomField__c","editable":true,"readable":true}'
+
+# Insert object permissions (omitted keys will be empty)
+sf easysources profiles customupsert -t objectPermissions -j '{"object":"CustomObject__c","allowCreate":true,"allowRead":true}'
+
+# Example with non-existent key (will be ignored)
+sf easysources profiles customupsert -t classAccesses -j '{"apexClass":"MyClass","enabled":true,"nonExistentKey":"value"}'
+# Result: only apexClass and enabled will be processed, nonExistentKey is ignored
+
+# Example with omitted keys (will result in empty values)
+sf easysources profiles customupsert -t fieldPermissions -j '{"field":"Account.Name"}'
+# Result: editable and readable will be empty in the CSV
+```
+
 ### `sf easysources profiles clean`
 **Description**: Clean Profile CSV files
 
@@ -227,6 +265,44 @@ sf easysources permissionsets delete --type "fieldPermissions" --tagid "*__c"
 
 # Delete all entries containing "Test"
 sf easysources permissionsets delete --type "classAccesses" --tagid "*Test*"
+```
+
+### `sf easysources permissionsets customupsert`
+**Description**: Insert or update specific entries in Permission Set CSV files using JSON content
+
+**Flags**:
+- `--es-csv, -c`: CSV directory
+- `--input, -i`: Specific permission set names (comma-separated). If omitted, all permission sets are processed
+- `--type, -t`: Specific permission type (e.g., `fieldPermissions`, `objectPermissions`) - **Required**
+- `--content, -j`: JSON content to insert/update - **Required**. Can be a single object or an array of objects
+- `--sort, -S`: Sort results (default: `true`)
+
+**Content Parameter Behavior**:
+- **Non-existent keys**: If the JSON contains keys that don't exist in the metadata type schema, they are **ignored**
+- **Omitted keys**: If existing keys are omitted from the JSON, they will have **empty values** in the resulting CSV
+- **Key calculation**: The `_tagid` is automatically calculated based on the metadata type's key configuration
+
+**Examples**:
+```bash
+# Insert/update a single object permission
+sf easysources permissionsets customupsert -t objectPermissions -j '{"object":"Account","allowRead":true,"allowEdit":true}'
+
+# Insert/update multiple field permissions at once
+sf easysources permissionsets customupsert -t fieldPermissions -j '[{"field":"Account.Name","editable":false,"readable":true},{"field":"Contact.Email","editable":true,"readable":true}]'
+
+# Update class accesses for a specific permission set
+sf easysources permissionsets customupsert -i MyCustomPermSet -t classAccesses -j '{"apexClass":"MyController","enabled":true}'
+
+# Insert page accesses (omitted keys will be empty)
+sf easysources permissionsets customupsert -t pageAccesses -j '{"apexPage":"MyPage","enabled":true}'
+
+# Example with non-existent key (will be ignored)
+sf easysources permissionsets customupsert -t objectPermissions -j '{"object":"CustomObject__c","allowRead":true,"invalidKey":"value"}'
+# Result: only object and allowRead will be processed, invalidKey is ignored
+
+# Example with omitted keys (will result in empty values)
+sf easysources permissionsets customupsert -t objectPermissions -j '{"object":"Account","allowRead":true}'
+# Result: allowCreate, allowEdit, allowDelete, etc. will be empty in the CSV
 ```
 
 ### `sf easysources permissionsets clean`
@@ -778,6 +854,11 @@ sf easysources profiles clearempty
   - `*example*` - matches all keys containing "example"
   - `example` - exact match (no wildcards)
 - **Type and TagID filtering**: Available in upsert commands for profiles and permission sets for precise control
+- **Custom Upsert with JSON content**: The `customupsert` command for profiles and permission sets allows direct insertion/update of entries via JSON:
+  - Accepts single objects or arrays via `--content` flag
+  - Non-existent keys in the JSON are ignored
+  - Omitted existing keys result in empty values in the CSV
+  - Automatically calculates the `_tagid` based on metadata type configuration
 - **Sorting**: Most commands include a `--sort` flag to control output ordering
 - **Path flexibility**: All commands respect custom paths via flags or configuration file
 - **Background operations**: Long-running commands like `allmeta retrieve` support background processing options

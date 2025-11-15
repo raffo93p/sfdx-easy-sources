@@ -1,0 +1,15 @@
+{
+  "commandDescription": "Inserts or updates entries in csv files based on JSON content input",
+  "esCsvFlagDescription": "Specify a custom dir for input csv permission sets. Default: '%s'",
+  "inputFlagDescription": "Specify a permission set. Example: MyPermissionSet",
+  "typeFlagDescription": "Specify the type of resource you want to upsert. Required.",
+  "contentFlagDescription": "Specify the JSON content you want to insert/update. Required. Can be a single object or an array of objects.",
+  "sortFlagDescription" : "Specify if results must be sorted. Default '%s'",
+  "examples": [
+    "sf easysources permissionsets customupsert -t applicationVisibilities -j '{\"application\":\"MyApp\",\"default\":true,\"visible\":true}'",
+    "sf easysources permissionsets customupsert -t classAccesses -j '{\"apexClass\":\"MyClass\",\"enabled\":true}'",
+    "sf easysources permissionsets customupsert -t fieldPermissions -j '{\"field\":\"Account.CustomField__c\",\"editable\":true,\"readable\":true}'",
+    "sf easysources permissionsets customupsert -t objectPermissions -j '{\"object\":\"CustomObject__c\",\"allowCreate\":true,\"allowRead\":true,\"allowEdit\":true,\"allowDelete\":false}'",
+    "sf easysources permissionsets customupsert -i MyPermSet -t classAccesses -j '[{\"apexClass\":\"Class1\",\"enabled\":true},{\"apexClass\":\"Class2\",\"enabled\":true}]'"
+  ]
+}

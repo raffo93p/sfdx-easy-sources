@@ -7,39 +7,40 @@ This document provides a quick reference matrix of all commands and their availa
 - ✅ = Parameter available
 - 🔥 = Parameter available with special functionality
 - ❌ = Parameter not available
-- 🆕 = New parameter (v0.7.6+)
 
 ---
 
 ## Profiles Commands
 
-| Command | `--sf-xml` | `--es-csv` | `--input` | `--sort` | `--type` 🆕 | `--tagid` 🆕 | `--ignoreuserperm` | `--mode` | Special Params |
-|---------|------------|------------|-----------|----------|-------------|--------------|-------------------|----------|----------------|
-| **split** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | - |
+| Command | `--sf-xml` | `--es-csv` | `--input` | `--sort` | `--type` | `--tagid` | `--content` | `--ignoreuserperm` | `--mode` | Special Params |
+|---------|------------|------------|-----------|----------|----------|-----------|-------------|-------------------|----------|----------------|
+| **split** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | - |
+| **merge** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | - |
+| **upsert** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | type + tagid (targeted) |
+| **customupsert** | ❌ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | JSON content insert/update |
+| **arealigned** | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | string/logic mode |
+| **updatekey** | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | - |
+| **delete** | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | wildcard * support for tagid |
+| **clean** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | `--orgname`, `--log-dir`, `--target`, `--include-standard-fields`, `--skip-manifest-creation`, `--skip-types`, `--include-types` |
+| **clearempty** | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | - |
+| **minify** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | - |
+
+---
+
+## Permission Sets Commands
+
+| Command | `--sf-xml` | `--es-csv` | `--input` | `--sort` | `--type` | `--tagid` | `--content` | `--mode` | Special Params |
+|---------|------------|------------|-----------|----------|----------|-----------|-------------|----------|----------------|
+| **split** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | - |
 | **merge** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | - |
-| **upsert** | ✅ | ✅ | ✅ | ✅ | 🆕 | 🆕 | ✅ | ❌ | type + tagid (targeted) |
+| **upsert** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | type + tagid (targeted) |
+| **customupsert** | ❌ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | JSON content insert/update |
 | **arealigned** | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | string/logic mode |
 | **updatekey** | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | - |
 | **delete** | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | wildcard * support for tagid |
 | **clean** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | `--orgname`, `--log-dir`, `--target`, `--include-standard-fields`, `--skip-manifest-creation`, `--skip-types`, `--include-types` |
 | **clearempty** | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | - |
 | **minify** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | - |
-
----
-
-## Permission Sets Commands
-
-| Command | `--sf-xml` | `--es-csv` | `--input` | `--sort` | `--type` 🆕 | `--tagid` 🆕 | `--mode` | Special Params |
-|---------|------------|------------|-----------|----------|-------------|--------------|----------|----------------|
-| **split** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | - |
-| **merge** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | - |
-| **upsert** | ✅ | ✅ | ✅ | ✅ | 🆕 | 🆕 | ❌ | type + tagid (targeted) |
-| **arealigned** | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | string/logic mode |
-| **updatekey** | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | - |
-| **delete** | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | wildcard * support for tagid |
-| **clean** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | `--orgname`, `--log-dir`, `--target`, `--include-standard-fields`, `--skip-manifest-creation`, `--skip-types`, `--include-types` |
-| **clearempty** | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | - |
-| **minify** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | - |
 
 ---
 
@@ -205,7 +206,8 @@ sf easysources allmeta retrieve --orgname "myorg" --split-merge --clean
 
 ## Notes
 
-- 🆕 **New in v0.7.6**: `--type` and `--tagid` parameters for targeted upsert operations
+- **New in v0.9.1**: `delete` command now supports wildcard patterns (`*`) in `--tagid` parameter for bulk deletions
+- **New in v0.9.2**: `customupsert` command for profiles and permission sets - insert/update entries via JSON content
 - **Comma-separated values**: Most parameters support multiple values separated by commas
 - **Targeted upsert**: When using `--type` or `--tagid`, the `-part.xml` file is not modified
 - **Configuration file**: Use `easysources-settings.json` for default path values

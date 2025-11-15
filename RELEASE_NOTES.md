@@ -1,5 +1,18 @@
 # Release Notes
 
+## Version 0.9.2
+- **New Feature: Custom Upsert Command for Profiles and Permission Sets** - Added a new `customupsert` command for both `profiles` and `permissionsets` that allows direct insertion/update of entries via JSON input. This command accepts JSON content (single object or array) through the `--content` flag and automatically calculates the appropriate key (_tagid) based on the metadata type configuration. Key features:
+  - **JSON Content Support**: Pass structured data directly via command line
+  - **Smart Key Handling**: Non-existent keys in the JSON are ignored, while omitted existing keys result in empty values
+  - **Bulk Operations**: Supports both single objects and arrays for batch processing
+  - **Target Specific Items**: Use `--input` flag to target specific profiles/permission sets, or omit to process all
+  - **Type Safety**: Requires `--type` parameter to specify the permission type (e.g., classAccesses, fieldPermissions)
+  - Example usage:
+    ```bash
+    sf easysources profiles customupsert -t classAccesses -j '{"apexClass":"MyClass","enabled":true}'
+    sf easysources permissionsets customupsert -t fieldPermissions -j '[{"field":"Account.Name__c","editable":true}]'
+    ```
+
 ## Version 0.9.1
 - **Enhancement: Wildcard support for delete commands** - Added wildcard pattern matching to the `--tagid` flag for both `profiles:delete` and `permissionsets:delete` commands. You can now use patterns to delete multiple items at once:
   - `example*` - deletes all keys starting with "example"

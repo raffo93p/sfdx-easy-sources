@@ -11,6 +11,7 @@ import { permissionsetClearEmpty } from '../commands/easysources/permissionsets/
 import { permissionsetMinify } from '../commands/easysources/permissionsets/minify';
 import { permissionsetDelete } from '../commands/easysources/permissionsets/delete';
 import { permissionsetClean } from '../commands/easysources/permissionsets/clean';
+import { permissionsetCustomUpsert } from '../commands/easysources/permissionsets/customupsert';
 
 /**
  * Configuration options for permission set operations
@@ -39,10 +40,12 @@ export interface PermissionSetOptions extends PathOptions {
     'include-types'?: string;
     /** Log directory path (clean only) */
     'log-dir'?: string;
-    /** Specific permission type to target (upsert, delete only) */
+    /** Specific permission type to target (upsert, delete, customUpsert only) */
     type?: string;
     /** Specific tag ID to target (upsert, delete only) */
     tagid?: string;
+    /** JSON content to insert/update (customUpsert only) */
+    content?: string;
 }
 
 /**
@@ -60,19 +63,26 @@ export interface PermissionSetOptions extends PathOptions {
  * - updateKey(): Updates permission set keys in CSV files
  * - minify(): Removes entries with only false permissions
  * - delete(): Deletes specific entries from CSV files
+ * - customUpsert(): Inserts or updates entries via JSON content
  * - clean(): Removes references to non-existent metadata
  * 
  * @example
  * ```javascript
- * const { permissionsets } = require('sfdx-easy-sources');
+ * const { permissionSets } = require('sfdx-easy-sources');
  * 
  * // Using default settings from easysources-settings.json
- * await permissionsets.split({ input: 'MyPermSet' });
+ * await permissionSets.split({ input: 'MyPermSet' });
  * 
  * // Override specific paths
- * await permissionsets.upsert({
+ * await permissionSets.upsert({
  *   'sf-xml': './custom-metadata-path',
  *   'es-csv': './custom-csv-path'
+ * });
+ * 
+ * // Custom upsert with JSON content
+ * await permissionSets.customUpsert({
+ *   type: 'objectPermissions',
+ *   content: JSON.stringify({ object: 'Account', allowRead: true, allowEdit: true })
  * });
  * ```
  */
@@ -147,6 +157,15 @@ export const permissionSets = {
    */
   delete: async (options: PermissionSetOptions): Promise<AnyJson> => {
     return await permissionsetDelete(options);
+  },
+
+  /**
+   * Inserts or updates specific entries in permission set CSV files using JSON content.
+   * @param options Configuration options for the custom upsert operation
+   * @returns Promise resolving to operation result
+   */
+  customUpsert: async (options: PermissionSetOptions): Promise<AnyJson> => {
+    return await permissionsetCustomUpsert(options);
   },
 
   /**
