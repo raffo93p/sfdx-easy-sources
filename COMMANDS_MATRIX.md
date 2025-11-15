@@ -20,7 +20,7 @@ This document provides a quick reference matrix of all commands and their availa
 | **upsert** | ✅ | ✅ | ✅ | ✅ | 🆕 | 🆕 | ✅ | ❌ | type + tagid (targeted) |
 | **arealigned** | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | string/logic mode |
 | **updatekey** | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | - |
-| **delete** | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | - |
+| **delete** | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | wildcard * support for tagid |
 | **clean** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | `--orgname`, `--log-dir`, `--target`, `--include-standard-fields`, `--skip-manifest-creation`, `--skip-types`, `--include-types` |
 | **clearempty** | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | - |
 | **minify** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | - |
@@ -36,7 +36,7 @@ This document provides a quick reference matrix of all commands and their availa
 | **upsert** | ✅ | ✅ | ✅ | ✅ | 🆕 | 🆕 | ❌ | type + tagid (targeted) |
 | **arealigned** | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | string/logic mode |
 | **updatekey** | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | - |
-| **delete** | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | - |
+| **delete** | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | wildcard * support for tagid |
 | **clean** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | `--orgname`, `--log-dir`, `--target`, `--include-standard-fields`, `--skip-manifest-creation`, `--skip-types`, `--include-types` |
 | **clearempty** | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | - |
 | **minify** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | - |
