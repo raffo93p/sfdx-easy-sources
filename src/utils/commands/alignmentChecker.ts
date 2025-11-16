@@ -13,11 +13,10 @@ export interface ValidationResult {
     itemName: string;
     isAligned: boolean;
     differences: string[];
-    isWarning?: boolean; // true when CSV directory is missing, false for actual alignment issues
 }
 
 export interface ItemResult {
-    result: 'OK' | 'KO' | 'WARN';
+    result: 'OK' | 'KO';
     error?: string;
 }
 
@@ -27,7 +26,6 @@ export interface ValidationSummary {
         totalItems: number;
         alignedItems: number;
         misalignedItems: number;
-        warningItems: number;
     };
     items: { [itemName: string]: ItemResult };
 }
@@ -71,7 +69,6 @@ export async function areAligned(
 
     const items: { [itemName: string]: ItemResult } = {};
     let alignedCount = 0;
-    let warningCount = 0;
 
     // Setup for string mode
     let tempDir: string | null = null;
@@ -82,27 +79,63 @@ export async function areAligned(
 
     try {
         for (const itemName of itemList) {
+            const xmlFilePath = join(baseXmlDir, itemName + file_extension);
+            const csvDirPath = join(baseCsvDir, itemName);
+            
+            // Check if XML file exists
+            if (!fs.existsSync(xmlFilePath)) {
+                items[itemName] = { 
+                    result: 'KO', 
+                    error: `XML file not found: ${xmlFilePath}` 
+                };
+                console.log(`❌ Item '${itemName}' has misalignment:`);
+                console.log(`   - XML file not found: ${xmlFilePath}`);
+                continue;
+            }
+
+            // Read original XML to check content
+            const originalXml = (await readXmlFromFile(xmlFilePath)) ?? {};
+            const originalItem = originalXml[file_root_tag] ?? {};
+
+            // Check if CSV directory exists
+            if (!fs.existsSync(csvDirPath)) {
+                // Check if original XML has any content in file_items sections
+                const hasContent = hasFileItemsContent(originalItem, file_items);
+                const message = `CSV directory not found: ${csvDirPath}`;
+                
+                if (hasContent) {
+                    items[itemName] = { result: 'KO', error: message };
+                    console.log(`❌ Item '${itemName}' has misalignment:`);
+                    console.log(`   - ${message}`);
+                } else {
+                    items[itemName] = { result: 'OK'};
+                    alignedCount++;
+                    console.log(`✅ Item '${itemName}' is properly aligned`);
+                }
+                continue;
+            }
+
             let validationResult: ValidationResult;
             
             if (mode === 'string') {
                 validationResult = await validateSingleItemWithStringComparison(
                     itemName,
-                    baseXmlDir,
-                    baseCsvDir,
+                    xmlFilePath,
+                    csvDirPath,
                     tempDir!,
                     file_extension,
                     file_root_tag,
                     file_items,
+                    originalItem,
                     options
                 );
             } else if (mode === 'logic') {
                 validationResult = await validateSingleItem(
                     itemName,
-                    baseXmlDir,
-                    baseCsvDir,
-                    file_extension,
+                    csvDirPath,
                     file_root_tag,
-                    file_items
+                    file_items,
+                    originalItem
                 );
             }
             
@@ -111,14 +144,6 @@ export async function areAligned(
                 items[itemName] = { result: 'OK' };
                 alignedCount++;
                 console.log(`✅ Item '${itemName}' is properly aligned`);
-            } else if (validationResult.isWarning) {
-                items[itemName] = { 
-                    result: 'WARN', 
-                    error: validationResult.differences.join('; ') 
-                };
-                warningCount++;
-                console.log(`⚠️  Item '${itemName}' has warnings:`);
-                validationResult.differences.forEach(diff => console.log(`   - ${diff}`));
             } else {
                 items[itemName] = { 
                     result: 'KO', 
@@ -140,54 +165,25 @@ export async function areAligned(
         summary: {
             totalItems: itemList.length,
             alignedItems: alignedCount,
-            misalignedItems: itemList.length - alignedCount - warningCount,
-            warningItems: warningCount
+            misalignedItems: itemList.length - alignedCount
         },
         items: items
     };
 
     const modeLabel = mode === 'string' ? ' (String Comparison)' : '';
-    console.log(`\nValidation Summary${modeLabel}: ${result.summary.totalItems} items validated, ${result.summary.alignedItems} aligned, ${result.summary.misalignedItems} misaligned, ${result.summary.warningItems} warnings`);
+    console.log(`\nValidation Summary${modeLabel}: ${result.summary.totalItems} items validated, ${result.summary.alignedItems} aligned, ${result.summary.misalignedItems} misaligned`);
     
     return result;
 }
 
 async function validateSingleItem(
     itemName: string,
-    baseXmlDir: string,
-    baseCsvDir: string,
-    file_extension: string,
+    csvDirPath: string,
     file_root_tag: string,
-    file_items: any
+    file_items: any,
+    originalItem: any
 ): Promise<ValidationResult> {
-    
-    const xmlFilePath = join(baseXmlDir, itemName + file_extension);
-    const csvDirPath = join(baseCsvDir, itemName);
-    
-    // Check if XML file exists
-    if (!fs.existsSync(xmlFilePath)) {
-        return {
-            itemName,
-            isAligned: false,
-            differences: [`XML file not found: ${xmlFilePath}`]
-        };
-    }
-
-    // Check if CSV directory exists
-    if (!fs.existsSync(csvDirPath)) {
-        return {
-            itemName,
-            isAligned: false,
-            differences: [`CSV directory not found: ${csvDirPath}`],
-            isWarning: true
-        };
-    }
-
     try {
-        // Read original XML
-        const originalXml = (await readXmlFromFile(xmlFilePath)) ?? {};
-        const originalItem = originalXml[file_root_tag] ?? {};
-
         // Reconstruct item from CSV files - this returns the XML structure directly
         const reconstructedXml = await reconstructItemFromCsv(itemName, csvDirPath, file_root_tag, file_items);
         const reconstructedItem = reconstructedXml[file_root_tag] ?? reconstructedXml;
@@ -308,46 +304,42 @@ function deepEqual(obj1: any, obj2: any): boolean {
     return false;
 }
 
+/**
+ * Check if the original XML item has any content in file_items sections
+ * Returns true if at least one file_items section exists and has length > 0
+ */
+export function hasFileItemsContent(originalItem: any, file_items: any): boolean {
+    for (const section of Object.keys(file_items)) {
+        const value = originalItem[section];
+        if (value && Array.isArray(value) && value.length > 0) {
+            return true;
+        }
+        if (value && !Array.isArray(value) && typeof value === 'object') {
+            // Single object counts as content
+            return true;
+        }
+    }
+    return false;
+}
+
 async function validateSingleItemWithStringComparison(
     itemName: string,
-    baseXmlDir: string,
-    baseCsvDir: string,
+    xmlFilePath: string,
+    csvDirPath: string,
     tempDir: string,
     file_extension: string,
     file_root_tag: string,
     file_items: any,
+    originalItem: any,
     options: any
 ): Promise<ValidationResult> {
-    
-    const originalXmlPath = join(baseXmlDir, itemName + file_extension);
-    const csvDirPath = join(baseCsvDir, itemName);
-    
-    // Check if original XML file exists
-    if (!fs.existsSync(originalXmlPath)) {
-        return {
-            itemName,
-            isAligned: false,
-            differences: [`Original XML file not found: ${originalXmlPath}`]
-        };
-    }
-
-    // Check if CSV directory exists
-    if (!fs.existsSync(csvDirPath)) {
-        return {
-            itemName,
-            isAligned: false,
-            differences: [`CSV directory not found: ${csvDirPath}`],
-            isWarning: true
-        };
-    }
-
     try {
         // Create merged XML from CSV files using the same logic as merger.ts
         const mergedXmlPath = join(tempDir, itemName + '_merged' + file_extension);
         await createMergedXmlFromCsv(itemName, csvDirPath, mergedXmlPath, file_root_tag, file_items, options);
 
         // Use the normalized file comparison utility
-        const isAligned = await areFilesEqual(originalXmlPath, mergedXmlPath);
+        const isAligned = await areFilesEqual(xmlFilePath, mergedXmlPath);
         const differences = isAligned ? [] : ['XML content differs after merge reconstruction'];
 
         return {

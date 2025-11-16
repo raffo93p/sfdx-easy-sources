@@ -107,51 +107,15 @@ export function transformFieldCSVtoXMLs(array) {
     }
 
     transformedArray.push(item);
-
-    // if (filteredItems.some(item => item.hasOwnProperty("picklistValues_masterLabel") && item.picklistValues_masterLabel !=='')) {
-    //   const picklistValues = filteredItems.map(item => ({
-    //     masterLabel: item.picklistValues_masterLabel,
-    //     translation: item.picklistValues_translation
-    //   }));
-
-    //   transformedArray.push({
-    //     "$":  {xmlns: 'http://soap.sforce.com/2006/04/metadata'},
-    //     label: filteredItems[0].label,
-    //     name,
-    //     picklistValues
-    //   });
-    // } else {
-    //   transformedArray.push({
-    //     "$":  {xmlns: 'http://soap.sforce.com/2006/04/metadata'},
-    //     label: filteredItems[0].label,
-    //     name,
-    //     relationshipLabel: filteredItems[0].relationshipLabel
-    //   });
-    // }
   }
 
   return transformedArray;
-
-
-    // var xml = {};
-    // xml['$'] = {xmlns: 'http://soap.sforce.com/2006/04/metadata'};
-    // xml['label'] = map['label'];
-    // xml['name'] = map['name'];
-    // const transformedObject = {
-    //     label: array[0].label,
-    //     name: array[0].name,
-    //     picklistValues: array.map(item => ({
-    //       masterLabel: item.picklistValues_masterLabel,
-    //       translation: item.picklistValues_translation
-    //     }))
-    //   };
-    // return {[OBJTRANSL_CFIELDTRANSL_ROOT_TAG]: xml}; 
 }
 
 export function getFieldTranslationFiles(dir){
     return fs.readdirSync(dir, { withFileTypes: true })
     // we only want custom fields, not the standard ones
-    .filter(item => !item.isDirectory() && item.name.endsWith('__c' + OBJTRANSL_FIELDTRANSL_EXTENSION))
+    .filter(item => !item.isDirectory() && item.name.endsWith(OBJTRANSL_FIELDTRANSL_EXTENSION))
     .map(item => item.name)
 }
 

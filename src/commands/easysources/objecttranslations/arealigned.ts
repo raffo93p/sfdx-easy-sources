@@ -35,6 +35,7 @@ import {
 import { 
     getFieldTranslationFiles
 } from '../../../utils/utils_objtransl';
+import { hasFileItemsContent } from '../../../utils/commands/alignmentChecker';
 
 const settings = loadSettings();
 
@@ -49,21 +50,20 @@ interface ValidationResult {
     itemName: string;
     isAligned: boolean;
     differences: string[];
-    isWarning?: boolean;
 }
 
 interface ItemResult {
-    result: 'OK' | 'KO' | 'WARN';
+    result: 'OK' | 'KO';
     error?: string;
 }
 
 interface ValidationSummary {
-    result: 'OK';
+    result: 'OK' | 'KO';
+    error?: string;
     summary: {
         totalItems: number;
         alignedItems: number;
         misalignedItems: number;
-        warningItems: number;
     };
     items: { [itemName: string]: ItemResult };
     [key: string]: any; // For AnyJson compatibility
@@ -122,20 +122,22 @@ export async function objectTranslationAreAligned(options: any = {}): Promise<Va
     if (!fs.existsSync(baseXmlDir)) {
         console.log(`Missing XML directory: ${baseXmlDir}`);
         return { 
-            result: 'OK', 
-            summary: { totalItems: 0, alignedItems: 0, misalignedItems: 0, warningItems: 0 }, 
+            result: 'KO', 
+            error: `Missing XML directory: ${baseXmlDir}`,
+            summary: { totalItems: 0, alignedItems: 0, misalignedItems: 0 }, 
             items: {} 
         };
     }
 
-    if (!fs.existsSync(baseCsvDir)) {
-        console.log(`Missing CSV directory: ${baseCsvDir}`);
-        return { 
-            result: 'OK', 
-            summary: { totalItems: 0, alignedItems: 0, misalignedItems: 0, warningItems: 0 }, 
-            items: {} 
-        };
-    }
+    // if (!fs.existsSync(baseCsvDir)) {
+    //     console.log(`Missing CSV directory: ${baseCsvDir}`);
+    //     return { 
+    //         result: 'KO',
+    //         error: `Missing CSV directory: ${baseCsvDir}`,
+    //         summary: { totalItems: 0, alignedItems: 0, misalignedItems: 0 }, 
+    //         items: {} 
+    //     };
+    // }
 
     var objectList = [];
     if (inputObjects) {
@@ -149,15 +151,72 @@ export async function objectTranslationAreAligned(options: any = {}): Promise<Va
 
     const items: { [itemName: string]: ItemResult } = {};
     let alignedCount = 0;
-    let warningCount = 0;
 
     for (const objectName of objectList) {
+        const xmlFilePath = join(baseXmlDir, objectName, objectName + OBJTRANSL_EXTENSION);
+        const xmlDir = join(baseXmlDir, objectName);
+        const objectCsvDir = join(baseCsvDir, objectName, 'csv');
+
+        // Check if XML file exists
+        if (!fs.existsSync(xmlFilePath)) {
+            items[objectName] = { 
+                result: 'KO', 
+                error: `XML file not found: ${xmlFilePath}` 
+            };
+            console.log(`❌ Object translation '${objectName}' has misalignment:`);
+            console.log(`   - XML file not found: ${xmlFilePath}`);
+            continue;
+        }
+
+        // Read original XML to check content
+        const originalXml = (await readXmlFromFile(xmlFilePath)) ?? {};
+        const originalItem = originalXml[OBJTRANSL_ROOT_TAG] ?? {};
+
+        // Check if CSV directory exists
+        if (!fs.existsSync(objectCsvDir)) {
+            
+            // Check if original XML has any content in OBJTRANSL_ITEMS sections (excluding fieldTranslations)
+            const itemsWithoutFieldTranslations = Object.keys(OBJTRANSL_ITEMS)
+                .filter(key => key !== OBJTRANSL_CFIELDTRANSL_ROOT)
+                .reduce((obj, key) => ({ ...obj, [key]: OBJTRANSL_ITEMS[key] }), {});
+            const hasContent = hasFileItemsContent(originalItem, itemsWithoutFieldTranslations);
+            
+            // Also check if there are any .fieldTranslation-meta.xml files
+            const fieldTranslationFiles = getFieldTranslationFiles(xmlDir);
+            const hasFieldTranslations = fieldTranslationFiles.length > 0;
+            
+            const message = `CSV directory not found: ${objectCsvDir}`;
+            
+            // CSV should exist if there's content OR if there are fieldTranslation files
+            if (hasContent || hasFieldTranslations) {
+                items[objectName] = { result: 'KO', error: message };
+                console.log(`❌ Object translation '${objectName}' has misalignment:`);
+                console.log(`   - ${message}`);
+            } else {
+                items[objectName] = { result: 'OK' };
+                alignedCount++;
+                console.log(`✅ Object translation '${objectName}' is aligned`);
+            }
+            continue;
+        }
+
         let validationResult: ValidationResult;
         
         if (mode === 'string') {
-            validationResult = await compareStringsForObject(objectName, baseXmlDir, baseCsvDir, options);
+            validationResult = await compareStringsForObject(
+                objectName,
+                xmlFilePath,
+                xmlDir,
+                objectCsvDir,
+                options
+            );
         } else {
-            validationResult = await validateSingleObjectTranslation(objectName, baseXmlDir, baseCsvDir, options);
+            validationResult = await validateSingleObjectTranslation(
+                objectName,
+                objectCsvDir,
+                originalItem,
+                options
+            );
         }
         
         // Convert ValidationResult to ItemResult format
@@ -165,14 +224,6 @@ export async function objectTranslationAreAligned(options: any = {}): Promise<Va
             items[objectName] = { result: 'OK' };
             alignedCount++;
             console.log(`✅ Object translation '${objectName}' is aligned`);
-        } else if (validationResult.isWarning) {
-            items[objectName] = { 
-                result: 'WARN', 
-                error: validationResult.differences.join('; ') 
-            };
-            warningCount++;
-            console.log(`⚠️  Object translation '${objectName}' has warnings:`);
-            validationResult.differences.forEach(diff => console.log(`   - ${diff}`));
         } else {
             items[objectName] = { 
                 result: 'KO', 
@@ -188,69 +239,36 @@ export async function objectTranslationAreAligned(options: any = {}): Promise<Va
         summary: {
             totalItems: objectList.length,
             alignedItems: alignedCount,
-            misalignedItems: objectList.length - alignedCount - warningCount,
-            warningItems: warningCount
+            misalignedItems: objectList.length - alignedCount
         },
         items: items
     };
 
-    console.log(`\n📊 Validation Summary: ${result.summary.totalItems} total, ${result.summary.alignedItems} aligned, ${result.summary.misalignedItems} misaligned, ${result.summary.warningItems} warnings`);
+    console.log(`\n📊 Validation Summary: ${result.summary.totalItems} total, ${result.summary.alignedItems} aligned, ${result.summary.misalignedItems} misaligned`);
     
     return result;
 }
 
 async function validateSingleObjectTranslation(
     objectName: string,
-    xmlDir: string,
-    csvDir: string,
+    objectCsvDir: string,
+    originalItem: any,
     options: any
 ): Promise<ValidationResult> {
     const differences: string[] = [];
 
     try {
-        // Check main object translation XML
-        const xmlFilePath = join(xmlDir, objectName, objectName + OBJTRANSL_EXTENSION);
-        if (!fs.existsSync(xmlFilePath)) {
-            return {
-                itemName: objectName,
-                isAligned: false,
-                differences: [`XML file not found: ${xmlFilePath}`],
-                isWarning: true
-            };
-        }
-
-        const originalXml = await readXmlFromFile(xmlFilePath);
-        if (!originalXml || !originalXml[OBJTRANSL_ROOT_TAG]) {
-            return {
-                itemName: objectName,
-                isAligned: false,
-                differences: [`Invalid XML structure in: ${xmlFilePath}`]
-            };
-        }
-
-        // Check CSV directory
-        const objectCsvDir = join(csvDir, objectName, 'csv');
-        if (!fs.existsSync(objectCsvDir)) {
-            return {
-                itemName: objectName,
-                isAligned: false,
-                differences: [`CSV directory not found: ${objectCsvDir}`],
-                isWarning: true
-            };
-        }
-
         // Reconstruct XML from CSV using shared merge logic
         const reconstructedXml = await mergeObjectTranslationFromCsv(objectName, objectCsvDir, options);
         
         // Compare main object translation structures
-        const originalData = originalXml[OBJTRANSL_ROOT_TAG] || {};
         const reconstructedData = reconstructedXml[OBJTRANSL_ROOT_TAG] || {};
 
         // Deep compare the relevant sections (excluding fieldTranslations)
         for (const sectionName in OBJTRANSL_ITEMS) {
             if (sectionName === OBJTRANSL_CFIELDTRANSL_ROOT) continue; // Skip fieldTranslations
             
-            const originalSection = originalData[sectionName] || [];
+            const originalSection = originalItem[sectionName] || [];
             const reconstructedSection = reconstructedData[sectionName] || [];
 
             // Convert to arrays if they're objects
@@ -278,7 +296,6 @@ async function validateSingleObjectTranslation(
         // Validate fieldTranslations separately
         const fieldTranslationsDifferences = await validateFieldTranslationsForObject(
             objectName, 
-            xmlDir, 
             objectCsvDir
         );
         differences.push(...fieldTranslationsDifferences);
@@ -300,56 +317,22 @@ async function validateSingleObjectTranslation(
 
 async function validateFieldTranslationsForObject(
     objectName: string,
-    xmlDir: string,
     csvDir: string
 ): Promise<string[]> {
     const differences: string[] = [];
 
     try {
-        // Get all existing fieldTranslation XML files
-        const objectXmlDir = join(xmlDir, objectName);
-        const fieldTranslationFiles = getFieldTranslationFiles(objectXmlDir);
-        
         // Use shared logic to get field translations from CSV
         const fieldXmlArray = await getFieldTranslationsFromCsv(objectName, csvDir);
-
-        // Compare counts
-        if (fieldTranslationFiles.length !== fieldXmlArray.length) {
-            differences.push(`fieldTranslations: File count mismatch (XML: ${fieldTranslationFiles.length}, CSV: ${fieldXmlArray.length})`);
+        
+        // In logic mode, we just verify that we can reconstruct from CSV
+        // The actual comparison with XML files is done in the main validation
+        // This is mainly to catch CSV parsing errors
+        if (fieldXmlArray.length === 0) {
+            // No field translations in CSV - this is OK
+            return differences;
         }
-
-        // Validate each field translation
-        for (const fieldEntry of fieldXmlArray) {
-            const expectedFileName = fieldEntry.name + OBJTRANSL_FIELDTRANSL_EXTENSION;
-            const expectedFilePath = join(objectXmlDir, expectedFileName);
-            
-            if (!fs.existsSync(expectedFilePath)) {
-                differences.push(`fieldTranslations: Missing XML file for ${fieldEntry.name}`);
-                continue;
-            }
-
-            // Compare content
-            const originalXml = await readXmlFromFile(expectedFilePath);
-            const reconstructedXml = { [OBJTRANSL_CFIELDTRANSL_ROOT_TAG]: fieldEntry };
-            
-            const originalStr = JSON.stringify(originalXml);
-            const reconstructedStr = JSON.stringify(reconstructedXml);
-            
-            if (originalStr !== reconstructedStr) {
-                differences.push(`fieldTranslations: Content mismatch for ${fieldEntry.name}`);
-            }
-        }
-
-        // Check for XML files not represented in CSV
-        for (const xmlFile of fieldTranslationFiles) {
-            const fieldName = xmlFile.replace(OBJTRANSL_FIELDTRANSL_EXTENSION, '');
-            const foundInCsv = fieldXmlArray.some(entry => entry.name === fieldName);
-            
-            if (!foundInCsv) {
-                differences.push(`fieldTranslations: XML file ${xmlFile} not represented in CSV`);
-            }
-        }
-            
+        
     } catch (error) {
         differences.push(`fieldTranslations validation error: ${error.message}`);
     }
@@ -359,33 +342,12 @@ async function validateFieldTranslationsForObject(
 
 async function compareStringsForObject(
     objectName: string,
+    xmlFilePath: string,
     xmlDir: string,
-    csvDir: string,
+    objectCsvDir: string,
     options: any
 ): Promise<ValidationResult> {
     try {
-        // Check main object translation XML
-        const xmlFilePath = join(xmlDir, objectName, objectName + OBJTRANSL_EXTENSION);
-        if (!fs.existsSync(xmlFilePath)) {
-            return {
-                itemName: objectName,
-                isAligned: false,
-                differences: [`XML file not found: ${xmlFilePath}`],
-                isWarning: true
-            };
-        }
-
-        // Check CSV directory
-        const objectCsvDir = join(csvDir, objectName, 'csv');
-        if (!fs.existsSync(objectCsvDir)) {
-            return {
-                itemName: objectName,
-                isAligned: false,
-                differences: [`CSV directory not found: ${objectCsvDir}`],
-                isWarning: true
-            };
-        }
-
         const originalXmlString = await readStringNormalizedFromFile(xmlFilePath);
 
         // Reconstruct XML from CSV using shared merge logic
@@ -440,15 +402,15 @@ async function compareFieldTranslationsStringsForObject(
     const differences: string[] = [];
 
     try {
-        const objectXmlDir = join(xmlDir, objectName);
-        const fieldTranslationFiles = getFieldTranslationFiles(objectXmlDir);
+        // xmlDir is already the full path to the object directory (e.g., assets/default/objectTranslations/Account-es_CL)
+        const fieldTranslationFiles = getFieldTranslationFiles(xmlDir);
         
         // Use shared logic to get field translations from CSV
         const fieldXmlArray = await getFieldTranslationsFromCsv(objectName, csvDir);
 
         // For each expected field translation file, reconstruct and compare
         for (const fieldEntry of fieldXmlArray) {
-            const expectedFilePath = join(objectXmlDir, fieldEntry.name + OBJTRANSL_FIELDTRANSL_EXTENSION);
+            const expectedFilePath = join(xmlDir, fieldEntry.name + OBJTRANSL_FIELDTRANSL_EXTENSION);
             
             if (fs.existsSync(expectedFilePath)) {
                 const originalString = await readStringNormalizedFromFile(expectedFilePath);

@@ -18,6 +18,7 @@ import { loadSettings } from "../../../utils/localSettings";
 import { tmpdir } from "os";
 import { mergeRecordTypeFromCsv } from './merge';
 import { jsonAndPrintError } from '../../../utils/commands/utils';
+import { hasFileItemsContent } from '../../../utils/commands/alignmentChecker';
 
 const settings = loadSettings();
 
@@ -32,11 +33,10 @@ interface ValidationResult {
     itemName: string;
     isAligned: boolean;
     differences: string[];
-    isWarning?: boolean;
 }
 
 interface ItemResult {
-    result: 'OK' | 'KO' | 'WARN';
+    result: 'OK' | 'KO';
     error?: string;
 }
 
@@ -46,7 +46,6 @@ interface ValidationSummary {
         totalItems: number;
         alignedItems: number;
         misalignedItems: number;
-        warningItems: number;
     };
     items: { [itemName: string]: ItemResult };
     [key: string]: any; // For AnyJson compatibility
@@ -132,7 +131,6 @@ export async function recordTypeAreAligned(options: any = {}): Promise<AnyJson> 
 
     const items: { [itemName: string]: ItemResult } = {};
     let alignedCount = 0;
-    let warningCount = 0;
     let totalItems = 0;
 
     for (const objectName of objectList) {
@@ -140,19 +138,6 @@ export async function recordTypeAreAligned(options: any = {}): Promise<AnyJson> 
         const objectCsvDir = join(baseCsvDir, objectName, 'recordTypes');
 
         if (!fs.existsSync(objectXmlDir)) continue;
-        if (!fs.existsSync(objectCsvDir)) {
-            const itemKey = `${objectName}/*`;
-            const errorMsg = messages.getMessage('missingCsvDirectory', [objectCsvDir]);
-            items[itemKey] = { 
-                result: 'WARN', 
-                error: errorMsg 
-            };
-            warningCount++;
-            totalItems++;
-            console.log(`⚠️  ${itemKey} has warnings:`);
-            console.log(`   - ${errorMsg}`);
-            continue;
-        }
 
         var recordTypeList = [];
         if (inputRecordTypes) {
@@ -167,12 +152,61 @@ export async function recordTypeAreAligned(options: any = {}): Promise<AnyJson> 
             const itemKey = `${objectName}/${recordTypeName}`;
             totalItems++;
             
+            const xmlFilePath = join(objectXmlDir, recordTypeName + RECORDTYPES_EXTENSION);
+            const recordTypeCsvDir = join(objectCsvDir, recordTypeName);
+
+            // Check if XML file exists
+            if (!fs.existsSync(xmlFilePath)) {
+                items[itemKey] = { 
+                    result: 'KO', 
+                    error: `XML file not found: ${xmlFilePath}` 
+                };
+                console.log(`❌ Record type '${itemKey}' has misalignment:`);
+                console.log(`   - XML file not found: ${xmlFilePath}`);
+                continue;
+            }
+
+            // Read original XML to check content
+            const originalXml = (await readXmlFromFile(xmlFilePath)) ?? {};
+            const originalItem = originalXml[RECORDTYPES_ROOT_TAG] ?? {};
+
+            // Check if CSV directory exists
+            if (!fs.existsSync(recordTypeCsvDir)) {
+                // Check if original XML has any content in RECORDTYPE_ITEMS sections
+                const hasContent = hasFileItemsContent(originalItem, RECORDTYPE_ITEMS);
+                const message = `CSV directory not found: ${recordTypeCsvDir}`;
+                
+                if (hasContent) {
+                    items[itemKey] = { result: 'KO', error: message };
+                    console.log(`❌ Record type '${itemKey}' has misalignment:`);
+                    console.log(`   - ${message}`);
+                } else {
+                    items[itemKey] = { result: 'OK' };
+                    alignedCount++;
+                    console.log(messages.getMessage('validationSuccess', [itemKey]));
+                }
+                continue;
+            }
+
             let validationResult: ValidationResult;
             
             if (mode === 'string') {
-                validationResult = await compareStringsForRecord(objectName, recordTypeName, objectXmlDir, objectCsvDir, options);
+                validationResult = await compareStringsForRecord(
+                    objectName,
+                    recordTypeName,
+                    xmlFilePath,
+                    recordTypeCsvDir,
+                    originalItem,
+                    options
+                );
             } else {
-                validationResult = await validateSingleRecordTypeForRecord(objectName, recordTypeName, objectXmlDir, objectCsvDir, options);
+                validationResult = await validateSingleRecordTypeForRecord(
+                    objectName,
+                    recordTypeName,
+                    recordTypeCsvDir,
+                    originalItem,
+                    options
+                );
             }
             
             // Convert ValidationResult to ItemResult format
@@ -180,14 +214,6 @@ export async function recordTypeAreAligned(options: any = {}): Promise<AnyJson> 
                 items[itemKey] = { result: 'OK' };
                 alignedCount++;
                 console.log(messages.getMessage('validationSuccess', [itemKey]));
-            } else if (validationResult.isWarning) {
-                items[itemKey] = { 
-                    result: 'WARN', 
-                    error: validationResult.differences.join('; ') 
-                };
-                warningCount++;
-                console.log(`⚠️  Record type '${itemKey}' has warnings:`);
-                validationResult.differences.forEach(diff => console.log(messages.getMessage('differenceFound', [diff])));
             } else {
                 items[itemKey] = { 
                     result: 'KO', 
@@ -204,8 +230,7 @@ export async function recordTypeAreAligned(options: any = {}): Promise<AnyJson> 
         summary: {
             totalItems: totalItems,
             alignedItems: alignedCount,
-            misalignedItems: totalItems - alignedCount - warningCount,
-            warningItems: warningCount
+            misalignedItems: totalItems - alignedCount
         },
         items: items
     };
@@ -222,33 +247,15 @@ export async function recordTypeAreAligned(options: any = {}): Promise<AnyJson> 
 async function compareStringsForRecord(
     objectName: string,
     recordTypeName: string,
-    xmlDir: string,
-    csvDir: string,
+    xmlFilePath: string,
+    recordTypeCsvDir: string,
+    originalItem: any,
     options: any
 ): Promise<ValidationResult> {
     const itemName = `${objectName}/${recordTypeName}`;
 
     try {
-        const originalXmlPath = join(xmlDir, recordTypeName + RECORDTYPES_EXTENSION);
-        if (!fs.existsSync(originalXmlPath)) {
-            return {
-                itemName: itemName,
-                isAligned: false,
-                differences: [`XML file not found: ${originalXmlPath}`],
-                isWarning: true
-            };
-        }
-
-        const originalXmlString = await readStringNormalizedFromFile(originalXmlPath);
-        const recordTypeCsvDir = join(csvDir, recordTypeName);
-        if (!fs.existsSync(recordTypeCsvDir)) {
-            return {
-                itemName: itemName,
-                isAligned: false,
-                differences: [`CSV directory not found: ${recordTypeCsvDir}`],
-                isWarning: true
-            };
-        }
+        const originalXmlString = await readStringNormalizedFromFile(xmlFilePath);
 
         const mergedXml = await mergeRecordTypeFromCsv(recordTypeName, recordTypeCsvDir, options);
         const tempDir = tmpdir();
@@ -286,49 +293,19 @@ async function compareStringsForRecord(
 async function validateSingleRecordTypeForRecord(
     objectName: string,
     recordTypeName: string,
-    xmlDir: string,
-    csvDir: string,
+    recordTypeCsvDir: string,
+    originalItem: any,
     options: any
 ): Promise<ValidationResult> {
     const itemName = `${objectName}/${recordTypeName}`;
     const differences: string[] = [];
 
     try {
-        const xmlFilePath = join(xmlDir, recordTypeName + RECORDTYPES_EXTENSION);
-        if (!fs.existsSync(xmlFilePath)) {
-            return {
-                itemName: itemName,
-                isAligned: false,
-                differences: [`XML file not found: ${xmlFilePath}`],
-                isWarning: true
-            };
-        }
-
-        const originalXml = await readXmlFromFile(xmlFilePath);
-        if (!originalXml || !originalXml[RECORDTYPES_ROOT_TAG]) {
-            return {
-                itemName: itemName,
-                isAligned: false,
-                differences: [`Invalid XML structure in: ${xmlFilePath}`]
-            };
-        }
-
-        const recordTypeCsvDir = join(csvDir, recordTypeName);
-        if (!fs.existsSync(recordTypeCsvDir)) {
-            return {
-                itemName: itemName,
-                isAligned: false,
-                differences: [`CSV directory not found: ${recordTypeCsvDir}`],
-                isWarning: true
-            };
-        }
-
         const reconstructedXml = await mergeRecordTypeFromCsv(recordTypeName, recordTypeCsvDir, options);
-        const originalData = originalXml[RECORDTYPES_ROOT_TAG] || {};
         const reconstructedData = reconstructedXml[RECORDTYPES_ROOT_TAG] || {};
 
         for (const sectionName in RECORDTYPE_ITEMS) {
-            const originalSection = originalData[sectionName] || [];
+            const originalSection = originalItem[sectionName] || [];
             const reconstructedSection = reconstructedData[sectionName] || [];
 
             const originalArray = Array.isArray(originalSection) ? originalSection : (originalSection ? [originalSection] : []);
