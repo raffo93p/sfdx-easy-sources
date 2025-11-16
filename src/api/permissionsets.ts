@@ -44,8 +44,8 @@ export interface PermissionSetOptions extends PathOptions {
     type?: string;
     /** Specific tag ID to target (upsert, delete only) */
     tagid?: string;
-    /** JSON content to insert/update (customUpsert only) */
-    content?: string;
+    /** JSON content to insert/update (customUpsert only) - can be object or JSON string */
+    content?: string | object | object[];
 }
 
 /**
@@ -82,7 +82,7 @@ export interface PermissionSetOptions extends PathOptions {
  * // Custom upsert with JSON content
  * await permissionSets.customUpsert({
  *   type: 'objectPermissions',
- *   content: JSON.stringify({ object: 'Account', allowRead: true, allowEdit: true })
+ *   content: { object: 'Account', allowRead: true, allowEdit: true }
  * });
  * ```
  */

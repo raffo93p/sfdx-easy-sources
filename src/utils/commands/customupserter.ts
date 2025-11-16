@@ -27,22 +27,47 @@ export async function customUpsert(flags: any, file_subpath: string, file_items:
     const baseInputDir = join((flags["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), file_subpath) as string;
     const inputProfile = flags.input as string;
 
+    // Parse and validate content parameter
+    let contentJson;
     try {
         if (!type) throw new Error('Type parameter is required');
         if (!content) throw new Error('Content parameter is required');
         if (!Object.keys(file_items).includes(type)) throw new Error('Invalid type parameter');
         
-        // Parse content parameter as JSON
-        let contentJson;
-        try {
-            contentJson = JSON.parse(content);
-        } catch (error) {
-            throw new Error('Content parameter must be valid JSON');
+        // Check if content is already an object (API usage) or a string (CLI usage)
+        if (typeof content === 'object' && content !== null) {
+            // Already parsed (API usage)
+            contentJson = content;
+        } else if (typeof content === 'string') {
+            // Parse JSON string (CLI usage)
+            try {
+                contentJson = JSON.parse(content);
+            } catch (error) {
+                throw new Error('Content parameter must be valid JSON');
+            }
+        } else {
+            throw new Error('Content must be a JSON string or object');
         }
         
         // Validate that content is an object or array
         if (typeof contentJson !== 'object' || contentJson === null) {
             throw new Error('Content must be a valid JSON object or array');
+        }
+        
+        // Ensure contentJson is always an array for validation
+        const contentArray = Array.isArray(contentJson) ? contentJson : [contentJson];
+        
+        // Validate that each item contains the required key field
+        const keyField = file_items[type].key;
+        const keyFields = Array.isArray(keyField) ? keyField : [keyField];
+        
+        for (const item of contentArray) {
+            // Check if at least one key field is present
+            const hasRequiredKey = keyFields.some(field => item.hasOwnProperty(field));
+            if (!hasRequiredKey) {
+                const keyFieldsList = keyFields.join(' and ');
+                throw new Error(`Content must contain the required key field(s): ${keyFieldsList} for type '${type}'`);
+            }
         }
         
         checkDirOrErrorSync(baseInputDir);
@@ -60,14 +85,6 @@ export async function customUpsert(flags: any, file_subpath: string, file_items:
         dirList = fs.readdirSync(baseInputDir, { withFileTypes: true })
             .filter(item => item.isDirectory())
             .map(item => item.name)
-    }
-
-    // Parse content as JSON
-    let contentJson;
-    try {
-        contentJson = JSON.parse(content);
-    } catch (error) {
-        return jsonAndPrintError('Content parameter must be valid JSON');
     }
 
     // Ensure contentJson is always an array

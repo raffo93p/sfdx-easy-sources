@@ -46,8 +46,8 @@ export interface ProfileOptions extends PathOptions {
     type?: string;
     /** Specific tag ID to target (upsert, delete only) */
     tagid?: string;
-    /** JSON content to insert/update (customUpsert only) */
-    content?: string;
+    /** JSON content to insert/update (customUpsert only) - can be object or JSON string */
+    content?: string | object | object[];
 }
 
 /**
@@ -84,7 +84,7 @@ export interface ProfileOptions extends PathOptions {
  * // Custom upsert with JSON content
  * await profiles.customUpsert({
  *   type: 'classAccesses',
- *   content: JSON.stringify({ apexClass: 'MyClass', enabled: true })
+ *   content: { apexClass: 'MyClass', enabled: true }
  * });
  * ```
  */

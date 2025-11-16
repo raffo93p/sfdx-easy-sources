@@ -71,14 +71,14 @@ async function automateMetadata() {
   // Custom upsert with JSON content
   await profiles.customUpsert({
     type: 'classAccesses',
-    content: JSON.stringify({ apexClass: 'MyClass', enabled: true })
+    content: { apexClass: 'MyClass', enabled: true }
   });
   
   // Same pattern for all metadata types
   await permissionsets.split();
   await permissionsets.customUpsert({
     type: 'objectPermissions',
-    content: JSON.stringify({ object: 'Account', allowRead: true, allowEdit: true })
+    content: { object: 'Account', allowRead: true, allowEdit: true }
   });
   await labels.upsert();
   await objectTranslations.minify();
