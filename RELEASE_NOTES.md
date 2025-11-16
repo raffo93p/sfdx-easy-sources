@@ -6,7 +6,6 @@
   - **Eliminated false positives**: Removed warning status - missing CSVs now return either OK (if the XML has no content to split) or KO (if content exists but CSVs are missing)
   - **Clearer results**: Simplified output with only two possible states - aligned (OK) or misaligned (KO) - making it easier to identify real alignment issues
   - This improvement applies to all `arealigned` commands
-- **Code Quality: Refactored validation logic** - Consolidated common validation logic into shared utility functions, reducing code duplication and improving maintainability across all `arealigned` command implementations.
 
 ## Version 0.9.2
 - **New Feature: Custom Upsert Command for Profiles and Permission Sets** - Added a new `customupsert` command for both `profiles` and `permissionsets` that allows direct insertion/update of entries via JSON input. This command accepts JSON content (single object or array) through the `--content` flag and automatically calculates the appropriate key (_tagid) based on the metadata type configuration. Key features:
