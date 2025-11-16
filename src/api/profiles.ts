@@ -11,6 +11,7 @@ import { profileClearEmpty } from '../commands/easysources/profiles/clearempty';
 import { profileMinify } from '../commands/easysources/profiles/minify';
 import { profileDelete } from '../commands/easysources/profiles/delete';
 import { profileClean } from '../commands/easysources/profiles/clean';
+import { profileCustomUpsert } from '../commands/easysources/profiles/customupsert';
 
 /**
  * Configuration options for profile operations
@@ -41,10 +42,12 @@ export interface ProfileOptions extends PathOptions {
     'include-types'?: string;
     /** Log directory path (clean only) */
     'log-dir'?: string;
-    /** Specific permission type to target (upsert, delete only) */
+    /** Specific permission type to target (upsert, delete, customUpsert only) */
     type?: string;
     /** Specific tag ID to target (upsert, delete only) */
     tagid?: string;
+    /** JSON content to insert/update (customUpsert only) - can be object or JSON string */
+    content?: string | object | object[];
 }
 
 /**
@@ -62,6 +65,7 @@ export interface ProfileOptions extends PathOptions {
  * - updateKey(): Updates profile keys in CSV files
  * - minify(): Removes entries with only false permissions
  * - delete(): Deletes specific entries from CSV files
+ * - customUpsert(): Inserts or updates entries via JSON content
  * - clean(): Removes references to non-existent metadata
  * 
  * @example
@@ -75,6 +79,12 @@ export interface ProfileOptions extends PathOptions {
  * await profiles.upsert({
  *   'sf-xml': './custom-metadata-path',
  *   'es-csv': './custom-csv-path'
+ * });
+ * 
+ * // Custom upsert with JSON content
+ * await profiles.customUpsert({
+ *   type: 'classAccesses',
+ *   content: { apexClass: 'MyClass', enabled: true }
  * });
  * ```
  */
@@ -149,6 +159,15 @@ export const profiles = {
    */
   delete: async (options: ProfileOptions): Promise<AnyJson> => {
     return await profileDelete(options);
+  },
+
+  /**
+   * Inserts or updates specific entries in profile CSV files using JSON content.
+   * @param options Configuration options for the custom upsert operation
+   * @returns Promise resolving to operation result
+   */
+  customUpsert: async (options: ProfileOptions): Promise<AnyJson> => {
+    return await profileCustomUpsert(options);
   },
 
   /**

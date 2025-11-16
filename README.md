@@ -28,8 +28,8 @@ With this plugin you can:
 | Metadata Label| Metadata api | Available commands    | Programmatic API |
 | :---:    | :---:  | :---: | :---: |
 | All Meta | allmeta   | split, upsert, merge, minify, retrieve   | ❌ |
-| Profiles | profiles | split, upsert, merge, minify, updatekey, delete, clean, clearempty, arealigned | ✅ **Complete** |
-| Permission Sets | permissionsets | split, upsert, merge, minify, updatekey, delete, clean, clearempty, arealigned | ✅ **Complete** |
+| Profiles | profiles | split, upsert, merge, minify, updatekey, delete, customupsert, clean, clearempty, arealigned | ✅ **Complete** |
+| Permission Sets | permissionsets | split, upsert, merge, minify, updatekey, delete, customupsert, clean, clearempty, arealigned | ✅ **Complete** |
 | Record Types | recordtypes | split, upsert, merge, updatekey, delete, clean, arealigned | ✅ **Complete** |
 | Labels | labels | split, upsert, merge, updatekey, arealigned | ✅ **Complete** |
 | Global Value Sets | globalvaluesets | split, upsert, merge, updatekey, arealigned | ✅ **Complete** |
@@ -68,8 +68,18 @@ async function automateMetadata() {
   await profiles.upsert({ input: 'Admin' });
   await profiles.merge({ input: 'Admin' });
   
+  // Custom upsert with JSON content
+  await profiles.customUpsert({
+    type: 'classAccesses',
+    content: { apexClass: 'MyClass', enabled: true }
+  });
+  
   // Same pattern for all metadata types
   await permissionsets.split();
+  await permissionsets.customUpsert({
+    type: 'objectPermissions',
+    content: { object: 'Account', allowRead: true, allowEdit: true }
+  });
   await labels.upsert();
   await objectTranslations.minify();
 }
@@ -99,6 +109,7 @@ Based on the source type, this plugin provides the following commands:
 - **Split**: Splits the resources into various CSV files, and creates an XML file containing all the tags that weren't split
 - **Merge**: Merges back all the resources previously split from CSV files into XML format
 - **Upsert**: Similar to split, but adds new entries to existing CSV files instead of recreating them
+- **CustomUpsert**: Inserts or updates specific entries in CSV files using JSON content, with automatic key calculation and smart field handling
 - **Updatekey**: Updates the `_tagid` column when developers make changes directly in CSV files
 - **Delete**: Bulk deletes a single permission from all resources of the same type (only applies to Profiles, PermissionSets and Record Types)
 - **Minify**: Removes entries that don't add value to the file (available for profiles, permissionsets, objecttranslations, and translations)
@@ -208,6 +219,37 @@ Another scenario could be during a cherry pick or a merge conflict. Suppose a de
 
 Suppose the developer deletes a field on the org, he needs to delete all the references for that field for all Profiles, PermissionSets and RecordTypes.
 This command is intended to delete references, and it has flags to specify the name of the field. Run with --help flag to get a better description of the possible flags for each metadata type.
+
+### CustomUpsert
+**Note: only applies to Profiles and PermissionSets**
+
+The customupsert command allows you to insert or update specific entries in CSV files using JSON content, providing a powerful way to programmatically manage permissions without manually editing CSV files.
+
+**Key Features:**
+- **JSON Input**: Pass structured data directly via the `--content` flag (single object or array)
+- **Smart Field Handling**: 
+  - Non-existent keys in the JSON are automatically ignored
+  - Omitted existing keys result in empty values in the CSV
+- **Automatic Key Calculation**: The `_tagid` is automatically calculated based on the metadata type configuration
+- **Bulk Operations**: Process multiple entries at once by passing an array
+- **Target Specific Items**: Use `--input` to target specific profiles/permission sets, or omit to process all
+
+**Examples:**
+```sh-session
+# Insert/update a single class access permission
+$ sf easysources profiles customupsert -t classAccesses -j '{"apexClass":"MyClass","enabled":true}'
+
+# Insert/update multiple entries at once
+$ sf easysources profiles customupsert -t classAccesses -j '[{"apexClass":"Class1","enabled":true},{"apexClass":"Class2","enabled":false}]'
+
+# Update field permissions for a specific profile
+$ sf easysources profiles customupsert -i Admin -t fieldPermissions -j '{"field":"Account.CustomField__c","editable":true,"readable":true}'
+
+# Update object permissions for all permission sets
+$ sf easysources permissionsets customupsert -t objectPermissions -j '{"object":"CustomObject__c","allowRead":true,"allowEdit":true}'
+```
+
+This command is particularly useful for automation scripts, CI/CD pipelines, or when you need to apply the same permission changes across multiple profiles or permission sets programmatically.
 
 ### Minify
 
