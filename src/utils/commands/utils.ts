@@ -139,7 +139,7 @@ export async function bulkExecuteCommands(flags, cmd, sequencial) {
 }
 
 export async function getDefaultOrgName(){
-	var cmdString = SF_CMD + ORG_DISPLAY_CMD + ' --json';
+	var cmdString = SF_CMD + ' ' + ORG_DISPLAY_CMD + ' --json';
 	console.log(cmdString);
 	var res = await exec(cmdString);
 	return JSON.parse(res.stdout).result.alias;

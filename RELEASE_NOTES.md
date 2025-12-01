@@ -1,5 +1,8 @@
 # Release Notes
 
+## Version 0.9.4
+- **Bug Fix: Clean command target org validation** - Fixed a bug that prevented the `clean` command from executing correctly when the target org was not specified. The command now properly handles cases where the target org is not provided.
+
 ## Version 0.9.3
 - **Enhancement: Improved `arealigned` command validation logic** - Significantly improved the behavior of the `arealigned` command across all metadata types when CSV directories are missing. The command now intelligently determines whether missing CSVs represent an actual error or an expected state:
   - **Smart validation**: When CSV directories don't exist, the command analyzes the original XML file to check if it contains data that should have been split into CSV format
