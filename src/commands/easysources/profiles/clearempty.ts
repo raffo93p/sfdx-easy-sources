@@ -49,11 +49,7 @@ export default class ClearEmpty extends SfdxCommand {
         const result = await profileClearEmpty(this.flags);
 
         Performance.getInstance().end();
-        return {
-            outputString: result.outputString,
-            deletedFiles: result.deletedFiles,
-            deletedFolders: result.deletedFolders
-        };
+        return result;
     }
 }
 

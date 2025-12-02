@@ -49,11 +49,7 @@ export default class ClearEmpty extends SfdxCommand {
         const result = await clearEmpty(this.flags, TRANSLATIONS_SUBPATH, TRANSLATION_ITEMS);
 
         Performance.getInstance().end();
-        return {
-            outputString: result.outputString,
-            deletedFiles: result.deletedFiles,
-            deletedFolders: result.deletedFolders
-        };
+        return result;
     }
 }
 
@@ -62,9 +58,5 @@ export async function translationClearEmpty(options: any = {}): Promise<AnyJson>
     
     const result = await clearEmpty(options, TRANSLATIONS_SUBPATH, TRANSLATION_ITEMS);
 
-    return {
-        outputString: result.outputString,
-        deletedFiles: result.deletedFiles,
-        deletedFolders: result.deletedFolders
-    };
+    return result;
 }
