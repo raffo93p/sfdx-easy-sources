@@ -139,6 +139,7 @@ export async function objectTranslationSplit(options: any = {}): Promise<AnyJson
                     myjson = [];
 
                     var fieldTrList = getFieldTranslationFiles(join(baseInputDir, objTrName));
+                    if(fieldTrList.length === 0) continue;
                     
                     for(const fieldTrFilename of fieldTrList){
                         const fieldTrPath = join(baseInputDir, objTrName, fieldTrFilename);

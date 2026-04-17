@@ -1,5 +1,8 @@
 # Release Notes
 
+## Version 0.9.5
+- **Bug Fix: Object Translations split skips empty field translation list** - Fixed a potential error in the `objecttranslations:split` command when processing objects with no custom field translation files. The command now properly skips field translation processing when no field translation files exist, preventing unnecessary iterations.
+
 ## Version 0.9.4
 - **Bug Fix: Clean command target org validation** - Fixed a bug that prevented the `clean` command from executing correctly when the target org was not specified. The command now properly handles cases where the target org is not provided.
 
