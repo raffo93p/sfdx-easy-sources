@@ -80,6 +80,7 @@ This document provides a quick reference matrix of all commands and their availa
 | **merge** | ✅ | ✅ | ✅ | ✅ | ❌ | - |
 | **upsert** | ✅ | ✅ | ✅ | ✅ | ❌ | - |
 | **arealigned** | ✅ | ✅ | ✅ | ❌ | ✅ | string/logic mode |
+| **updatekey** | ❌ | ✅ | ✅ | ✅ | ❌ | - |
 | **clearempty** | ❌ | ✅ | ✅ | ❌ | ❌ | - |
 | **minify** | ✅ | ✅ | ✅ | ✅ | ❌ | - |
 

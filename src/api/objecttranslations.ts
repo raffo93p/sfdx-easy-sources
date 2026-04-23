@@ -8,6 +8,7 @@ import { objectTranslationMerge } from '../commands/easysources/objecttranslatio
 import { objectTranslationAreAligned } from '../commands/easysources/objecttranslations/arealigned';
 import { objectTranslationClearEmpty } from '../commands/easysources/objecttranslations/clearempty';
 import { objectTranslationMinify } from '../commands/easysources/objecttranslations/minify';
+import { objectTranslationUpdateKey } from '../commands/easysources/objecttranslations/updatekey';
 
 /**
  * Object Translation-specific options interface
@@ -105,5 +106,14 @@ export const objectTranslations = {
    */
   minify: async (options: ObjectTranslationOptions = {}): Promise<AnyJson> => {
     return await objectTranslationMinify(options);
+  },
+
+  /**
+   * Updates the _tagid key on CSV files based on the other fields.
+   * @param options Optional configuration, automatically resolved from settings if not provided
+   * @returns Promise resolving to operation result
+   */
+  updateKey: async (options: ObjectTranslationOptions = {}): Promise<AnyJson> => {
+    return await objectTranslationUpdateKey(options);
   }
 };

@@ -1,5 +1,8 @@
 # Release Notes
 
+## Version 0.9.7
+- **New Feature: `objecttranslations updatekey` command** - Added the missing `updatekey` command for the `objecttranslations` metadata type, consistent with other metadata types that already support this operation. The command updates the `_tagid` field in object translation CSV files based on the other key fields. Also exposed via the programmatic API as `objectTranslations.updateKey()`.
+
 ## Version 0.9.6
 - **New Feature: `translations updatekey` command** - Added the missing `updatekey` command for the `translations` metadata type, consistent with other metadata types that already support this operation. The command updates the `_tagid` field in translation CSV files based on the other key fields. Also exposed via the programmatic API as `translations.updateKey()`.
 
