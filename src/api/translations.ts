@@ -8,6 +8,7 @@ import { translationMerge } from '../commands/easysources/translations/merge';
 import { translationAreAligned } from '../commands/easysources/translations/arealigned';
 import { translationMinify } from '../commands/easysources/translations/minify';
 import { translationClearEmpty } from '../commands/easysources/translations/clearempty';
+import { translationUpdateKey } from '../commands/easysources/translations/updatekey';
 
 /**
  * Interface for Translation operation options.
@@ -103,5 +104,14 @@ export const translations = {
    */
   clearEmpty: async (options: TranslationOptions = {}): Promise<AnyJson> => {
     return translationClearEmpty(options);
+  },
+
+  /**
+   * Updates the _tagid key on CSV files based on the other fields.
+   * @param options Optional configuration, automatically resolved from settings if not provided
+   * @returns Promise resolving to operation result
+   */
+  updateKey: async (options: TranslationOptions = {}): Promise<AnyJson> => {
+    return translationUpdateKey(options);
   }
 };

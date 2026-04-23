@@ -1,0 +1,10 @@
+{
+  "commandDescription": "Update _tagid on csv files, based on the other fields",
+  "esCsvFlagDescription": "Specify a custom dir for input translations. Default: '%s'",
+  "inputFlagDescription": "Specify a translation. Example: en_US",
+  "sortFlagDescription" : "Specify if split results must be sorted. Default '%s'",
+  "examples": [
+    "sf easysources translations updatekey",
+    "sf easysources translations updatekey -c './easysources'"
+  ]
+}

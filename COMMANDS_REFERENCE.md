@@ -465,6 +465,14 @@ sf easysources recordtypes delete --picklist "Status" --apiname "Active,Inactive
 - `--input, -i`: Specific translation files (comma-separated)
 - `--mode`: Comparison mode (`string` or `logic`, default: `string`)
 
+### `sf easysources translations updatekey`
+**Description**: Update _tagid on CSV files, based on the other fields
+
+**Flags**:
+- `--es-csv, -c`: CSV directory
+- `--input, -i`: Specific translation (e.g. `en_US`)
+- `--sort, -S`: Sort results (default: `true`)
+
 ### `sf easysources translations clearempty`
 **Description**: Remove empty CSV files and folders
 

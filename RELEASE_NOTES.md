@@ -1,5 +1,8 @@
 # Release Notes
 
+## Version 0.9.6
+- **New Feature: `translations updatekey` command** - Added the missing `updatekey` command for the `translations` metadata type, consistent with other metadata types that already support this operation. The command updates the `_tagid` field in translation CSV files based on the other key fields. Also exposed via the programmatic API as `translations.updateKey()`.
+
 ## Version 0.9.5
 - **Bug Fix: Object Translations split skips empty field translation list** - Fixed a potential error in the `objecttranslations:split` command when processing objects with no custom field translation files. The command now properly skips field translation processing when no field translation files exist, preventing unnecessary iterations.
 
