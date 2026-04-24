@@ -1,5 +1,8 @@
 # Release Notes
 
+## Version 0.9.8
+- **Enhancement: Improved `--content` parameter parsing for `customupsert` command** - The `--content` flag for both `profiles:customupsert` and `permissionsets:customupsert` now correctly handles cases where the shell strips double quotes from the JSON string. This issue is common on Windows PowerShell, where passing a JSON argument results in unquoted keys and values (e.g., `{apexClass:MyClass,enabled:true}` instead of `{"apexClass":"MyClass","enabled":"true"}`). The command now attempts standard JSON parsing first, and if that fails, falls back to a lenient parser that reconstructs the JSON object from the unquoted format.
+
 ## Version 0.9.7
 - **New Feature: `objecttranslations updatekey` command** - Added the missing `updatekey` command for the `objecttranslations` metadata type, consistent with other metadata types that already support this operation. The command updates the `_tagid` field in object translation CSV files based on the other key fields. Also exposed via the programmatic API as `objectTranslations.updateKey()`.
 

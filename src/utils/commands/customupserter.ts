@@ -39,12 +39,9 @@ export async function customUpsert(flags: any, file_subpath: string, file_items:
             // Already parsed (API usage)
             contentJson = content;
         } else if (typeof content === 'string') {
-            // Parse JSON string (CLI usage)
-            try {
-                contentJson = JSON.parse(content);
-            } catch (error) {
-                throw new Error('Content parameter must be valid JSON');
-            }
+            // Parse JSON string (CLI usage), with fallback for unquoted key-value format
+            // (handles cases where the shell strips quotes from JSON strings)
+            contentJson = parseLooseJson(content);
         } else {
             throw new Error('Content must be a JSON string or object');
         }
@@ -161,4 +158,82 @@ export async function customUpsert(flags: any, file_subpath: string, file_items:
     }
 
     return result;
+}
+
+/**
+ * Parses a JSON-like string that may have unquoted keys/values.
+ * First attempts standard JSON.parse; if that fails, falls back to a
+ * lenient parser that handles the format produced by shells (e.g. PowerShell)
+ * that strip quotes from JSON strings.
+ *
+ * Examples of accepted loose formats:
+ *   {apexClass:MyClass,enabled:true}
+ *   [{apexClass:Class1,enabled:true},{apexClass:Class2,enabled:false}]
+ */
+function parseLooseJson(input: string): any {
+    const trimmed = input.trim();
+    try {
+        return JSON.parse(trimmed);
+    } catch (_) { /* fall through to loose parser */ }
+
+    if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+        const inner = trimmed.slice(1, -1).trim();
+        if (!inner) return [];
+        return splitTopLevel(inner, ',').map(item => parseLooseObject(item.trim()));
+    }
+    if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+        return parseLooseObject(trimmed);
+    }
+    throw new Error('Content parameter must be valid JSON');
+}
+
+function parseLooseObject(input: string): any {
+    const trimmed = input.trim();
+    if (!trimmed.startsWith('{') || !trimmed.endsWith('}')) {
+        throw new Error('Content parameter must be valid JSON');
+    }
+    const inner = trimmed.slice(1, -1).trim();
+    if (!inner) return {};
+
+    const result: any = {};
+    const pairs = splitTopLevel(inner, ',');
+    for (const pair of pairs) {
+        const colonIdx = pair.indexOf(':');
+        if (colonIdx === -1) continue;
+        const key = pair.slice(0, colonIdx).trim().replace(/^"|"$|^'|'$/g, '');
+        const rawValue = pair.slice(colonIdx + 1).trim().replace(/^"|"$|^'|'$/g, '');
+        result[key] = coerceLooseValue(rawValue);
+    }
+    return result;
+}
+
+function coerceLooseValue(val: string): any {
+    if (val === 'true') return true;
+    if (val === 'false') return false;
+    if (val === 'null' || val === 'undefined') return null;
+    const num = Number(val);
+    if (val !== '' && !isNaN(num)) return num;
+    return val;
+}
+
+/**
+ * Splits a string by the given single-character separator,
+ * respecting nested {} and [] so inner commas are not treated as separators.
+ */
+function splitTopLevel(input: string, separator: string): string[] {
+    const parts: string[] = [];
+    let depth = 0;
+    let current = '';
+    for (const ch of input) {
+        if (ch === '{' || ch === '[') depth++;
+        else if (ch === '}' || ch === ']') depth--;
+        else if (ch === separator && depth === 0) {
+            parts.push(current);
+            current = '';
+            continue;
+        }
+        current += ch;
+    }
+    if (current.trim()) parts.push(current);
+    return parts;
 }
