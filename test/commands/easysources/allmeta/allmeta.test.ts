@@ -1,4 +1,4 @@
-import { expect, test } from '@oclif/test';
+import { expect, test } from '../../../oclif-compat';
 
 import { join } from 'path';
 import { areFilesEqual } from '../../../../src/utils/filesUtils';

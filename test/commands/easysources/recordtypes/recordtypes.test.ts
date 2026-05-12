@@ -1,4 +1,4 @@
-import { expect, test } from '@oclif/test';
+import { expect, test } from '../../../oclif-compat';
 
 import { join } from 'path';
 import { RECORDTYPES_DEFAULT_SFXML_PATH } from '../../../../src/utils/constants/constants_recordtypes';

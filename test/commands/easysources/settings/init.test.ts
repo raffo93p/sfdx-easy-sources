@@ -1,4 +1,4 @@
-import { expect, test } from '@oclif/test';
+import { expect, test } from '../../../oclif-compat';
 import { SETTINGS_PATH } from "../../../../src/utils/constants/constants";
 
 const fs = require('fs-extra');
