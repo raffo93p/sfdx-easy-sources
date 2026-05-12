@@ -1,4 +1,4 @@
-import { loadSettings } from "./localSettings";
+import { loadSettings } from "./localSettings.js";
 
 export function generateTagId(myArray, key, headers) {
 

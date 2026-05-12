@@ -1,4 +1,4 @@
-import { DEFAULT_SFXML_PATH } from "./constants";
+import { DEFAULT_SFXML_PATH } from "./constants.js";
 
 export const RECORDTYPES_EXTENSION = ".recordType-meta.xml";
 export const RECORDTYPES_ROOT_TAG = "RecordType";

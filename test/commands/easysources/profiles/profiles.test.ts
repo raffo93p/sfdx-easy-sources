@@ -1,10 +1,10 @@
-import { expect, test } from '../../../oclif-compat';
+import { expect, test } from '../../../oclif-compat.js';
 
 import { join } from 'path';
-import { PROFILES_DEFAULT_SFXML_PATH } from '../../../../src/utils/constants/constants_profiles';
-import { areFilesEqual } from '../../../../src/utils/filesUtils';
+import { PROFILES_DEFAULT_SFXML_PATH } from '../../../../src/utils/constants/constants_profiles.js';
+import { areFilesEqual } from '../../../../src/utils/filesUtils.js';
 
-const fs = require('fs-extra');
+import fs from 'fs-extra';
 
 const sourceFolder = PROFILES_DEFAULT_SFXML_PATH;
 const csvFolder = join(sourceFolder, 'MyProfile');

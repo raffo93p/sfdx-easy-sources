@@ -8,22 +8,22 @@ import * as os from 'os';
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages } from '@salesforce/core';
 
-import { RECORDTYPE_ITEMS, RECORDTYPES_EXTENSION, RECORDTYPES_ROOT_TAG, RECORDTYPES_SUBPATH } from '../../../utils/constants/constants_recordtypes';
-import Performance from '../../../utils/performance';
-import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
-const fs = require('fs-extra');
+import { RECORDTYPE_ITEMS, RECORDTYPES_EXTENSION, RECORDTYPES_ROOT_TAG, RECORDTYPES_SUBPATH } from '../../../utils/constants/constants_recordtypes.js';
+import Performance from '../../../utils/performance.js';
+import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants.js';
+import fs from 'fs-extra';
 import { join } from "path";
-import { readXmlFromFile, writeXmlToFile, readStringNormalizedFromFile } from "../../../utils/filesUtils";
-import { loadSettings } from "../../../utils/localSettings";
+import { readXmlFromFile, writeXmlToFile, readStringNormalizedFromFile } from "../../../utils/filesUtils.js";
+import { loadSettings } from "../../../utils/localSettings.js";
 import { tmpdir } from "os";
-import { mergeRecordTypeFromCsv } from './merge';
-import { jsonAndPrintError } from '../../../utils/commands/utils';
-import { hasFileItemsContent } from '../../../utils/commands/alignmentChecker';
+import { mergeRecordTypeFromCsv } from './merge.js';
+import { jsonAndPrintError } from '../../../utils/commands/utils.js';
+import { hasFileItemsContent } from '../../../utils/commands/alignmentChecker.js';
 
 const settings = loadSettings();
 
 // Initialize Messages with the current plugin directory
-Messages.importMessagesDirectory(__dirname);
+Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.

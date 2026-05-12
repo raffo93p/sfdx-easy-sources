@@ -7,34 +7,34 @@
 import * as os from 'os';
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages } from '@salesforce/core';
-const fs = require('fs-extra');
+import fs from 'fs-extra';
 import { join } from "path";
-import Performance from '../../../utils/performance';
+import Performance from '../../../utils/performance.js';
 
 import {
     DEFAULT_ESCSV_PATH,
     DEFAULT_SFXML_PATH,
     XML_PART_EXTENSION
-} from "../../../utils/constants/constants";
+} from "../../../utils/constants/constants.js";
 
 import {
     RECORDTYPES_EXTENSION,
     RECORDTYPES_ROOT_TAG,
     RECORDTYPES_SUBPATH,
     RECORDTYPE_ITEMS
-} from "../../../utils/constants/constants_recordtypes";
+} from "../../../utils/constants/constants_recordtypes.js";
 
-import { writeXmlToFile, readCsvToJsonArray, readXmlFromFile, calcCsvFilename } from "../../../utils/filesUtils"
-import { sortByKey } from "../../../utils/utils"
-import { transformCSVtoXML } from '../../../utils/utils_recordtypes';
-import { loadSettings } from '../../../utils/localSettings';
-import { jsonAndPrintError } from '../../../utils/commands/utils';
+import { writeXmlToFile, readCsvToJsonArray, readXmlFromFile, calcCsvFilename } from "../../../utils/filesUtils.js"
+import { sortByKey } from "../../../utils/utils.js"
+import { transformCSVtoXML } from '../../../utils/utils_recordtypes.js';
+import { loadSettings } from '../../../utils/localSettings.js';
+import { jsonAndPrintError } from '../../../utils/commands/utils.js';
 
 const settings = loadSettings();
 
 
 // Initialize Messages with the current plugin directory
-Messages.importMessagesDirectory(__dirname);
+Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.

@@ -1,12 +1,12 @@
 import { AnyJson } from '@salesforce/ts-types';
-import { PathOptions } from './paths';
+import { PathOptions } from './paths.js';
 
 // Import label-specific functions directly from command files
-import { labelSplit } from '../commands/easysources/labels/split';
-import { labelUpsert } from '../commands/easysources/labels/upsert';
-import { labelMerge } from '../commands/easysources/labels/merge';
-import { labelUpdateKey } from '../commands/easysources/labels/updatekey';
-import { labelAreAligned } from '../commands/easysources/labels/arealigned';
+import { labelSplit } from '../commands/easysources/labels/split.js';
+import { labelUpsert } from '../commands/easysources/labels/upsert.js';
+import { labelMerge } from '../commands/easysources/labels/merge.js';
+import { labelUpdateKey } from '../commands/easysources/labels/updatekey.js';
+import { labelAreAligned } from '../commands/easysources/labels/arealigned.js';
 
 /**
  * Label-specific options interface

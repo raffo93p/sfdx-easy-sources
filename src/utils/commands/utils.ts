@@ -2,19 +2,19 @@ import * as child from 'child_process';
 import * as util from 'util';
 import { join } from "path";
 const exec = util.promisify(child.exec);
-import { DEFAULT_PACKAGE_LOC, DEFAULT_PACKAGE_ORG, MANIFEST_CREATE_CMD, ORG_DISPLAY_CMD, SOURCE_RETRIEVE_CMD } from "../constants/constants_sourcesdownload";
-import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, SF_CMD } from '../constants/constants';
-const fs = require('fs');
+import { DEFAULT_PACKAGE_LOC, DEFAULT_PACKAGE_ORG, MANIFEST_CREATE_CMD, ORG_DISPLAY_CMD, SOURCE_RETRIEVE_CMD } from "../constants/constants_sourcesdownload.js";
+import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, SF_CMD } from '../constants/constants.js';
+import fs from 'fs';
 
-import { profiles } from '../../api/profiles';
-import { permissionSets } from '../../api/permissionsets';
-import { objectTranslations } from '../../api/objecttranslations';
-import { translations } from '../../api/translations';
-import { recordTypes } from '../../api/recordtypes';
-import { labels } from '../../api/labels';
-import { globalValueSetTranslations } from '../../api/globalvaluesettranslations';
-import { globalValueSets } from '../../api/globalvaluesets';
-import { applications } from '../../api/applications';
+import { profiles } from '../../api/profiles.js';
+import { permissionSets } from '../../api/permissionsets.js';
+import { objectTranslations } from '../../api/objecttranslations.js';
+import { translations } from '../../api/translations.js';
+import { recordTypes } from '../../api/recordtypes.js';
+import { labels } from '../../api/labels.js';
+import { globalValueSetTranslations } from '../../api/globalvaluesettranslations.js';
+import { globalValueSets } from '../../api/globalvaluesets.js';
+import { applications } from '../../api/applications.js';
 
 export async function retrieveAllMetadataPackageOrg(orgname, manifestDir){
 	var cmdString = SF_CMD + ' ' + MANIFEST_CREATE_CMD + ' --from-org ' + orgname + ' --name='+DEFAULT_PACKAGE_ORG+' --output-dir=' + manifestDir + " -c unlocked managed";

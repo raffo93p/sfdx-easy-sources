@@ -1,14 +1,14 @@
-import { readXmlFromFile, readCsvToJsonMap, jsonArrayCsvToMap, removeExtension, writeXmlToFile, calcCsvFilename } from '../filesUtils'
-import { sortByKey, generateTagId } from "../utils"
-import { split } from './splitter'
+import { readXmlFromFile, readCsvToJsonMap, jsonArrayCsvToMap, removeExtension, writeXmlToFile, calcCsvFilename } from '../filesUtils.js'
+import { sortByKey, generateTagId } from "../utils.js"
+import { split } from './splitter.js'
 import { join } from "path";
-import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../constants/constants';
-import { PROFILE_USERPERM_ROOT, PROFILES_SUBPATH } from '../constants/constants_profiles';
-import { loadSettings } from '../localSettings';
-import { jsonAndPrintError } from './utils';
-import CsvWriter from '../csvWriter';
-import { sortObjectKeys } from './utils';
-const fs = require('fs-extra');
+import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../constants/constants.js';
+import { PROFILE_USERPERM_ROOT, PROFILES_SUBPATH } from '../constants/constants_profiles.js';
+import { loadSettings } from '../localSettings.js';
+import { jsonAndPrintError } from './utils.js';
+import CsvWriter from '../csvWriter.js';
+import { sortObjectKeys } from './utils.js';
+import fs from 'fs-extra';
 
 const settings = loadSettings();
 

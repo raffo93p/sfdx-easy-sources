@@ -1,5 +1,5 @@
-import { setDefault } from "../utils";
-import { DEFAULT_SFXML_PATH } from "./constants";
+import { setDefault } from "../utils.js";
+import { DEFAULT_SFXML_PATH } from "./constants.js";
 
 export const OBJTRANSL_FIELDSET_ROOT = 'fieldSets';
 export const OBJTRANSL_FIELDSET_HEADER = [setDefault('label'), 'name'];

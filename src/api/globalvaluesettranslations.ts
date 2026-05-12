@@ -1,10 +1,10 @@
 import { AnyJson } from '@salesforce/ts-types';
-import { PathOptions } from './paths';
-import { globalValueSetTranslationSplit } from '../commands/easysources/globalvaluesettranslations/split';
-import { globalValueSetTranslationUpsert } from '../commands/easysources/globalvaluesettranslations/upsert';
-import { globalValueSetTranslationMerge } from '../commands/easysources/globalvaluesettranslations/merge';
-import { globalValueSetTranslationAreAligned } from '../commands/easysources/globalvaluesettranslations/arealigned';
-import { globalValueSetTranslationUpdateKey } from '../commands/easysources/globalvaluesettranslations/updatekey';
+import { PathOptions } from './paths.js';
+import { globalValueSetTranslationSplit } from '../commands/easysources/globalvaluesettranslations/split.js';
+import { globalValueSetTranslationUpsert } from '../commands/easysources/globalvaluesettranslations/upsert.js';
+import { globalValueSetTranslationMerge } from '../commands/easysources/globalvaluesettranslations/merge.js';
+import { globalValueSetTranslationAreAligned } from '../commands/easysources/globalvaluesettranslations/arealigned.js';
+import { globalValueSetTranslationUpdateKey } from '../commands/easysources/globalvaluesettranslations/updatekey.js';
 
 /**
  * Interface for Global Value Set Translation operation options.

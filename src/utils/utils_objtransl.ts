@@ -1,5 +1,5 @@
-import { OBJTRANSL_FIELDTRANSL_EXTENSION, OBJTRANSL_OPTIONAL_TAGS } from "./constants/constants_objecttranslations";
-const fs = require('fs-extra');
+import { OBJTRANSL_FIELDTRANSL_EXTENSION, OBJTRANSL_OPTIONAL_TAGS } from "./constants/constants_objecttranslations.js";
+import fs from 'fs-extra';
 
 export function transformLayoutXMLtoCSV(jsonArray) {
     if (!Array.isArray(jsonArray)) jsonArray = [jsonArray];

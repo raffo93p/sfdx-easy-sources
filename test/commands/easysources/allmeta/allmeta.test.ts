@@ -1,10 +1,10 @@
-import { expect, test } from '../../../oclif-compat';
+import { expect, test } from '../../../oclif-compat.js';
 
 import { join } from 'path';
-import { areFilesEqual } from '../../../../src/utils/filesUtils';
-import { DEFAULT_SFXML_PATH } from '../../../../src/utils/constants/constants';
+import { areFilesEqual } from '../../../../src/utils/filesUtils.js';
+import { DEFAULT_SFXML_PATH } from '../../../../src/utils/constants/constants.js';
 
-const fs = require('fs-extra');
+import fs from 'fs-extra';
 
 const sourceFolder = DEFAULT_SFXML_PATH;
 const resourcesFolder = '../test/resources';

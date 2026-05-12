@@ -1,7 +1,7 @@
-import { expect, test } from '../../../oclif-compat';
-import { SETTINGS_PATH } from "../../../../src/utils/constants/constants";
+import { expect, test } from '../../../oclif-compat.js';
+import { SETTINGS_PATH } from "../../../../src/utils/constants/constants.js";
 
-const fs = require('fs-extra');
+import fs from 'fs-extra';
 
 
 describe('easysources:settings:init', function () {

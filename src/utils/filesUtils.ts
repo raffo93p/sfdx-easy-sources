@@ -2,11 +2,11 @@ import { promises } from "fs";
 import { join } from "path";
 import { Parser } from "xml2js";
 import { SfProject } from "@salesforce/core";
-import XmlFormatter from "./xmlFormatter";
-import { CSV_EXTENSION } from "./constants/constants";
-const fs = require('fs-extra');
+import XmlFormatter from "./xmlFormatter.js";
+import { CSV_EXTENSION } from "./constants/constants.js";
+import fs from 'fs-extra';
 
-const csvparser = require("csvtojson");
+import csvparser from "csvtojson";
 
 export async function readXmlFromFile(file: string): Promise<any> {
 	return promises

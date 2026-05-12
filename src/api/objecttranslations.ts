@@ -1,14 +1,14 @@
 import { AnyJson } from '@salesforce/ts-types';
-import { PathOptions } from './paths';
+import { PathOptions } from './paths.js';
 
 // Import object translation-specific functions directly from command files
-import { objectTranslationSplit } from '../commands/easysources/objecttranslations/split';
-import { objectTranslationUpsert } from '../commands/easysources/objecttranslations/upsert';
-import { objectTranslationMerge } from '../commands/easysources/objecttranslations/merge';
-import { objectTranslationAreAligned } from '../commands/easysources/objecttranslations/arealigned';
-import { objectTranslationClearEmpty } from '../commands/easysources/objecttranslations/clearempty';
-import { objectTranslationMinify } from '../commands/easysources/objecttranslations/minify';
-import { objectTranslationUpdateKey } from '../commands/easysources/objecttranslations/updatekey';
+import { objectTranslationSplit } from '../commands/easysources/objecttranslations/split.js';
+import { objectTranslationUpsert } from '../commands/easysources/objecttranslations/upsert.js';
+import { objectTranslationMerge } from '../commands/easysources/objecttranslations/merge.js';
+import { objectTranslationAreAligned } from '../commands/easysources/objecttranslations/arealigned.js';
+import { objectTranslationClearEmpty } from '../commands/easysources/objecttranslations/clearempty.js';
+import { objectTranslationMinify } from '../commands/easysources/objecttranslations/minify.js';
+import { objectTranslationUpdateKey } from '../commands/easysources/objecttranslations/updatekey.js';
 
 /**
  * Object Translation-specific options interface

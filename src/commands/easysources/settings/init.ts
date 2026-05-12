@@ -7,12 +7,12 @@
 import * as os from 'os';
 import { SfCommand } from '@salesforce/sf-plugins-core';
 import { Messages } from '@salesforce/core';
-const fs = require('fs-extra');
-import { SETTINGS_PATH } from '../../../utils/constants/constants';
-import { initSettings } from '../../../utils/localSettings';
+import fs from 'fs-extra';
+import { SETTINGS_PATH } from '../../../utils/constants/constants.js';
+import { initSettings } from '../../../utils/localSettings.js';
 
 // Initialize Messages with the current plugin directory
-Messages.importMessagesDirectory(__dirname);
+Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.

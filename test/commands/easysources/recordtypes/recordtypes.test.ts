@@ -1,10 +1,10 @@
-import { expect, test } from '../../../oclif-compat';
+import { expect, test } from '../../../oclif-compat.js';
 
 import { join } from 'path';
-import { RECORDTYPES_DEFAULT_SFXML_PATH } from '../../../../src/utils/constants/constants_recordtypes';
-import { areFilesEqual } from '../../../../src/utils/filesUtils';
+import { RECORDTYPES_DEFAULT_SFXML_PATH } from '../../../../src/utils/constants/constants_recordtypes.js';
+import { areFilesEqual } from '../../../../src/utils/filesUtils.js';
 
-const fs = require('fs-extra');
+import fs from 'fs-extra';
 
 const recordTypeFolder = join(RECORDTYPES_DEFAULT_SFXML_PATH, 'testObj', 'recordTypes');
 const csvFolder = join(recordTypeFolder, 'myRecordType');

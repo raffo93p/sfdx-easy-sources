@@ -7,21 +7,21 @@
 import * as os from 'os';
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages } from '@salesforce/core';
-import Performance from '../../../utils/performance';
-import { OBJTRANSL_ITEMS, OBJTRANSL_SUBPATH } from '../../../utils/constants/constants_objecttranslations';
-import { DEFAULT_ESCSV_PATH } from '../../../utils/constants/constants';
-import { calcCsvFilename, readCsvToJsonArray } from '../../../utils/filesUtils';
-import { generateTagId, sortByKey } from '../../../utils/utils';
-import { jsonAndPrintError } from '../../../utils/commands/utils';
-import { loadSettings } from '../../../utils/localSettings';
-import CsvWriter from '../../../utils/csvWriter';
+import Performance from '../../../utils/performance.js';
+import { OBJTRANSL_ITEMS, OBJTRANSL_SUBPATH } from '../../../utils/constants/constants_objecttranslations.js';
+import { DEFAULT_ESCSV_PATH } from '../../../utils/constants/constants.js';
+import { calcCsvFilename, readCsvToJsonArray } from '../../../utils/filesUtils.js';
+import { generateTagId, sortByKey } from '../../../utils/utils.js';
+import { jsonAndPrintError } from '../../../utils/commands/utils.js';
+import { loadSettings } from '../../../utils/localSettings.js';
+import CsvWriter from '../../../utils/csvWriter.js';
 import { join } from 'path';
-const fs = require('fs-extra');
+import fs from 'fs-extra';
 
 const settings = loadSettings();
 
 // Initialize Messages with the current plugin directory
-Messages.importMessagesDirectory(__dirname);
+Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.

@@ -1,5 +1,6 @@
 import { format } from "fast-csv";
-import { loadSettings } from "./localSettings";
+import { Parser, transforms as json2csvTransforms } from 'json2csv';
+import { loadSettings } from "./localSettings.js";
 
 export enum CsvEngine {
     FAST_CSV = 'fast-csv',
@@ -46,7 +47,7 @@ export default class CsvWriter {
 
             case CsvEngine.JSON2CSV:
                 // Fallback al vecchio json2csv se necessario (usa gli header originali con unwind)
-                const { Parser, transforms: { unwind } } = require('json2csv');
+                const { unwind } = json2csvTransforms;
                 const transforms = [unwind({ paths: headers })];
                 const parser = new Parser({ fields: [...headers, '_tagid'], transforms });
                 csvContent = parser.parse(data);

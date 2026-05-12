@@ -7,13 +7,13 @@
 import * as os from 'os';
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages } from '@salesforce/core';
-import Performance from '../../../utils/performance';
-import { APPLICATIONS_SUBPATH, APPLICATION_ITEMS } from '../../../utils/constants/constants_applications';
-import { updatekey } from '../../../utils/commands/keyupdater';
-import { DEFAULT_ESCSV_PATH } from '../../../utils/constants/constants';
+import Performance from '../../../utils/performance.js';
+import { APPLICATIONS_SUBPATH, APPLICATION_ITEMS } from '../../../utils/constants/constants_applications.js';
+import { updatekey } from '../../../utils/commands/keyupdater.js';
+import { DEFAULT_ESCSV_PATH } from '../../../utils/constants/constants.js';
 
 // Initialize Messages with the current plugin directory
-Messages.importMessagesDirectory(__dirname);
+Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.

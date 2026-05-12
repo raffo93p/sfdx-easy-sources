@@ -8,23 +8,23 @@ import * as os from 'os';
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages } from '@salesforce/core';
 
-const fs = require('fs-extra');
+import fs from 'fs-extra';
 import { join } from "path";
-import Performance from '../../../utils/performance';
-import { calcCsvFilename, checkDirOrCreateSync, checkDirOrErrorSync, jsonArrayPackageToMap, readCsvToJsonArray, readXmlFromFile } from "../../../utils/filesUtils"
-import { sortByKey, toArray } from "../../../utils/utils"
-import { DEFAULT_ESCSV_PATH, DEFAULT_LOG_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
-import { loadSettings } from '../../../utils/localSettings';
-import { getDefaultOrgName, retrieveAllMetadataPackageLocal, retrieveAllMetadataPackageOrg } from '../../../utils/commands/utils';
-import { DEFAULT_PACKAGE_LOC_EXT, DEFAULT_PACKAGE_ORG_EXT, TYPES_PICKVAL_ROOT, TYPES_ROOT_TAG } from '../../../utils/constants/constants_sourcesdownload';
-import { PERMSETS_SUBPATH, PERMSET_ITEMS, PERMSET_KEY_TYPE } from '../../../utils/constants/constants_permissionsets';
-import CsvWriter from '../../../utils/csvWriter';
-const _ = require('lodash') ;
+import Performance from '../../../utils/performance.js';
+import { calcCsvFilename, checkDirOrCreateSync, checkDirOrErrorSync, jsonArrayPackageToMap, readCsvToJsonArray, readXmlFromFile } from "../../../utils/filesUtils.js"
+import { sortByKey, toArray } from "../../../utils/utils.js"
+import { DEFAULT_ESCSV_PATH, DEFAULT_LOG_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants.js';
+import { loadSettings } from '../../../utils/localSettings.js';
+import { getDefaultOrgName, retrieveAllMetadataPackageLocal, retrieveAllMetadataPackageOrg } from '../../../utils/commands/utils.js';
+import { DEFAULT_PACKAGE_LOC_EXT, DEFAULT_PACKAGE_ORG_EXT, TYPES_PICKVAL_ROOT, TYPES_ROOT_TAG } from '../../../utils/constants/constants_sourcesdownload.js';
+import { PERMSETS_SUBPATH, PERMSET_ITEMS, PERMSET_KEY_TYPE } from '../../../utils/constants/constants_permissionsets.js';
+import CsvWriter from '../../../utils/csvWriter.js';
+import _ from 'lodash';
 
 const settings = loadSettings();
 
 // Initialize Messages with the current plugin directory
-Messages.importMessagesDirectory(__dirname);
+Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.

@@ -1,11 +1,11 @@
-const fs = require('fs-extra');
+import fs from 'fs-extra';
 import { join } from "path";
-import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from "../constants/constants"
-import { writeXmlToFile, readCsvToJsonArray, readXmlFromFile, calcCsvFilename } from "../filesUtils"
-import { sortByKey } from "../utils"
-import { loadSettings } from "../localSettings";
-import { flatToArray } from "../flatArrayUtils";
-import { jsonAndPrintError } from "./utils";
+import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from "../constants/constants.js"
+import { writeXmlToFile, readCsvToJsonArray, readXmlFromFile, calcCsvFilename } from "../filesUtils.js"
+import { sortByKey } from "../utils.js"
+import { loadSettings } from "../localSettings.js";
+import { flatToArray } from "../flatArrayUtils.js";
+import { jsonAndPrintError } from "./utils.js";
 
 const settings = loadSettings();
 

@@ -5,12 +5,12 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-const fs = require('fs-extra');
+import fs from 'fs-extra';
 import { join } from "path";
-import { calcCsvFilename, checkDirOrErrorSync, readCsvToJsonArrayWithNulls } from "../filesUtils";
-import { loadSettings } from '../localSettings';
-import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../constants/constants';
-import { jsonAndPrintError } from "./utils";
+import { calcCsvFilename, checkDirOrErrorSync, readCsvToJsonArrayWithNulls } from "../filesUtils.js";
+import { loadSettings } from '../localSettings.js';
+import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../constants/constants.js';
+import { jsonAndPrintError } from "./utils.js";
 
 const settings = loadSettings();
 

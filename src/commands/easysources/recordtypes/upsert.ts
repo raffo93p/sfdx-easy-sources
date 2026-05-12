@@ -7,23 +7,23 @@
 import * as os from 'os';
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages } from '@salesforce/core';
-import { readXmlFromFile, readCsvToJsonMap, jsonArrayCsvToMap, removeExtension, writeXmlToFile, calcCsvFilename } from '../../../utils/filesUtils'
-import { generateTagId, sortByKey } from '../../../utils/utils'
-import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../../../utils/constants/constants';
-import Performance from '../../../utils/performance';
+import { readXmlFromFile, readCsvToJsonMap, jsonArrayCsvToMap, removeExtension, writeXmlToFile, calcCsvFilename } from '../../../utils/filesUtils.js'
+import { generateTagId, sortByKey } from '../../../utils/utils.js'
+import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../../../utils/constants/constants.js';
+import Performance from '../../../utils/performance.js';
 import { join } from "path";
-import { RECORDTYPES_EXTENSION, RECORDTYPES_ROOT_TAG, RECORDTYPES_SUBPATH, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
-import { transformXMLtoCSV } from '../../../utils/utils_recordtypes';
-import { loadSettings } from '../../../utils/localSettings';
-import { jsonAndPrintError, sortObjectKeys } from '../../../utils/commands/utils';
-import CsvWriter from '../../../utils/csvWriter';
-import { recordTypeSplit } from './split';
-const fs = require('fs-extra');
+import { RECORDTYPES_EXTENSION, RECORDTYPES_ROOT_TAG, RECORDTYPES_SUBPATH, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes.js';
+import { transformXMLtoCSV } from '../../../utils/utils_recordtypes.js';
+import { loadSettings } from '../../../utils/localSettings.js';
+import { jsonAndPrintError, sortObjectKeys } from '../../../utils/commands/utils.js';
+import CsvWriter from '../../../utils/csvWriter.js';
+import { recordTypeSplit } from './split.js';
+import fs from 'fs-extra';
 
 const settings = loadSettings();
 
 // Initialize Messages with the current plugin directory
-Messages.importMessagesDirectory(__dirname);
+Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.

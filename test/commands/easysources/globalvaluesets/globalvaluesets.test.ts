@@ -1,10 +1,10 @@
-import { expect, test } from '../../../oclif-compat';
+import { expect, test } from '../../../oclif-compat.js';
 
 import { join } from 'path';
-import { GVSETS_DEFAULT_SFXML_PATH } from '../../../../src/utils/constants/constants_globalvaluesets';
-import { areFilesEqual } from '../../../../src/utils/filesUtils';
+import { GVSETS_DEFAULT_SFXML_PATH } from '../../../../src/utils/constants/constants_globalvaluesets.js';
+import { areFilesEqual } from '../../../../src/utils/filesUtils.js';
 
-const fs = require('fs-extra');
+import fs from 'fs-extra';
 
 const sourceFolder = GVSETS_DEFAULT_SFXML_PATH;
 const csvFolder = join(sourceFolder, 'MyGVS');

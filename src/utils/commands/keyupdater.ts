@@ -1,12 +1,12 @@
-import { calcCsvFilename, readCsvToJsonArray } from '../filesUtils'
-import { sortByKey } from "../utils"
-import { generateTagId } from '../utils'
+import { calcCsvFilename, readCsvToJsonArray } from '../filesUtils.js'
+import { sortByKey } from "../utils.js"
+import { generateTagId } from '../utils.js'
 import { join } from "path";
-import { DEFAULT_ESCSV_PATH } from '../constants/constants';
-import { loadSettings } from '../localSettings';
-import { jsonAndPrintError } from './utils';
-import CsvWriter from '../csvWriter';
-const fs = require('fs-extra');
+import { DEFAULT_ESCSV_PATH } from '../constants/constants.js';
+import { loadSettings } from '../localSettings.js';
+import { jsonAndPrintError } from './utils.js';
+import CsvWriter from '../csvWriter.js';
+import fs from 'fs-extra';
 
 const settings = loadSettings();
 

@@ -4,12 +4,14 @@
   "version": "1.0.0",
   "author": "Raffaele Prudenzano @raffo93p",
   "bugs": "https://github.com/raffo93p/sfdx-easy-sources/issues",
+  "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
+  "exports": "./lib/index.js",
   "dependencies": {
     "@oclif/core": "^4",
     "@salesforce/core": "^8",
-    "@salesforce/sf-plugins-core": "^11.3.12",
+    "@salesforce/sf-plugins-core": "^12",
     "csv": "^6.2.1",
     "csvtojson": "^2.0.10",
     "dottie": "^2.0.2",
@@ -26,16 +28,16 @@
     "@salesforce/ts-sinon": "^1",
     "@types/chai": "^4",
     "@types/mocha": "^10",
-    "@types/node": "^18",
+    "@types/node": "^20",
     "@typescript-eslint/eslint-plugin": "^8",
     "@typescript-eslint/parser": "^8",
+    "c8": "^11.0.0",
     "chai": "^4",
     "eslint": "^9",
     "eslint-config-prettier": "^10",
     "eslint-plugin-import": "^2",
     "eslint-plugin-prettier": "^5",
     "mocha": "^11",
-    "nyc": "^17",
     "oclif": "^4.23.0",
     "prettier": "^3",
     "sinon": "^22",
@@ -73,25 +75,8 @@
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "eslint src/**/*.ts test/**/*.ts",
     "prepack": "rm -rf lib && tsc -b && oclif manifest && oclif readme",
-    "test": "rm -rf test_tmp && mkdir test_tmp && pwd && cp test/resources/easysources-settings.json test_tmp && cd test_tmp && nyc --extension .ts --require ts-node/register mocha --require ../test/setup.ts --forbid-only \"../test/**/*.test.ts\"; EXIT=$?; cd ..; rm -rf test_tmp; exit $EXIT",
+    "test": "rm -rf test_tmp && mkdir test_tmp && cp test/resources/easysources-settings.json test_tmp && cd test_tmp && NODE_PATH=../node_modules c8 --include 'src/**' --exclude 'src/_tests_/**' --reporter text --reporter text-summary --reports-dir ../coverage mocha --node-option loader=ts-node/esm --require ../test/setup.ts --forbid-only \"../test/**/*.test.ts\"; EXIT=$?; cd ..; rm -rf test_tmp; exit $EXIT",
     "version": "oclif readme && git add README.md",
     "link": "npm install && rm -rf lib && npm run build && sf plugins link"
-  },
-  "nyc": {
-    "check-coverage": true,
-    "all": true,
-    "include": [
-      "src/**/!(*.test.*).[tj]s?(x)"
-    ],
-    "exclude": [
-      "src/_tests_/**/*.*"
-    ],
-    "reporter": [
-      "html",
-      "lcov",
-      "text",
-      "text-summary"
-    ],
-    "report-dir": "coverage"
   }
 }

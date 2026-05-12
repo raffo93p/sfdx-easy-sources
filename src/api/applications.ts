@@ -1,10 +1,10 @@
 import { AnyJson } from '@salesforce/ts-types';
-import { PathOptions } from './paths';
-import { applicationSplit } from '../commands/easysources/applications/split';
-import { applicationUpsert } from '../commands/easysources/applications/upsert';
-import { applicationMerge } from '../commands/easysources/applications/merge';
-import { applicationAreAligned } from '../commands/easysources/applications/arealigned';
-import { applicationUpdateKey } from '../commands/easysources/applications/updatekey';
+import { PathOptions } from './paths.js';
+import { applicationSplit } from '../commands/easysources/applications/split.js';
+import { applicationUpsert } from '../commands/easysources/applications/upsert.js';
+import { applicationMerge } from '../commands/easysources/applications/merge.js';
+import { applicationAreAligned } from '../commands/easysources/applications/arealigned.js';
+import { applicationUpdateKey } from '../commands/easysources/applications/updatekey.js';
 
 /**
  * Interface for Application operation options.

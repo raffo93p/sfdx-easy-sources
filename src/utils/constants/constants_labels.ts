@@ -1,5 +1,5 @@
-import { setDefault } from "../utils";
-import { DEFAULT_SFXML_PATH } from "./constants";
+import { setDefault } from "../utils.js";
+import { DEFAULT_SFXML_PATH } from "./constants.js";
 
 export const LABELS_EXTENSION = ".labels-meta.xml";
 export const LABELS_ROOT_TAG = "CustomLabels";

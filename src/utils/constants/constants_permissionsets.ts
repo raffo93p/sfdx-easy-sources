@@ -1,5 +1,5 @@
-import { setDefault } from "../utils";
-import { DEFAULT_SFXML_PATH } from "./constants";
+import { setDefault } from "../utils.js";
+import { DEFAULT_SFXML_PATH } from "./constants.js";
 
 export const PERMSET_APP_ROOT = 'applicationVisibilities';
 export const PERMSET_APP_HEADER = ['application', 'default', 'visible'];

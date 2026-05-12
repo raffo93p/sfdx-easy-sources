@@ -1,17 +1,17 @@
-import { PathOptions } from './paths';
+import { PathOptions } from './paths.js';
 import { AnyJson } from '@salesforce/ts-types';
 
 // Import profile-specific functions directly from command files
-import { profileSplit } from '../commands/easysources/profiles/split';
-import { profileUpsert } from '../commands/easysources/profiles/upsert';
-import { profileMerge } from '../commands/easysources/profiles/merge';  
-import { profileUpdateKey } from '../commands/easysources/profiles/updatekey';
-import { profileAreAligned } from '../commands/easysources/profiles/arealigned';
-import { profileClearEmpty } from '../commands/easysources/profiles/clearempty';
-import { profileMinify } from '../commands/easysources/profiles/minify';
-import { profileDelete } from '../commands/easysources/profiles/delete';
-import { profileClean } from '../commands/easysources/profiles/clean';
-import { profileCustomUpsert } from '../commands/easysources/profiles/customupsert';
+import { profileSplit } from '../commands/easysources/profiles/split.js';
+import { profileUpsert } from '../commands/easysources/profiles/upsert.js';
+import { profileMerge } from '../commands/easysources/profiles/merge.js';  
+import { profileUpdateKey } from '../commands/easysources/profiles/updatekey.js';
+import { profileAreAligned } from '../commands/easysources/profiles/arealigned.js';
+import { profileClearEmpty } from '../commands/easysources/profiles/clearempty.js';
+import { profileMinify } from '../commands/easysources/profiles/minify.js';
+import { profileDelete } from '../commands/easysources/profiles/delete.js';
+import { profileClean } from '../commands/easysources/profiles/clean.js';
+import { profileCustomUpsert } from '../commands/easysources/profiles/customupsert.js';
 
 /**
  * Configuration options for profile operations

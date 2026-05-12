@@ -7,23 +7,23 @@
 import * as os from 'os';
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages } from '@salesforce/core';
-import Performance from '../../../utils/performance';
-import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../../../utils/constants/constants';
-import { OBJTRANSL_CFIELDTRANSL_ROOT, OBJTRANSL_CFIELDTRANSL_ROOT_TAG, OBJTRANSL_EXTENSION, OBJTRANSL_ITEMS, OBJTRANSL_LAYOUT_ROOT, OBJTRANSL_ROOT_TAG, OBJTRANSL_SUBPATH } from '../../../utils/constants/constants_objecttranslations';
-import { loadSettings } from '../../../utils/localSettings';
+import Performance from '../../../utils/performance.js';
+import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH, XML_PART_EXTENSION } from '../../../utils/constants/constants.js';
+import { OBJTRANSL_CFIELDTRANSL_ROOT, OBJTRANSL_CFIELDTRANSL_ROOT_TAG, OBJTRANSL_EXTENSION, OBJTRANSL_ITEMS, OBJTRANSL_LAYOUT_ROOT, OBJTRANSL_ROOT_TAG, OBJTRANSL_SUBPATH } from '../../../utils/constants/constants_objecttranslations.js';
+import { loadSettings } from '../../../utils/localSettings.js';
 import { join } from "path";
-import { calcCsvFilename, checkDirOrErrorSync, readXmlFromFile, writeXmlToFile } from '../../../utils/filesUtils';
-import { generateTagId, sortByKey } from '../../../utils/utils';
-import {  getFieldTranslationFiles, transformFieldXMLtoCSV, transformLayoutXMLtoCSV } from '../../../utils/utils_objtransl';
-import CsvWriter from '../../../utils/csvWriter';
-import { jsonAndPrintError, sortObjectKeys } from '../../../utils/commands/utils';
-const fs = require('fs-extra');
+import { calcCsvFilename, checkDirOrErrorSync, readXmlFromFile, writeXmlToFile } from '../../../utils/filesUtils.js';
+import { generateTagId, sortByKey } from '../../../utils/utils.js';
+import {  getFieldTranslationFiles, transformFieldXMLtoCSV, transformLayoutXMLtoCSV } from '../../../utils/utils_objtransl.js';
+import CsvWriter from '../../../utils/csvWriter.js';
+import { jsonAndPrintError, sortObjectKeys } from '../../../utils/commands/utils.js';
+import fs from 'fs-extra';
 
 
 const settings = loadSettings();
 
 // Initialize Messages with the current plugin directory
-Messages.importMessagesDirectory(__dirname);
+Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.

@@ -1,17 +1,17 @@
 import { AnyJson } from '@salesforce/ts-types';
-import { PathOptions } from './paths';
+import { PathOptions } from './paths.js';
 
 // Import permission set-specific functions directly from command files
-import { permissionsetSplit } from '../commands/easysources/permissionsets/split';
-import { permissionsetUpsert } from '../commands/easysources/permissionsets/upsert';
-import { permissionsetMerge } from '../commands/easysources/permissionsets/merge';
-import { permissionsetUpdateKey } from '../commands/easysources/permissionsets/updatekey';
-import { permissionsetAreAligned } from '../commands/easysources/permissionsets/arealigned';
-import { permissionsetClearEmpty } from '../commands/easysources/permissionsets/clearempty';
-import { permissionsetMinify } from '../commands/easysources/permissionsets/minify';
-import { permissionsetDelete } from '../commands/easysources/permissionsets/delete';
-import { permissionsetClean } from '../commands/easysources/permissionsets/clean';
-import { permissionsetCustomUpsert } from '../commands/easysources/permissionsets/customupsert';
+import { permissionsetSplit } from '../commands/easysources/permissionsets/split.js';
+import { permissionsetUpsert } from '../commands/easysources/permissionsets/upsert.js';
+import { permissionsetMerge } from '../commands/easysources/permissionsets/merge.js';
+import { permissionsetUpdateKey } from '../commands/easysources/permissionsets/updatekey.js';
+import { permissionsetAreAligned } from '../commands/easysources/permissionsets/arealigned.js';
+import { permissionsetClearEmpty } from '../commands/easysources/permissionsets/clearempty.js';
+import { permissionsetMinify } from '../commands/easysources/permissionsets/minify.js';
+import { permissionsetDelete } from '../commands/easysources/permissionsets/delete.js';
+import { permissionsetClean } from '../commands/easysources/permissionsets/clean.js';
+import { permissionsetCustomUpsert } from '../commands/easysources/permissionsets/customupsert.js';
 
 /**
  * Configuration options for permission set operations

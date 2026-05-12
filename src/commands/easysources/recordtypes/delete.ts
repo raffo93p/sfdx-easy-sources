@@ -8,25 +8,25 @@ import * as os from 'os';
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages, SfError } from '@salesforce/core';
 
-const fs = require('fs-extra');
+import fs from 'fs-extra';
 import { join } from "path";
-import Performance from '../../../utils/performance';
+import Performance from '../../../utils/performance.js';
 
-import { DEFAULT_ESCSV_PATH } from "../../../utils/constants/constants";
+import { DEFAULT_ESCSV_PATH } from "../../../utils/constants/constants.js";
 
-import { calcCsvFilename, readCsvToJsonMap } from "../../../utils/filesUtils"
-import { sortByKey } from "../../../utils/utils"
+import { calcCsvFilename, readCsvToJsonMap } from "../../../utils/filesUtils.js"
+import { sortByKey } from "../../../utils/utils.js"
 
-import { RECORDTYPES_PICKVAL_ROOT, RECORDTYPES_SUBPATH, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes';
-import { loadSettings } from '../../../utils/localSettings';
-import CsvWriter from '../../../utils/csvWriter';
-import { jsonAndPrintError } from '../../../utils/commands/utils';
+import { RECORDTYPES_PICKVAL_ROOT, RECORDTYPES_SUBPATH, RECORDTYPE_ITEMS } from '../../../utils/constants/constants_recordtypes.js';
+import { loadSettings } from '../../../utils/localSettings.js';
+import CsvWriter from '../../../utils/csvWriter.js';
+import { jsonAndPrintError } from '../../../utils/commands/utils.js';
 
 const settings = loadSettings();
 
 
 // Initialize Messages with the current plugin directory
-Messages.importMessagesDirectory(__dirname);
+Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.

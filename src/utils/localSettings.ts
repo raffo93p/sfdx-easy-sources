@@ -1,6 +1,6 @@
-import { DEFAULT_ESCSV_PATH, DEFAULT_LOG_PATH, DEFAULT_SFXML_PATH, SETTINGS_PATH } from "./constants/constants";
+import { DEFAULT_ESCSV_PATH, DEFAULT_LOG_PATH, DEFAULT_SFXML_PATH, SETTINGS_PATH } from "./constants/constants.js";
 
-const fs = require('fs-extra');
+import fs from 'fs-extra';
 
 
 export function loadSettings() {

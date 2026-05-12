@@ -1,14 +1,14 @@
 import { AnyJson } from '@salesforce/ts-types';
-import { PathOptions } from './paths';
+import { PathOptions } from './paths.js';
 
 // Import translation-specific functions directly from command files
-import { translationSplit } from '../commands/easysources/translations/split';
-import { translationUpsert } from '../commands/easysources/translations/upsert';
-import { translationMerge } from '../commands/easysources/translations/merge';
-import { translationAreAligned } from '../commands/easysources/translations/arealigned';
-import { translationMinify } from '../commands/easysources/translations/minify';
-import { translationClearEmpty } from '../commands/easysources/translations/clearempty';
-import { translationUpdateKey } from '../commands/easysources/translations/updatekey';
+import { translationSplit } from '../commands/easysources/translations/split.js';
+import { translationUpsert } from '../commands/easysources/translations/upsert.js';
+import { translationMerge } from '../commands/easysources/translations/merge.js';
+import { translationAreAligned } from '../commands/easysources/translations/arealigned.js';
+import { translationMinify } from '../commands/easysources/translations/minify.js';
+import { translationClearEmpty } from '../commands/easysources/translations/clearempty.js';
+import { translationUpdateKey } from '../commands/easysources/translations/updatekey.js';
 
 /**
  * Interface for Translation operation options.

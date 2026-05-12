@@ -19,8 +19,8 @@
  * ```
  */
 
-import { loadSettings } from '../utils/localSettings';
-import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../utils/constants/constants';
+import { loadSettings } from '../utils/localSettings.js';
+import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../utils/constants/constants.js';
 
 /**
  * Path options interface for all metadata operations

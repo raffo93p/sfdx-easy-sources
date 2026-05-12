@@ -8,21 +8,21 @@ import * as os from 'os';
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages } from '@salesforce/core';
 
-const fs = require('fs-extra');
+import fs from 'fs-extra';
 import { join } from "path";
-import Performance from '../../../utils/performance';
-import { calcCsvFilename, checkDirOrErrorSync, readCsvToJsonArray } from "../../../utils/filesUtils"
-import { sortByKey, toArray } from "../../../utils/utils"
-import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
-import { loadSettings } from '../../../utils/localSettings';
-import { PERMSETS_SUBPATH, PERMSET_ITEMS, PERMSET_TAG_BOOL } from '../../../utils/constants/constants_permissionsets';
-import { jsonAndPrintError } from '../../../utils/commands/utils';
-import CsvWriter from '../../../utils/csvWriter';
+import Performance from '../../../utils/performance.js';
+import { calcCsvFilename, checkDirOrErrorSync, readCsvToJsonArray } from "../../../utils/filesUtils.js"
+import { sortByKey, toArray } from "../../../utils/utils.js"
+import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants.js';
+import { loadSettings } from '../../../utils/localSettings.js';
+import { PERMSETS_SUBPATH, PERMSET_ITEMS, PERMSET_TAG_BOOL } from '../../../utils/constants/constants_permissionsets.js';
+import { jsonAndPrintError } from '../../../utils/commands/utils.js';
+import CsvWriter from '../../../utils/csvWriter.js';
 
 const settings = loadSettings();
 
 // Initialize Messages with the current plugin directory
-Messages.importMessagesDirectory(__dirname);
+Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.

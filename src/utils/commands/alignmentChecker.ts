@@ -1,11 +1,11 @@
-const fs = require('fs-extra');
+import fs from 'fs-extra';
 import { join } from "path";
-import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from "../constants/constants";
-import { readXmlFromFile, writeXmlToFile, areFilesEqual } from "../filesUtils";
-import { loadSettings } from "../localSettings";
+import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from "../constants/constants.js";
+import { readXmlFromFile, writeXmlToFile, areFilesEqual } from "../filesUtils.js";
+import { loadSettings } from "../localSettings.js";
 import { tmpdir } from "os";
-import { mergeItemFromCsv } from "./merger";
-import { jsonAndPrintError } from "./utils";
+import { mergeItemFromCsv } from "./merger.js";
+import { jsonAndPrintError } from "./utils.js";
 
 const settings = loadSettings();
 

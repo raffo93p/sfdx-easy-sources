@@ -1,5 +1,5 @@
 import { Builder } from "xml2js";
-import { XML_PART_EXTENSION } from "./constants/constants";
+import { XML_PART_EXTENSION } from "./constants/constants.js";
 
 export default class XmlFormatter {
 

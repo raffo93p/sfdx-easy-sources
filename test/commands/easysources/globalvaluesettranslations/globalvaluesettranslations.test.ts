@@ -1,10 +1,10 @@
-import { expect, test } from '../../../oclif-compat';
+import { expect, test } from '../../../oclif-compat.js';
 
 import { join } from 'path';
-import { GVSETTRANS_DEFAULT_SFXML_PATH } from '../../../../src/utils/constants/constants_globalvaluesettranslations';
-import { areFilesEqual } from '../../../../src/utils/filesUtils';
+import { GVSETTRANS_DEFAULT_SFXML_PATH } from '../../../../src/utils/constants/constants_globalvaluesettranslations.js';
+import { areFilesEqual } from '../../../../src/utils/filesUtils.js';
 
-const fs = require('fs-extra');
+import fs from 'fs-extra';
 
 const sourceFolder = GVSETTRANS_DEFAULT_SFXML_PATH;
 const csvFolder = join(sourceFolder, 'MyGVST-en_US');

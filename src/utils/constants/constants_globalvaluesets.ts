@@ -1,5 +1,5 @@
-import { setDefault } from "../utils";
-import { DEFAULT_SFXML_PATH } from "./constants";
+import { setDefault } from "../utils.js";
+import { DEFAULT_SFXML_PATH } from "./constants.js";
 
 export const GVSETS_EXTENSION = ".globalValueSet-meta.xml";
 export const GVSETS_ROOT_TAG = "GlobalValueSet";

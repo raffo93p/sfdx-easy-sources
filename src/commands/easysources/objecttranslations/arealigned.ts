@@ -16,31 +16,31 @@ import {
     OBJTRANSL_CFIELDTRANSL_ROOT,
     OBJTRANSL_CFIELDTRANSL_ROOT_TAG,
     OBJTRANSL_FIELDTRANSL_EXTENSION
-} from '../../../utils/constants/constants_objecttranslations';
-import Performance from '../../../utils/performance';
-import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
-const fs = require('fs-extra');
+} from '../../../utils/constants/constants_objecttranslations.js';
+import Performance from '../../../utils/performance.js';
+import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants.js';
+import fs from 'fs-extra';
 import { join } from "path";
 import { 
     readXmlFromFile, 
     writeXmlToFile, 
     readStringNormalizedFromFile
-} from "../../../utils/filesUtils";
-import { loadSettings } from "../../../utils/localSettings";
+} from "../../../utils/filesUtils.js";
+import { loadSettings } from "../../../utils/localSettings.js";
 import { tmpdir } from "os";
 import { 
     mergeObjectTranslationFromCsv,
     getFieldTranslationsFromCsv
-} from './merge';
+} from './merge.js';
 import { 
     getFieldTranslationFiles
-} from '../../../utils/utils_objtransl';
-import { hasFileItemsContent } from '../../../utils/commands/alignmentChecker';
+} from '../../../utils/utils_objtransl.js';
+import { hasFileItemsContent } from '../../../utils/commands/alignmentChecker.js';
 
 const settings = loadSettings();
 
 // Initialize Messages with the current plugin directory
-Messages.importMessagesDirectory(__dirname);
+Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.

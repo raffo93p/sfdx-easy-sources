@@ -8,22 +8,22 @@ import * as os from 'os';
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages } from '@salesforce/core';
 
-import Performance from '../../../utils/performance';
-import { DEFAULT_ESCSV_PATH, DEFAULT_LOG_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
+import Performance from '../../../utils/performance.js';
+import { DEFAULT_ESCSV_PATH, DEFAULT_LOG_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants.js';
 import { join } from "path";
-import { DEFAULT_PACKAGE_ORG_EXT, OBJECT_SUBPART_SKIP, PACKAGE_VERSION, PERMSET_FIX_TYPE, PROFILE_REL_TYPES, PROFILE_FIX_TYPE, RESOURCES_MAXNUM, TYPES_PICKVAL_ROOT, TYPES_ROOT_TAG, TRANSL_REL_TYPES, TRANSL_FIX_TYPES, TYPES_TO_SPLIT, CUSTOBJTRANSL_FIX_TYPES, CUSTOMOBJECT_TYPE, CUSTOMOBJECTTRANSL_TYPE } from '../../../utils/constants/constants_sourcesdownload';
-import { cleanDir, jsonArrayPackageToMap, readStringFromFile, readXmlFromFile, writeXmlToFile } from '../../../utils/filesUtils';
-import { bulkExecuteCommands, retrieveAllMetadataPackageOrg, retrievePackage } from '../../../utils/commands/utils';
-import { executeCommand } from '../../../utils/commands/utils';
-import { loadSettings } from '../../../utils/localSettings';
-const fs = require('fs-extra');
-const _ = require('lodash') ;
+import { DEFAULT_PACKAGE_ORG_EXT, OBJECT_SUBPART_SKIP, PACKAGE_VERSION, PERMSET_FIX_TYPE, PROFILE_REL_TYPES, PROFILE_FIX_TYPE, RESOURCES_MAXNUM, TYPES_PICKVAL_ROOT, TYPES_ROOT_TAG, TRANSL_REL_TYPES, TRANSL_FIX_TYPES, TYPES_TO_SPLIT, CUSTOBJTRANSL_FIX_TYPES, CUSTOMOBJECT_TYPE, CUSTOMOBJECTTRANSL_TYPE } from '../../../utils/constants/constants_sourcesdownload.js';
+import { cleanDir, jsonArrayPackageToMap, readStringFromFile, readXmlFromFile, writeXmlToFile } from '../../../utils/filesUtils.js';
+import { bulkExecuteCommands, retrieveAllMetadataPackageOrg, retrievePackage } from '../../../utils/commands/utils.js';
+import { executeCommand } from '../../../utils/commands/utils.js';
+import { loadSettings } from '../../../utils/localSettings.js';
+import fs from 'fs-extra';
+import _ from 'lodash';
 
 const settings = loadSettings();
 
 
 // Initialize Messages with the current plugin directory
-Messages.importMessagesDirectory(__dirname);
+Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.

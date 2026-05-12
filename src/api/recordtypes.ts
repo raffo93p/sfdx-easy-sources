@@ -1,14 +1,14 @@
 import { AnyJson } from '@salesforce/ts-types';
-import { PathOptions } from './paths';
+import { PathOptions } from './paths.js';
 
 // Import record type-specific functions directly from command files
-import { recordTypeSplit } from '../commands/easysources/recordtypes/split';
-import { recordTypeMerge } from '../commands/easysources/recordtypes/merge';
-import { recordTypeUpsert } from '../commands/easysources/recordtypes/upsert';
-import { recordTypeDelete } from '../commands/easysources/recordtypes/delete';
-import { recordTypeAreAligned } from '../commands/easysources/recordtypes/arealigned';
-import { recordTypeUpdateKey } from '../commands/easysources/recordtypes/updatekey';
-import { recordTypeClean } from '../commands/easysources/recordtypes/clean';
+import { recordTypeSplit } from '../commands/easysources/recordtypes/split.js';
+import { recordTypeMerge } from '../commands/easysources/recordtypes/merge.js';
+import { recordTypeUpsert } from '../commands/easysources/recordtypes/upsert.js';
+import { recordTypeDelete } from '../commands/easysources/recordtypes/delete.js';
+import { recordTypeAreAligned } from '../commands/easysources/recordtypes/arealigned.js';
+import { recordTypeUpdateKey } from '../commands/easysources/recordtypes/updatekey.js';
+import { recordTypeClean } from '../commands/easysources/recordtypes/clean.js';
 
 /**
  * Configuration options for record type operations
