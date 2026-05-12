@@ -1,4 +1,4 @@
-import { expect, test } from '@salesforce/command/lib/test';
+import { expect, test } from '@oclif/test';
 
 import { join } from 'path';
 import { areFilesEqual } from '../../../../src/utils/filesUtils';
@@ -27,7 +27,7 @@ describe('easysources:allmeta ', function () {
 
 
         })
-        .command(['easysources:allmeta:split'])
+        .command(['easysources allmeta split'])
         .it('runs easysources:allmeta:split', async (ctx) => {
             expect(await fs.existsSync(join(sourceFolder, 'applications', 'MyApplication'))).to.be.true;
             expect(await fs.existsSync(join(sourceFolder, 'globalValueSets', 'MyGVS'))).to.be.true;
@@ -42,7 +42,7 @@ describe('easysources:allmeta ', function () {
 
     test
         .stdout()
-        .command(['easysources:allmeta:merge'])
+        .command(['easysources allmeta merge'])
         .it('runs easysources:allmeta:merge (1)', async (ctx) => {
                 
             expect(await areFilesEqual(join(resourcesFolder, 'applications', 'myApplication_merge1.app-meta.xml'), join(sourceFolder, 'applications', 'MyApplication.app-meta.xml'))).to.be.true;
@@ -65,7 +65,7 @@ describe('easysources:allmeta ', function () {
             fs.copySync(join(resourcesFolder, 'permissionsets', 'myPermSet_upsert.permissionset-meta.xml'), join(sourceFolder, 'permissionSets', 'MyPermSet.permissionset-meta.xml'));
             fs.copySync(join(resourcesFolder, 'profiles', 'myProfile_upsert.profile-meta.xml'), join(sourceFolder, 'profiles', 'MyProfile.profile-meta.xml'));
             fs.copySync(join(resourcesFolder, 'recordtypes', 'myRecordType_upsert.recordType-meta.xml'), join(sourceFolder, 'objects', 'testObj', 'recordTypes', 'MyRecordType.recordType-meta.xml'));        })
-        .command(['easysources:allmeta:upsert'])
+        .command(['easysources allmeta upsert'])
         .it('runs easysources:allmeta:upsert', async (ctx) => {
                 
             // TODO Sistemare con test più specifici
@@ -80,7 +80,7 @@ describe('easysources:allmeta ', function () {
 
     test
         .stdout()
-        .command(['easysources:allmeta:merge'])
+        .command(['easysources allmeta merge'])
         .it('runs easysources:allmeta:merge (2)', async (ctx) => {
                 
             expect(await areFilesEqual(join(resourcesFolder, 'applications', 'myApplication_merge2.app-meta.xml'), join(sourceFolder, 'applications', 'MyApplication.app-meta.xml'))).to.be.true;

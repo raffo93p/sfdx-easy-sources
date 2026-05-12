@@ -5,9 +5,9 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import * as os from 'os';
-import { flags, SfdxCommand } from '@salesforce/command';
+import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages } from '@salesforce/core';
-import { AnyJson } from '@salesforce/ts-types';
+
 const fs = require('fs-extra');
 import { join } from "path";
 import Performance from '../../../utils/performance';
@@ -30,74 +30,74 @@ Messages.importMessagesDirectory(__dirname);
 // or any library that is using the messages framework can also be loaded this way.
 const messages = Messages.loadMessages('sfdx-easy-sources', 'recordtypes_clean');
 
-export default class Clean extends SfdxCommand {
-    public static description = messages.getMessage('commandDescription');
+export default class Clean extends SfCommand<unknown> {
+    public static readonly summary = messages.getMessage('commandDescription');
 
-    public static examples = messages.getMessage('examples').split(os.EOL);
+    public static readonly examples = messages.getMessage('examples').split(os.EOL);
 
-    public static args = [{ name: 'file' }];
 
-    protected static flagsConfig = {
+    public static readonly flags = {
         // flag with a value (-n, --name=VALUE)
-        "sf-xml": flags.string({
+        "sf-xml": Flags.string({
             char: 'x',
-            description: messages.getMessage('sfXmlFlagDescription', [DEFAULT_SFXML_PATH]),
+            summary: messages.getMessage('sfXmlFlagDescription', [DEFAULT_SFXML_PATH]),
         }),
-        "es-csv": flags.string({
+        "es-csv": Flags.string({
             char: 'c',
-            description: messages.getMessage('esCsvFlagDescription', [DEFAULT_ESCSV_PATH]),
+            summary: messages.getMessage('esCsvFlagDescription', [DEFAULT_ESCSV_PATH]),
         }),
-        orgname:  flags.string({
+        orgname:  Flags.string({
             char: 'u',
-            description: messages.getMessage('orgFlagDescription', [""]),
+            summary: messages.getMessage('orgFlagDescription', [""]),
             required: false
         }),
-        object: flags.string({
+        object: Flags.string({
             char: 's',
-            description: messages.getMessage('objectFlagDescription'),
+            summary: messages.getMessage('objectFlagDescription'),
         }),
-        recordtype: flags.string({
+        recordtype: Flags.string({
             char: 'r',
-            description: messages.getMessage('recordtypeFlagDescription'),
+            summary: messages.getMessage('recordtypeFlagDescription'),
         }),
-        "log-dir": flags.string({
+        "log-dir": Flags.string({
             char:  'l',
-            description: messages.getMessage('logdirFlagDescription', [DEFAULT_LOG_PATH]),
+            summary: messages.getMessage('logdirFlagDescription', [DEFAULT_LOG_PATH]),
         }),
-        mode: flags.enum({
+        mode: Flags.string({
             char: 'm',
-            description: messages.getMessage('modeFlagDescription', ['clean']),
+            summary: messages.getMessage('modeFlagDescription', ['clean']),
             options: ['clean', 'log'],
             default: 'clean',
         }),
-        target: flags.enum({
+        target: Flags.string({
             char: 'g',
-            description: messages.getMessage('targetFlagDescription', ['both']),
+            summary: messages.getMessage('targetFlagDescription', ['both']),
             options: ['org', 'local', 'both'],
             default: 'both',
         }),
-        'include-standard-fields': flags.boolean({
+        'include-standard-fields': Flags.boolean({
             char: 'F',
-            description: messages.getMessage('includeStandardFieldsFlagDescription', ['false']),
+            summary: messages.getMessage('includeStandardFieldsFlagDescription', ['false']),
             default: false,
         }),
-        'skip-manifest-creation': flags.boolean({
+        'skip-manifest-creation': Flags.boolean({
             char: 'M',
-            description: messages.getMessage('skipManifestCreationFlagDescription', ['false']),
+            summary: messages.getMessage('skipManifestCreationFlagDescription', ['false']),
             default: false,
         }),
-        sort: flags.enum({
+        sort: Flags.string({
             char: 'S',
-            description: messages.getMessage('sortFlagDescription', ['true']),
+            summary: messages.getMessage('sortFlagDescription', ['true']),
             options: ['true', 'false'],
             default: 'true',
         }),
     };
 
-    public async run(): Promise<AnyJson> {
+    public async run(): Promise<unknown> {
+        const { flags } = await this.parse(Clean);
         Performance.getInstance().start();
         
-        const result = await recordTypeClean(this.flags);
+        const result = await recordTypeClean(flags);
         
         Performance.getInstance().end();
 
@@ -107,7 +107,7 @@ export default class Clean extends SfdxCommand {
 }
 
 // Export function for API usage  
-export async function recordTypeClean(options: any = {}): Promise<AnyJson> {
+export async function recordTypeClean(options: any = {}): Promise<any> {
     const csvWriter = new CsvWriter();
     
     const logdir = options['log-dir'] || settings['easysources-log-path'] || DEFAULT_LOG_PATH;

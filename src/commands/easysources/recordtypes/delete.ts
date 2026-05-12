@@ -5,9 +5,9 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import * as os from 'os';
-import { flags, SfdxCommand } from '@salesforce/command';
+import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages, SfError } from '@salesforce/core';
-import { AnyJson } from '@salesforce/ts-types';
+
 const fs = require('fs-extra');
 import { join } from "path";
 import Performance from '../../../utils/performance';
@@ -32,47 +32,47 @@ Messages.importMessagesDirectory(__dirname);
 // or any library that is using the messages framework can also be loaded this way.
 const messages = Messages.loadMessages('sfdx-easy-sources', 'recordtypes_delete');
 
-export default class Delete extends SfdxCommand {
-    public static description = messages.getMessage('commandDescription');
+export default class Delete extends SfCommand<unknown> {
+    public static readonly summary = messages.getMessage('commandDescription');
 
-    public static examples = messages.getMessage('examples').split(os.EOL);
+    public static readonly examples = messages.getMessage('examples').split(os.EOL);
 
-    public static args = [{ name: 'file' }];
 
-    protected static flagsConfig = {
+    public static readonly flags = {
         // flag with a value (-n, --name=VALUE)
-        "es-csv": flags.string({
+        "es-csv": Flags.string({
             char: 'c',
-            description: messages.getMessage('esCsvFlagDescription', [DEFAULT_ESCSV_PATH]),
+            summary: messages.getMessage('esCsvFlagDescription', [DEFAULT_ESCSV_PATH]),
         }),
-        object: flags.string({
+        object: Flags.string({
             char: 's',
-            description: messages.getMessage('objectFlagDescription'),
+            summary: messages.getMessage('objectFlagDescription'),
         }),
-        recordtype: flags.string({
+        recordtype: Flags.string({
             char: 'r',
-            description: messages.getMessage('recordtypeFlagDescription'),
+            summary: messages.getMessage('recordtypeFlagDescription'),
         }),
-        picklist: flags.string({
+        picklist: Flags.string({
             char: 'p',
-            description: messages.getMessage('picklistFlagDescription'),
+            summary: messages.getMessage('picklistFlagDescription'),
         }),
-        apiname: flags.string({
+        apiname: Flags.string({
             char: 'k',
-            description: messages.getMessage('apinameFlagDescription'),
+            summary: messages.getMessage('apinameFlagDescription'),
         }),
-        sort: flags.enum({
+        sort: Flags.string({
             char: 'S',
-            description: messages.getMessage('sortFlagDescription', ['true']),
+            summary: messages.getMessage('sortFlagDescription', ['true']),
             options: ['true', 'false'],
             default: 'true',
         }),
     };
 
-    public async run(): Promise<AnyJson> {
+    public async run(): Promise<unknown> {
+        const { flags } = await this.parse(Delete);
         Performance.getInstance().start();
 
-        const result = await recordTypeDelete(this.flags);
+        const result = await recordTypeDelete(flags);
 
         Performance.getInstance().end();
 
@@ -81,7 +81,7 @@ export default class Delete extends SfdxCommand {
 }
 
 // Export function for programmatic API
-export async function recordTypeDelete(options: any = {}): Promise<AnyJson> {
+export async function recordTypeDelete(options: any = {}): Promise<any> {
     const csvWriter = new CsvWriter();
     
     const picklist = options.picklist;

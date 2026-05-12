@@ -1,7 +1,7 @@
 import { promises } from "fs";
 import { join } from "path";
 import { Parser } from "xml2js";
-import { SfdxProject } from "@salesforce/core";
+import { SfProject } from "@salesforce/core";
 import XmlFormatter from "./xmlFormatter";
 import { CSV_EXTENSION } from "./constants/constants";
 const fs = require('fs-extra');
@@ -26,7 +26,7 @@ export async function writeXmlToFile(
 	return promises.writeFile(file, new XmlFormatter().formatXml(xml, file));
 }
 
-export function getDefaultFolder(project: SfdxProject): string {
+export function getDefaultFolder(project: SfProject): string {
 	const allPossibleDirectories = project.getPackageDirectories();
 	let defaultFolder;
 	if (allPossibleDirectories.length == 0) {

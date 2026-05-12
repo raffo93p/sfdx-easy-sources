@@ -1,4 +1,4 @@
-import { expect, test } from '@salesforce/command/lib/test';
+import { expect, test } from '@oclif/test';
 
 import { join } from 'path';
 import { RECORDTYPES_DEFAULT_SFXML_PATH } from '../../../../src/utils/constants/constants_recordtypes';
@@ -20,7 +20,7 @@ describe('easysources:recordtypes ', function () {
             fs.mkdirSync(recordTypeFolder, { recursive: true } );
             fs.copySync(join(resourcesFolder,'myRecordType.recordType-meta.xml'), join(recordTypeFolder, 'myRecordType.recordType-meta.xml'));
         })
-        .command(['easysources:recordtypes:split'])
+        .command(['easysources recordtypes split'])
         .it('runs easysources:recordtypes:split', async (ctx) => {
 
             expect(fs.existsSync(csvFolder)).to.be.true;
@@ -30,7 +30,7 @@ describe('easysources:recordtypes ', function () {
 
     test
         .stdout()
-        .command(['easysources:recordtypes:merge'])
+        .command(['easysources recordtypes merge'])
         .it('runs easysources:recordtypes:merge (1)', async (ctx) => {
                 
             expect(await areFilesEqual(join(resourcesFolder, 'myRecordType_merge1.recordType-meta.xml'), join(recordTypeFolder, 'myRecordType.recordType-meta.xml'))).to.be.true;
@@ -41,7 +41,7 @@ describe('easysources:recordtypes ', function () {
         .do(() => {
             fs.copySync(join(resourcesFolder,'myRecordType_upsert.recordType-meta.xml'), join(recordTypeFolder, 'myRecordType.recordType-meta.xml'));
         })
-        .command(['easysources:recordtypes:upsert'])
+        .command(['easysources recordtypes upsert'])
         .it('runs easysources:recordtypes:upsert', async (ctx) => {
                 
                 expect(await areFilesEqual(join(resourcesFolder, 'myRecordType_upsert-picklistValues.csv'), join(csvFolder, 'myRecordType-picklistValues.csv'))).to.be.true;
@@ -50,7 +50,7 @@ describe('easysources:recordtypes ', function () {
 
     test
         .stdout()
-        .command(['easysources:recordtypes:merge'])
+        .command(['easysources recordtypes merge'])
         .it('runs easysources:recordtypes:merge (2)', async (ctx) => {
                 
             expect(await areFilesEqual(join(resourcesFolder, 'myRecordType_merge2.recordType-meta.xml'), join(recordTypeFolder, 'myRecordType.recordType-meta.xml'))).to.be.true;
@@ -58,7 +58,7 @@ describe('easysources:recordtypes ', function () {
 
     test
         .stdout()
-        .command(['easysources:recordtypes:delete', '-p', 'Picklist A', '-k', 'Entry A 2'])
+        .command(['easysources recordtypes delete', '-p', 'Picklist A', '-k', 'Entry A 2'])
         .it('runs easysources:recordtypes:delete -p "Picklist A" -k "Entry A 2"', async (ctx) => {
                 
             expect(await areFilesEqual(join(resourcesFolder, 'myRecordType_delete-picklistValues.csv'), join(csvFolder, 'myRecordType-picklistValues.csv'))).to.be.true;
@@ -66,7 +66,7 @@ describe('easysources:recordtypes ', function () {
 
     test
         .stdout()
-        .command(['easysources:recordtypes:merge'])
+        .command(['easysources recordtypes merge'])
         .it('runs easysources:recordtypes:merge (3)', async (ctx) => {
                 
             expect(await areFilesEqual(join(resourcesFolder, 'myRecordType_merge3.recordType-meta.xml'), join(recordTypeFolder, 'myRecordType.recordType-meta.xml'))).to.be.true;
@@ -77,7 +77,7 @@ describe('easysources:recordtypes ', function () {
         .do(() => {
             fs.copySync(join(resourcesFolder,'myRecordType_updkeypre-picklistValues.csv'), join(csvFolder, 'myRecordType-picklistValues.csv'));
         })
-        .command(['easysources:recordtypes:updatekey'])
+        .command(['easysources recordtypes updatekey'])
         .it('runs easysources:recordtypes:updatekey',async (ctx) => {
             expect(await areFilesEqual(join(resourcesFolder, 'myRecordType_updkeypost-picklistValues.csv'), join(csvFolder, 'myRecordType-picklistValues.csv'))).to.be.true;
         });

@@ -5,9 +5,8 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import * as os from 'os';
-import { flags, SfdxCommand } from '@salesforce/command';
+import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages } from '@salesforce/core';
-import { AnyJson } from '@salesforce/ts-types';
 import Performance from '../../../utils/performance';
 import { split } from '../../../utils/commands/splitter';
 import { GVSETTRANS_ROOT_TAG, GVSETTRAN_ITEMS, GVSETTRANS_EXTENSION, GVSETTRANS_SUBPATH } from "../../../utils/constants/constants_globalvaluesettranslations";
@@ -21,39 +20,40 @@ Messages.importMessagesDirectory(__dirname);
 // or any library that is using the messages framework can also be loaded this way.
 const messages = Messages.loadMessages('sfdx-easy-sources', 'globalvaluesettranslations_split');
 
-export default class Split extends SfdxCommand {
-    public static description = messages.getMessage('commandDescription');
+export default class Split extends SfCommand<unknown> {
+    public static readonly summary = messages.getMessage('commandDescription');
 
-    public static examples = messages.getMessage('examples').split(os.EOL);
+    public static readonly examples = messages.getMessage('examples').split(os.EOL);
 
 
-    protected static flagsConfig = {
+    public static readonly flags = {
         // flag with a value (-n, --name=VALUE)
-        "sf-xml": flags.string({
+        "sf-xml": Flags.string({
             char: 'x',
-            description: messages.getMessage('sfXmlFlagDescription', [DEFAULT_SFXML_PATH]),
+            summary: messages.getMessage('sfXmlFlagDescription', [DEFAULT_SFXML_PATH]),
         }),
-        "es-csv": flags.string({
+        "es-csv": Flags.string({
             char: 'c',
-            description: messages.getMessage('esCsvFlagDescription', [DEFAULT_ESCSV_PATH]),
+            summary: messages.getMessage('esCsvFlagDescription', [DEFAULT_ESCSV_PATH]),
         }),
-        input: flags.string({
+        input: Flags.string({
             char: 'i',
-            description: messages.getMessage('inputFlagDescription'),
+            summary: messages.getMessage('inputFlagDescription'),
         }),
-        sort: flags.enum({
+        sort: Flags.string({
             char: 'S',
-            description: messages.getMessage('sortFlagDescription', ['false']),
+            summary: messages.getMessage('sortFlagDescription', ['false']),
             options: ['true', 'false'],
             default: 'false',
         }),
     };
 
 
-    public async run(): Promise<AnyJson> {
+    public async run(): Promise<unknown> {
+        const { flags } = await this.parse(Split);
         Performance.getInstance().start();
 
-        var result = await split(this.flags, GVSETTRANS_SUBPATH, GVSETTRANS_EXTENSION, GVSETTRANS_ROOT_TAG, GVSETTRAN_ITEMS);
+        var result = await split(flags, GVSETTRANS_SUBPATH, GVSETTRANS_EXTENSION, GVSETTRANS_ROOT_TAG, GVSETTRAN_ITEMS);
 
         Performance.getInstance().end();
         return result;
@@ -61,6 +61,6 @@ export default class Split extends SfdxCommand {
 }
 
 // Export function for programmatic API
-export async function globalValueSetTranslationSplit(options: any = {}): Promise<AnyJson> {
+export async function globalValueSetTranslationSplit(options: any = {}): Promise<any> {
     return await split(options, GVSETTRANS_SUBPATH, GVSETTRANS_EXTENSION, GVSETTRANS_ROOT_TAG, GVSETTRAN_ITEMS);
 }

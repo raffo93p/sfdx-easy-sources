@@ -4,6 +4,7 @@ SFDX plugin to simplify the management of Salesforce sources, splitting some lon
 
 # [BETA]
 
+> **🚀 From version 1.0.0, this plugin is fully compatible with the `sf` CLI.** All commands now use the space-separated format (e.g., `sf easysources profiles split`). The legacy `sfdx` colon-separated format is no longer supported.
 
 [![Version](https://img.shields.io/npm/v/sfdx-easy-sources.svg)](https://npmjs.org/package/sfdx-easy-sources)
 [![Known Vulnerabilities](https://snyk.io/test/github/raffo93p/sfdx-easy-sources/badge.svg)](https://snyk.io/test/github/raffo93p/sfdx-easy-sources)

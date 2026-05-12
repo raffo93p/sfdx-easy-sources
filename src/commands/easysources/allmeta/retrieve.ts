@@ -5,9 +5,9 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import * as os from 'os';
-import { flags, SfdxCommand } from '@salesforce/command';
+import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages } from '@salesforce/core';
-import { AnyJson } from '@salesforce/ts-types';
+
 import Performance from '../../../utils/performance';
 import { DEFAULT_ESCSV_PATH, DEFAULT_LOG_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants';
 import { join } from "path";
@@ -29,83 +29,84 @@ Messages.importMessagesDirectory(__dirname);
 // or any library that is using the messages framework can also be loaded this way.
 const messages = Messages.loadMessages('sfdx-easy-sources', 'allmeta_retrieve');
 
-export default class Retrieve extends SfdxCommand {
-    public static description = messages.getMessage('commandDescription');
+export default class Retrieve extends SfCommand<unknown> {
+    public static readonly summary = messages.getMessage('commandDescription');
 
-    public static examples = messages.getMessage('examples').split(os.EOL);
+    public static readonly examples = messages.getMessage('examples').split(os.EOL);
 
-    protected static flagsConfig = {
+    public static readonly flags = {
         // flag with a value (-n, --name=VALUE)
-        manifest: flags.string({
+        manifest: Flags.string({
             char: 'm',
-            description: messages.getMessage('manifestFlagDescription', [""]),
+            summary: messages.getMessage('manifestFlagDescription', [""]),
         }),
-        "sf-xml": flags.string({
+        "sf-xml": Flags.string({
             char: 'x',
-            description: messages.getMessage('sfXmlFlagDescription', [DEFAULT_SFXML_PATH]),
+            summary: messages.getMessage('sfXmlFlagDescription', [DEFAULT_SFXML_PATH]),
         }),
-        "es-csv": flags.string({
+        "es-csv": Flags.string({
             char: 'c',
-            description: messages.getMessage('esCsvFlagDescription', [DEFAULT_ESCSV_PATH]),
+            summary: messages.getMessage('esCsvFlagDescription', [DEFAULT_ESCSV_PATH]),
         }),
-        orgname:  flags.string({
+        orgname:  Flags.string({
             char: 'r',
-            description: messages.getMessage('orgFlagDescription', [""]),
+            summary: messages.getMessage('orgFlagDescription', [""]),
             required: true
         }),
-        "dont-retrieve": flags.boolean({
+        "dont-retrieve": Flags.boolean({
             char: 'k',
-            description: messages.getMessage('dontRetrieveFlagDescription', ["false"]),
+            summary: messages.getMessage('dontRetrieveFlagDescription', ["false"]),
             default: false
         }),
-        resnumb: flags.string({
+        resnumb: Flags.string({
             char:  'n',
-            description: messages.getMessage('resnumbFlagDescription', [RESOURCES_MAXNUM]),
+            summary: messages.getMessage('resnumbFlagDescription', [RESOURCES_MAXNUM]),
         }),
-        "log-dir": flags.string({
+        "log-dir": Flags.string({
             char:  'l',
-            description: messages.getMessage('logdirFlagDescription', [DEFAULT_LOG_PATH]),
+            summary: messages.getMessage('logdirFlagDescription', [DEFAULT_LOG_PATH]),
         }),
-        "split-merge": flags.boolean({
+        "split-merge": Flags.boolean({
             char: 't',
-            description: messages.getMessage('splitMergeFlagDescription', ["false"]),
+            summary: messages.getMessage('splitMergeFlagDescription', ["false"]),
             default: false
         }),
-        clean: flags.boolean({
+        clean: Flags.boolean({
             char:  'e',
-            description: messages.getMessage('cleanFlagDescription', ["false"]),
+            summary: messages.getMessage('cleanFlagDescription', ["false"]),
             default: false
         }),
-        sequencial: flags.boolean({
+        sequencial: Flags.boolean({
             char: 's',
-            description: messages.getMessage('sequencialFlagDescription', ["false"]),
+            summary: messages.getMessage('sequencialFlagDescription', ["false"]),
             default: false
         }),
     };
     
-    public async run(): Promise<AnyJson> {
+    public async run(): Promise<unknown> {
+        const { flags } = await this.parse(Retrieve);
         Performance.getInstance().start();
         
         // * STEP 0 - Set variables
 
-        var orgname = this.flags.orgname;
-        var manifest = this.flags.manifest;
+        var orgname = flags.orgname as string;
+        var manifest = flags.manifest as string;
 
         var manifestDir = join( '.', 'manifest') as string;
 
-        var retrieve = !this.flags["dont-retrieve"];
-        var splitmerge = this.flags["split-merge"];
-        var clean = this.flags.clean;
+        var retrieve = !flags["dont-retrieve"];
+        var splitmerge = flags["split-merge"];
+        var clean = flags.clean;
 
-        const resourcesNum = this.flags.resnumb || RESOURCES_MAXNUM;
+        const resourcesNum = flags.resnumb || RESOURCES_MAXNUM;
 
         if (manifest == null && !fs.existsSync(manifestDir)) {
             fs.mkdirSync(manifestDir, { recursive: true });
         }
 
-        const logdir = this.flags['log-dir'] || settings['easysources-log-path'] || DEFAULT_LOG_PATH;
-        const xmldir = this.flags['sf-xml'] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH;
-        const csvdir = this.flags['es-csv'] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH;
+        const logdir = flags['log-dir'] || settings['easysources-log-path'] || DEFAULT_LOG_PATH;
+        const xmldir = flags['sf-xml'] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH;
+        const csvdir = flags['es-csv'] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH;
 
         if (!fs.existsSync(logdir)) {
             fs.mkdirSync(logdir, { recursive: true });
@@ -209,19 +210,19 @@ export default class Retrieve extends SfdxCommand {
         // * STEP 4 - retrieve chunk packages
         if(retrieve) {
             await Promise.all([
-                retrieveChunks(translationChunks, orgname, manifestDir, 'translations', translFiles, logdir),
-                retrieveChunks(customObjectTranslationChunks, orgname, manifestDir, 'customobjtranslations', cotFiles, logdir),
-                retrieveChunks(profileChunks, orgname, manifestDir, 'profiles', profFiles, logdir),
-                retrieveChunks(permsetChunks, orgname, manifestDir, 'permissionsets', permsFiles, logdir),
-                retrieveChunks(typeItemsMapChunks, orgname, manifestDir, null, otherFiles, logdir)
+                retrieveChunks(translationChunks, orgname, manifestDir, 'translations', translFiles, logdir, flags),
+                retrieveChunks(customObjectTranslationChunks, orgname, manifestDir, 'customobjtranslations', cotFiles, logdir, flags),
+                retrieveChunks(profileChunks, orgname, manifestDir, 'profiles', profFiles, logdir, flags),
+                retrieveChunks(permsetChunks, orgname, manifestDir, 'permissionsets', permsFiles, logdir, flags),
+                retrieveChunks(typeItemsMapChunks, orgname, manifestDir, null, otherFiles, logdir, flags)
             ])
             
         }
 
         // * STEP 5 - Split and merge
         if(splitmerge){
-            await bulkExecuteCommands(this.flags, 'split', this.flags.sequencial);
-            await bulkExecuteCommands(this.flags, 'merge', this.flags.sequencial);
+            await bulkExecuteCommands(flags, 'split', flags.sequencial);
+            await bulkExecuteCommands(flags, 'merge', flags.sequencial);
         }
 
         Performance.getInstance().end();
@@ -338,7 +339,7 @@ export async function writeChunkPackages(chunks, baseInputDir, type, counter){
     return filenames;
 }
 
-export async function retrieveChunks(chunks, orgname, baseInputDir, type, filenames, logdir){
+export async function retrieveChunks(chunks, orgname, baseInputDir, type, filenames, logdir, flags){
     var isFirst = true;
     for(var filename of filenames){
 
@@ -346,16 +347,16 @@ export async function retrieveChunks(chunks, orgname, baseInputDir, type, filena
         if(type != null && TYPES_TO_SPLIT.includes(type) && chunks.length > 1){
             if(isFirst){
                 isFirst = false;
-                await executeCommand(this.flags, 'split', type);
+                await executeCommand(flags, 'split', type);
             } else {
-                await executeCommand(this.flags, 'upsert', type);
+                await executeCommand(flags, 'upsert', type);
             }
         }
     }
 
 
     if(type != null && chunks.length > 1){
-        await executeCommand(this.flags, 'merge', type);
+        await executeCommand(flags, 'merge', type);
     }
     
 }

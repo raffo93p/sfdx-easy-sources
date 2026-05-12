@@ -1,4 +1,4 @@
-import { expect, test } from '@salesforce/command/lib/test';
+import { expect, test } from '@oclif/test';
 
 import { join } from 'path';
 import { PERMSETS_DEFAULT_SFXML_PATH } from '../../../../src/utils/constants/constants_permissionsets';
@@ -20,7 +20,7 @@ describe('easysources:permissionsets ', function () {
             fs.mkdirSync(sourceFolder, { recursive: true } );
             fs.copySync(join(resourcesFolder,'myPermSet.permissionset-meta.xml'), join(sourceFolder, 'MyPermSet.permissionset-meta.xml'));
         })
-        .command(['easysources:permissionsets:split'])
+        .command(['easysources permissionsets split'])
         .it('runs easysources:permissionsets:split', async (ctx) => {
             
             expect(fs.existsSync(csvFolder)).to.be.true;
@@ -40,7 +40,7 @@ describe('easysources:permissionsets ', function () {
 
     test
         .stdout()
-        .command(['easysources:permissionsets:merge'])
+        .command(['easysources permissionsets merge'])
         .it('runs easysources:permissionsets:merge (1)', async (ctx) => {
                 
             expect(await areFilesEqual(join(resourcesFolder, 'myPermSet_merge1.permissionset-meta.xml'), join(sourceFolder, 'MyPermSet.permissionset-meta.xml'))).to.be.true;
@@ -52,7 +52,7 @@ describe('easysources:permissionsets ', function () {
         .do(() => {
             fs.copySync(join(resourcesFolder,'myPermSet_upsert.permissionset-meta.xml'), join(sourceFolder, 'MyPermSet.permissionset-meta.xml'));
         })
-        .command(['easysources:permissionsets:upsert'])
+        .command(['easysources permissionsets upsert'])
         .it('runs easysources:permissionsets:upsert', async (ctx) => {
                 
             expect(await areFilesEqual(join(resourcesFolder, 'csvupsert', 'myPermSet-part.xml'), join(csvFolder, 'MyPermSet-part.xml'))).to.be.true;
@@ -71,7 +71,7 @@ describe('easysources:permissionsets ', function () {
 
     test
         .stdout()
-        .command(['easysources:permissionsets:merge'])
+        .command(['easysources permissionsets merge'])
         .it('runs easysources:permissionsets:merge (2)', async (ctx) => {
                 
             expect(await areFilesEqual(join(resourcesFolder, 'myPermSet_merge2.permissionset-meta.xml'), join(sourceFolder, 'MyPermSet.permissionset-meta.xml'))).to.be.true;
@@ -82,14 +82,14 @@ describe('easysources:permissionsets ', function () {
         .do(() => {
             fs.copySync(join(resourcesFolder,'myPermSet_updkeypre-recordTypeVisibilities.csv'), join(csvFolder, 'MyPermSet-recordTypeVisibilities.csv'));
         })
-        .command(['easysources:permissionsets:updatekey'])
+        .command(['easysources permissionsets updatekey'])
         .it('runs easysources:permissionsets:updatekey',async (ctx) => {
             expect(await areFilesEqual(join(resourcesFolder, 'myPermSet_updkeypost-recordTypeVisibilities.csv'), join(csvFolder, 'MyPermSet-recordTypeVisibilities.csv'))).to.be.true;
         });
     
     test
         .stdout()
-        .command(['easysources:permissionsets:delete', '-t', 'classAccesses', '-k', 'Class C'])
+        .command(['easysources permissionsets delete', '-t', 'classAccesses', '-k', 'Class C'])
         .it('runs easysources:permissionsets:delete -t "classAccesses" -k "Class C"', async (ctx) => {
                 
             expect(await areFilesEqual(join(resourcesFolder, 'csvdelete', 'myPermSet-classAccesses.csv'), join(csvFolder, 'MyPermSet-classAccesses.csv'))).to.be.true;
@@ -97,7 +97,7 @@ describe('easysources:permissionsets ', function () {
 
     test
         .stdout()
-        .command(['easysources:permissionsets:delete', '-t', 'fieldPermissions', '-k', 'Object_B__c.Field_A__c'])
+        .command(['easysources permissionsets delete', '-t', 'fieldPermissions', '-k', 'Object_B__c.Field_A__c'])
         .it('runs easysources:permissionsets:delete -t "fieldPermissions" -k "Object_B__c.Field_A__c"', async (ctx) => {
                 
             expect(await areFilesEqual(join(resourcesFolder, 'csvdelete', 'myPermSet-fieldPermissions.csv'), join(csvFolder, 'MyPermSet-fieldPermissions.csv'))).to.be.true;
@@ -105,7 +105,7 @@ describe('easysources:permissionsets ', function () {
 
     test
         .stdout()
-        .command(['easysources:permissionsets:merge'])
+        .command(['easysources permissionsets merge'])
         .it('runs easysources:permissionsets:merge (3)', async (ctx) => {
                 
             expect(await areFilesEqual(join(resourcesFolder, 'myPermSet_merge3.permissionset-meta.xml'), join(sourceFolder, 'MyPermSet.permissionset-meta.xml'))).to.be.true;
@@ -113,14 +113,14 @@ describe('easysources:permissionsets ', function () {
 
     test
         .stdout()
-        .command(['easysources:permissionsets:arealigned', '-i', 'MyPermSet', '--mode', 'logic'])
+        .command(['easysources permissionsets arealigned', '-i', 'MyPermSet', '--mode', 'logic'])
         .it('runs easysources:permissionsets:arealigned with logic mode', async (ctx) => {
             expect(ctx.stdout).to.contain('1 aligned');
         });
 
     test
         .stdout()
-        .command(['easysources:permissionsets:arealigned', '-i', 'MyPermSet', '--mode', 'string'])
+        .command(['easysources permissionsets arealigned', '-i', 'MyPermSet', '--mode', 'string'])
         .it('runs easysources:permissionsets:arealigned with string mode', async (ctx) => {
             expect(ctx.stdout).to.contain('1 aligned');
         });

@@ -5,9 +5,8 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import * as os from 'os';
-import { flags, SfdxCommand } from '@salesforce/command';
+import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages } from '@salesforce/core';
-import { AnyJson } from '@salesforce/ts-types';
 import Performance from '../../../utils/performance';
 import { updatekey } from "../../../utils/commands/keyupdater";
 import { TRANSLATION_ITEMS, TRANSLATIONS_SUBPATH } from '../../../utils/constants/constants_translations';
@@ -20,35 +19,36 @@ Messages.importMessagesDirectory(__dirname);
 // or any library that is using the messages framework can also be loaded this way.
 const messages = Messages.loadMessages('sfdx-easy-sources', 'translations_updatekey');
 
-export default class UpdateKey extends SfdxCommand {
-    public static description = messages.getMessage('commandDescription');
+export default class UpdateKey extends SfCommand<unknown> {
+    public static readonly summary = messages.getMessage('commandDescription');
 
-    public static examples = messages.getMessage('examples').split(os.EOL);
+    public static readonly examples = messages.getMessage('examples').split(os.EOL);
 
 
-    protected static flagsConfig = {
+    public static readonly flags = {
         // flag with a value (-n, --name=VALUE)
-        "es-csv": flags.string({
+        "es-csv": Flags.string({
             char: 'c',
-            description: messages.getMessage('esCsvFlagDescription', [DEFAULT_ESCSV_PATH]),
+            summary: messages.getMessage('esCsvFlagDescription', [DEFAULT_ESCSV_PATH]),
         }),
-        input: flags.string({
+        input: Flags.string({
             char: 'i',
-            description: messages.getMessage('inputFlagDescription'),
+            summary: messages.getMessage('inputFlagDescription'),
         }),
-        sort: flags.enum({
+        sort: Flags.string({
             char: 'S',
-            description: messages.getMessage('sortFlagDescription', ['true']),
+            summary: messages.getMessage('sortFlagDescription', ['true']),
             options: ['true', 'false'],
             default: 'true',
         }),
     };
 
 
-    public async run(): Promise<AnyJson> {
+    public async run(): Promise<unknown> {
+        const { flags } = await this.parse(UpdateKey);
         Performance.getInstance().start();
 
-        var result = await translationUpdateKey(this.flags);
+        var result = await translationUpdateKey(flags);
 
         Performance.getInstance().end();
         return result;
@@ -56,6 +56,6 @@ export default class UpdateKey extends SfdxCommand {
 }
 
 // Export function for programmatic API
-export async function translationUpdateKey(options: any = {}): Promise<AnyJson> {
+export async function translationUpdateKey(options: any = {}): Promise<any> {
     return await updatekey(options, TRANSLATIONS_SUBPATH, TRANSLATION_ITEMS);
 }

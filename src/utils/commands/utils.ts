@@ -17,19 +17,19 @@ import { globalValueSets } from '../../api/globalvaluesets';
 import { applications } from '../../api/applications';
 
 export async function retrieveAllMetadataPackageOrg(orgname, manifestDir){
-	var cmdString = SF_CMD + ' ' + MANIFEST_CREATE_CMD + ' --fromorg ' + orgname + ' --manifestname='+DEFAULT_PACKAGE_ORG+' --outputdir=' + manifestDir + " -c unlocked managed";
+	var cmdString = SF_CMD + ' ' + MANIFEST_CREATE_CMD + ' --from-org ' + orgname + ' --name='+DEFAULT_PACKAGE_ORG+' --output-dir=' + manifestDir + " -c unlocked managed";
 	console.log(cmdString);
 	await exec(cmdString);
 }
 
 export async function retrieveAllMetadataPackageLocal(srcDir, manifestDir){
-	var cmdString = SF_CMD + ' ' + MANIFEST_CREATE_CMD + ' --sourcepath=' + srcDir + ' --manifestname=' +DEFAULT_PACKAGE_LOC + ' --outputdir=' + manifestDir;
+	var cmdString = SF_CMD + ' ' + MANIFEST_CREATE_CMD + ' --source-dir=' + srcDir + ' --name=' +DEFAULT_PACKAGE_LOC + ' --output-dir=' + manifestDir;
 	console.log(cmdString);
 	await exec(cmdString);
 }
 
 export async function retrievePackage(orgname, baseDir, filename, logdir){
-	var cmdString = SF_CMD + ' ' + SOURCE_RETRIEVE_CMD + ' --targetusername ' + orgname + ' --manifest '+join(baseDir, filename);
+	var cmdString = SF_CMD + ' ' + SOURCE_RETRIEVE_CMD + ' --target-org ' + orgname + ' --manifest '+join(baseDir, filename);
 	console.log(cmdString+'...');
 	
 	const logFilename = 'retrieve_' + filename.substring(0, filename.indexOf('.')) + '.log';
@@ -66,7 +66,7 @@ export async function retrievePackage(orgname, baseDir, filename, logdir){
 }
 
 export async function executeCommand(flags, cmd, mdt) {
-	var cmdString = SF_CMD + ' easysources:' + mdt + ':' + cmd + ' --sf-xml ' + (flags['sf-xml'] || DEFAULT_SFXML_PATH) + ' --es-csv ' + (flags['es-csv'] || DEFAULT_ESCSV_PATH);
+	var cmdString = SF_CMD + ' easysources ' + mdt + ' ' + cmd + ' --sf-xml ' + (flags['sf-xml'] || DEFAULT_SFXML_PATH) + ' --es-csv ' + (flags['es-csv'] || DEFAULT_ESCSV_PATH);
 	console.log(cmdString+'...');
 
 	let p = child.spawn(cmdString, { shell: true});

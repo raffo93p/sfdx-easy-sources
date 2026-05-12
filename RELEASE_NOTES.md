@@ -1,5 +1,15 @@
 # Release Notes
 
+## Version 1.0.0
+- **BREAKING: Full upgrade to `sf` CLI framework** - The plugin has been completely migrated from the legacy `sfdx` (`@salesforce/command` / `SfdxCommand`) architecture to the modern `sf` (`@salesforce/sf-plugins-core` / `SfCommand`) architecture. This means:
+  - All commands now use the `sf` space-separated topic format: `sf easysources profiles split` (instead of `sfdx easysources:profiles:split`)
+  - Dependencies updated: `@salesforce/sf-plugins-core@^5`, `@salesforce/core@^6`, `@oclif/core@^3`, `typescript@^5`
+  - Removed deprecated `@salesforce/command` dependency
+  - Minimum Node.js version raised to 18
+  - All flags now use the `sf`-standard `--flag-name` format
+  - Test framework migrated from `@salesforce/command/lib/test` to `@oclif/test`
+  - Internal sf CLI commands updated to new syntax (`project generate manifest`, `project retrieve start`, `org display`)
+
 ## Version 0.9.8
 - **Enhancement: Improved `--content` parameter parsing for `customupsert` command** - The `--content` flag for both `profiles:customupsert` and `permissionsets:customupsert` now correctly handles cases where the shell strips double quotes from the JSON string. This issue is common on Windows PowerShell, where passing a JSON argument results in unquoted keys and values (e.g., `{apexClass:MyClass,enabled:true}` instead of `{"apexClass":"MyClass","enabled":"true"}`). The command now attempts standard JSON parsing first, and if that fails, falls back to a lenient parser that reconstructs the JSON object from the unquoted format.
 

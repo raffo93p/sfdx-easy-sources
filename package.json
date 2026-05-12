@@ -1,15 +1,15 @@
 {
   "name": "sfdx-easy-sources",
   "description": "This plugin provides tools to simplify Salesforce sources",
-  "version": "0.9.8",
+  "version": "1.0.0",
   "author": "Raffaele Prudenzano @raffo93p",
   "bugs": "https://github.com/raffo93p/sfdx-easy-sources/issues",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "dependencies": {
-    "@oclif/core": "^1",
-    "@salesforce/command": "^5",
-    "@salesforce/core": "^3",
+    "@oclif/core": "^3.27.0",
+    "@salesforce/core": "^6.7.6",
+    "@salesforce/sf-plugins-core": "^5.0.13",
     "csv": "^6.2.1",
     "csvtojson": "^2.0.10",
     "dottie": "^2.0.2",
@@ -22,31 +22,28 @@
     "xml2js": "^0.4.23"
   },
   "devDependencies": {
-    "@istanbuljs/nyc-config-typescript": "^1.0.2",
-    "@oclif/test": "^2",
+    "@oclif/test": "^3",
     "@salesforce/ts-sinon": "^1",
     "@types/chai": "^4",
-    "@types/mocha": "^8",
-    "@typescript-eslint/eslint-plugin": "^4",
-    "@typescript-eslint/parser": "^4",
+    "@types/mocha": "^10",
+    "@types/node": "^18",
+    "@typescript-eslint/eslint-plugin": "^6",
+    "@typescript-eslint/parser": "^6",
     "chai": "^4",
-    "eslint": "^7",
-    "eslint-config-prettier": "^8",
-    "eslint-plugin-header": "^3",
+    "eslint": "^8",
+    "eslint-config-prettier": "^9",
     "eslint-plugin-import": "^2",
-    "eslint-plugin-jsdoc": "^35",
-    "eslint-plugin-prettier": "^3",
-    "eslint-plugin-typescript": "^0",
-    "mocha": "^9",
+    "eslint-plugin-prettier": "^5",
+    "mocha": "^10",
     "nyc": "^15.1.0",
-    "oclif": "^3",
-    "prettier": "^2",
-    "sinon": "10.0.0",
+    "oclif": "^4.23.0",
+    "prettier": "^3",
+    "sinon": "^15",
     "ts-node": "^10",
-    "typescript": "4"
+    "typescript": "^5"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=18.0.0"
   },
   "files": [
     "/lib",
@@ -56,15 +53,16 @@
   ],
   "homepage": "https://github.com/raffo93p/sfdx-easy-sources",
   "keywords": [
-    "sfdx-plugin"
+    "sf-plugin"
   ],
   "license": "MIT",
   "oclif": {
     "commands": "./lib/commands",
-    "bin": "sfdx",
+    "bin": "sf",
+    "topicSeparator": " ",
     "topics": {
-      "hello": {
-        "description": "Commands to say hello."
+      "easysources": {
+        "description": "Commands to simplify Salesforce sources."
       }
     }
   },
@@ -75,12 +73,11 @@
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "eslint src/**/*.ts test/**/*.ts",
     "prepack": "rm -rf lib && tsc -b && oclif manifest && oclif readme",
-    "test": "rm -rf test_tmp && mkdir test_tmp && pwd && cp test/resources/easysources-settings.json test_tmp && cd test_tmp && nyc --extension .ts --require ts-node/register mocha --forbid-only \"../test/**/*.test.ts\"",
+    "test": "rm -rf test_tmp && mkdir test_tmp && pwd && cp test/resources/easysources-settings.json test_tmp && cd test_tmp && nyc --extension .ts --require ts-node/register mocha --require ../test/setup.ts --forbid-only \"../test/**/*.test.ts\"; EXIT=$?; cd ..; rm -rf test_tmp; exit $EXIT",
     "version": "oclif readme && git add README.md",
     "link": "npm install && npm run build && sf plugins link"
   },
   "nyc": {
-    "extends": "@istanbuljs/nyc-config-typescript",
     "check-coverage": true,
     "all": true,
     "include": [

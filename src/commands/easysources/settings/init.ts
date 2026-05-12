@@ -5,9 +5,8 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import * as os from 'os';
-import { SfdxCommand } from '@salesforce/command';
+import { SfCommand } from '@salesforce/sf-plugins-core';
 import { Messages } from '@salesforce/core';
-import { AnyJson } from '@salesforce/ts-types';
 const fs = require('fs-extra');
 import { SETTINGS_PATH } from '../../../utils/constants/constants';
 import { initSettings } from '../../../utils/localSettings';
@@ -19,19 +18,17 @@ Messages.importMessagesDirectory(__dirname);
 // or any library that is using the messages framework can also be loaded this way.
 const messages = Messages.loadMessages('sfdx-easy-sources', 'settings_init');
 
-export default class Init extends SfdxCommand {
-    public static description = messages.getMessage('commandDescription');
+export default class Init extends SfCommand<unknown> {
+    public static readonly summary = messages.getMessage('commandDescription');
 
-    public static examples = messages.getMessage('examples').split(os.EOL);
+    public static readonly examples = messages.getMessage('examples').split(os.EOL);
 
-    public static args = [{ name: 'file' }];
-
-    protected static flagsConfig = {
+    public static readonly flags = {
         // flag with a value (-n, --name=VALUE)
         
     };
 
-    public async run(): Promise<AnyJson> {
+    public async run(): Promise<unknown> {
 
         const settings = initSettings();
         fs.writeFileSync(SETTINGS_PATH, JSON.stringify(settings, null, 4));

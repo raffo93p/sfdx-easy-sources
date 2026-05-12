@@ -1,4 +1,4 @@
-import { expect, test } from '@salesforce/command/lib/test';
+import { expect, test } from '@oclif/test';
 
 import { join } from 'path';
 import { LABELS_DEFAULT_SFXML_PATH } from '../../../../src/utils/constants/constants_labels';
@@ -20,7 +20,7 @@ describe('easysources:labels ', function () {
             fs.mkdirSync(sourceFolder, { recursive: true } );
             fs.copySync(join(resourcesFolder,'myLabels.labels-meta.xml'), join(sourceFolder, 'CustomLabels.labels-meta.xml'));
         })
-        .command(['easysources:labels:split'])
+        .command(['easysources labels split'])
         .it('runs easysources:labels:split', async (ctx) => {
 
             expect(fs.existsSync(csvFolder)).to.be.true;
@@ -30,7 +30,7 @@ describe('easysources:labels ', function () {
 
     test
         .stdout()
-        .command(['easysources:labels:merge'])
+        .command(['easysources labels merge'])
         .it('runs easysources:labels:merge (1)', async (ctx) => {
                 
             expect(await areFilesEqual(join(resourcesFolder, 'myLabels_merge1.labels-meta.xml'), join(sourceFolder, 'CustomLabels.labels-meta.xml'))).to.be.true;
@@ -41,7 +41,7 @@ describe('easysources:labels ', function () {
         .do(() => {
             fs.copySync(join(resourcesFolder,'myLabels_upsert.labels-meta.xml'), join(sourceFolder, 'CustomLabels.labels-meta.xml'));
         })
-        .command(['easysources:labels:upsert'])
+        .command(['easysources labels upsert'])
         .it('runs easysources:labels:upsert', async (ctx) => {
                 
                 expect(await areFilesEqual(join(resourcesFolder, 'myLabels_upsert-labels.csv'), join(csvFolder, 'CustomLabels-labels.csv'))).to.be.true;
@@ -50,7 +50,7 @@ describe('easysources:labels ', function () {
 
     test
         .stdout()
-        .command(['easysources:labels:merge'])
+        .command(['easysources labels merge'])
         .it('runs easysources:labels:merge (2)', async (ctx) => {
                 
             expect(await areFilesEqual(join(resourcesFolder, 'myLabels_merge2.labels-meta.xml'), join(sourceFolder, 'CustomLabels.labels-meta.xml'))).to.be.true;
@@ -58,14 +58,14 @@ describe('easysources:labels ', function () {
 
     test
         .stdout()
-        .command(['easysources:labels:arealigned', '--mode', 'logic'])
+        .command(['easysources labels arealigned', '--mode', 'logic'])
         .it('runs easysources:labels:arealigned with logic mode', async (ctx) => {
             expect(ctx.stdout).to.contain('1 aligned');
         });
 
     test
         .stdout()
-        .command(['easysources:labels:arealigned', '--mode', 'string'])
+        .command(['easysources labels arealigned', '--mode', 'string'])
         .it('runs easysources:labels:arealigned with string mode', async (ctx) => {
             expect(ctx.stdout).to.contain('1 aligned');
         });
@@ -75,7 +75,7 @@ describe('easysources:labels ', function () {
         .do(() => {
             fs.copySync(join(resourcesFolder,'myLabels_updkeypre-labels.csv'), join(csvFolder, 'CustomLabels-labels.csv'));
         })
-        .command(['easysources:labels:updatekey'])
+        .command(['easysources labels updatekey'])
         .it('runs easysources:labels:updatekey',async (ctx) => {
             expect(await areFilesEqual(join(resourcesFolder, 'myLabels_updkeypost-labels.csv'), join(csvFolder, 'CustomLabels-labels.csv'))).to.be.true;
         });

@@ -1,4 +1,4 @@
-import { expect, test } from '@salesforce/command/lib/test';
+import { expect, test } from '@oclif/test';
 
 import { join } from 'path';
 import { APPLICATIONS_DEFAULT_SFXML_PATH } from '../../../../src/utils/constants/constants_applications';
@@ -20,7 +20,7 @@ describe('easysources:applications ', function () {
             fs.mkdirSync(sourceFolder, { recursive: true } );
             fs.copySync(join(resourcesFolder,'myApplication.app-meta.xml'), join(sourceFolder, 'MyApplication.app-meta.xml'));
         })
-        .command(['easysources:applications:split'])
+        .command(['easysources applications split'])
         .it('runs easysources:applications:split', async (ctx) => {
 
             expect(fs.existsSync(csvFolder)).to.be.true;
@@ -29,7 +29,7 @@ describe('easysources:applications ', function () {
         });
     test
         .stdout()
-        .command(['easysources:applications:merge'])
+        .command(['easysources applications merge'])
         .it('runs easysources:applications:merge (1)', async (ctx) => {
                 
             expect(await areFilesEqual(join(resourcesFolder, 'myApplication_merge1.app-meta.xml'), join(sourceFolder, 'MyApplication.app-meta.xml'))).to.be.true;
@@ -40,7 +40,7 @@ describe('easysources:applications ', function () {
         .do(() => {
             fs.copySync(join(resourcesFolder,'myApplication_upsert.app-meta.xml'), join(sourceFolder, 'MyApplication.app-meta.xml'));
         })
-        .command(['easysources:applications:upsert'])
+        .command(['easysources applications upsert'])
         .it('runs easysources:applications:upsert', async (ctx) => {
                 
                 expect(await areFilesEqual(join(resourcesFolder, 'myApplication_upsert-profileActionOverrides.csv'), join(csvFolder, 'MyApplication-profileActionOverrides.csv'))).to.be.true;
@@ -49,7 +49,7 @@ describe('easysources:applications ', function () {
 
     test
         .stdout()
-        .command(['easysources:applications:merge'])
+        .command(['easysources applications merge'])
         .it('runs easysources:applications:merge (2)', async (ctx) => {
                 
             expect(await areFilesEqual(join(resourcesFolder, 'myApplication_merge2.app-meta.xml'), join(sourceFolder, 'MyApplication.app-meta.xml'))).to.be.true;
@@ -57,14 +57,14 @@ describe('easysources:applications ', function () {
 
     test
         .stdout()
-        .command(['easysources:applications:arealigned', '-i', 'MyApplication', '--mode', 'logic'])
+        .command(['easysources applications arealigned', '-i', 'MyApplication', '--mode', 'logic'])
         .it('runs easysources:applications:arealigned with logic mode', async (ctx) => {
             expect(ctx.stdout).to.contain('1 aligned');
         });
 
     test
         .stdout()
-        .command(['easysources:applications:arealigned', '-i', 'MyApplication', '--mode', 'string'])
+        .command(['easysources applications arealigned', '-i', 'MyApplication', '--mode', 'string'])
         .it('runs easysources:applications:arealigned with string mode', async (ctx) => {
             expect(ctx.stdout).to.contain('1 aligned');
         });
@@ -74,7 +74,7 @@ describe('easysources:applications ', function () {
         .do(() => {
             fs.copySync(join(resourcesFolder,'myApplication_updkeypre-profileActionOverrides.csv'), join(csvFolder, 'MyApplication-profileActionOverrides.csv'));
         })
-        .command(['easysources:applications:updatekey'])
+        .command(['easysources applications updatekey'])
         .it('runs easysources:applications:updatekey',async (ctx) => {
             expect(await areFilesEqual(join(resourcesFolder, 'myApplication_updkeypost-profileActionOverrides.csv'), join(csvFolder, 'MyApplication-profileActionOverrides.csv'))).to.be.true;
         });

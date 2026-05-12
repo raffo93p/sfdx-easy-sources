@@ -1,4 +1,4 @@
-import { expect, test } from '@salesforce/command/lib/test';
+import { expect, test } from '@oclif/test';
 import { SETTINGS_PATH } from "../../../../src/utils/constants/constants";
 
 const fs = require('fs-extra');
@@ -13,7 +13,7 @@ describe('easysources:settings:init', function () {
             expect(fs.existsSync(SETTINGS_PATH)).to.be.false;
         })
         .stdout()
-        .command(['easysources:settings:init'])
+        .command(['easysources settings init'])
         .it('runs easysources:settings:init', (ctx) => {
             const settings = JSON.parse(fs.readFileSync(SETTINGS_PATH));
             expect(settings).to.have.property("salesforce-xml-path");

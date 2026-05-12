@@ -5,9 +5,8 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import * as os from 'os';
-import { flags, SfdxCommand } from '@salesforce/command';
+import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages } from '@salesforce/core';
-import { AnyJson } from '@salesforce/ts-types';
 import { calcCsvFilename, readCsvToJsonArray } from '../../../utils/filesUtils'
 import { generateTagId, sortByKey } from '../../../utils/utils'
 import { DEFAULT_ESCSV_PATH } from '../../../utils/constants/constants';
@@ -28,38 +27,39 @@ Messages.importMessagesDirectory(__dirname);
 // or any library that is using the messages framework can also be loaded this way.
 const messages = Messages.loadMessages('sfdx-easy-sources', 'recordtypes_updatekey');
 
-export default class UpdateKey extends SfdxCommand {
-    public static description = messages.getMessage('commandDescription');
+export default class UpdateKey extends SfCommand<unknown> {
+    public static readonly summary = messages.getMessage('commandDescription');
 
-    public static examples = messages.getMessage('examples').split(os.EOL);
+    public static readonly examples = messages.getMessage('examples').split(os.EOL);
 
-    protected static flagsConfig = {
+    public static readonly flags = {
         // flag with a value (-n, --name=VALUE)
-        "es-csv": flags.string({
+        "es-csv": Flags.string({
             char: 'c',
-            description: messages.getMessage('esCsvFlagDescription', [DEFAULT_ESCSV_PATH]),
+            summary: messages.getMessage('esCsvFlagDescription', [DEFAULT_ESCSV_PATH]),
         }),
-        object: flags.string({
+        object: Flags.string({
             char: 's',
-            description: messages.getMessage('objectFlagDescription'),
+            summary: messages.getMessage('objectFlagDescription'),
         }),
-        recordtype: flags.string({
+        recordtype: Flags.string({
             char: 'r',
-            description: messages.getMessage('recordtypeFlagDescription'),
+            summary: messages.getMessage('recordtypeFlagDescription'),
         }),
-        sort: flags.enum({
+        sort: Flags.string({
             char: 'S',
-            description: messages.getMessage('sortFlagDescription', ['true']),
+            summary: messages.getMessage('sortFlagDescription', ['true']),
             options: ['true', 'false'],
             default: 'true',
         }),
     };
 
 
-    public async run(): Promise<AnyJson> {
+    public async run(): Promise<unknown> {
+        const { flags } = await this.parse(UpdateKey);
         Performance.getInstance().start();
         
-        const result = await recordTypeUpdateKey(this.flags);
+        const result = await recordTypeUpdateKey(flags);
 
         Performance.getInstance().end();
 
@@ -68,7 +68,7 @@ export default class UpdateKey extends SfdxCommand {
 }
 
 // Export function for API usage
-export async function recordTypeUpdateKey(options: any = {}): Promise<AnyJson> {
+export async function recordTypeUpdateKey(options: any = {}): Promise<any> {
     const csvWriter = new CsvWriter();
     const baseInputDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), RECORDTYPES_SUBPATH) as string;
     const inputObject = (options.object) as string;

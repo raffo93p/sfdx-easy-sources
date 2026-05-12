@@ -5,9 +5,9 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import * as os from 'os';
-import { flags, SfdxCommand } from '@salesforce/command';
+import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages } from '@salesforce/core';
-import { AnyJson } from '@salesforce/ts-types';
+
 import { PROFILE_ITEMS, PROFILES_EXTENSION, PROFILES_ROOT_TAG, PROFILES_SUBPATH } from '../../../utils/constants/constants_profiles';
 import Performance from '../../../utils/performance';
 import { split } from '../../../utils/commands/splitter';
@@ -21,45 +21,46 @@ Messages.importMessagesDirectory(__dirname);
 // or any library that is using the messages framework can also be loaded this way.
 const messages = Messages.loadMessages('sfdx-easy-sources', 'profiles_split');
 
-export default class Split extends SfdxCommand {
-    public static description = messages.getMessage('commandDescription');
+export default class Split extends SfCommand<unknown> {
+    public static readonly summary = messages.getMessage('commandDescription');
 
-    public static examples = messages.getMessage('examples').split(os.EOL);
+    public static readonly examples = messages.getMessage('examples').split(os.EOL);
 
 
-    protected static flagsConfig = {
+    public static readonly flags = {
         // flag with a value (-n, --name=VALUE)
-        "sf-xml": flags.string({
+        "sf-xml": Flags.string({
             char: 'x',
-            description: messages.getMessage('sfXmlFlagDescription', [DEFAULT_SFXML_PATH]),
+            summary: messages.getMessage('sfXmlFlagDescription', [DEFAULT_SFXML_PATH]),
         }),
-        "es-csv": flags.string({
+        "es-csv": Flags.string({
             char: 'c',
-            description: messages.getMessage('esCsvFlagDescription', [DEFAULT_ESCSV_PATH]),
+            summary: messages.getMessage('esCsvFlagDescription', [DEFAULT_ESCSV_PATH]),
         }),
-        input: flags.string({
+        input: Flags.string({
             char: 'i',
-            description: messages.getMessage('inputFlagDescription'),
+            summary: messages.getMessage('inputFlagDescription'),
         }),
-        sort: flags.enum({
+        sort: Flags.string({
             char: 'S',
-            description: messages.getMessage('sortFlagDescription', ['true']),
+            summary: messages.getMessage('sortFlagDescription', ['true']),
             options: ['true', 'false'],
             default: 'true',
         }),
-        ignoreuserperm: flags.enum({
+        ignoreuserperm: Flags.string({
             char: 'u',
-            description: messages.getMessage('ignoreuserpermFlagDescription', ['false']),
+            summary: messages.getMessage('ignoreuserpermFlagDescription', ['false']),
             options: ['true', 'false'],
             default: 'false',
         }),
     };
 
 
-    public async run(): Promise<AnyJson> {
+    public async run(): Promise<unknown> {
+        const { flags } = await this.parse(Split);
         Performance.getInstance().start();
 
-        var result = await profileSplit(this.flags);
+        var result = await profileSplit(flags);
 
         Performance.getInstance().end();
         return result;

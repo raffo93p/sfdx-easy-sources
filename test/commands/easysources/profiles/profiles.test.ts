@@ -1,4 +1,4 @@
-import { expect, test } from '@salesforce/command/lib/test';
+import { expect, test } from '@oclif/test';
 
 import { join } from 'path';
 import { PROFILES_DEFAULT_SFXML_PATH } from '../../../../src/utils/constants/constants_profiles';
@@ -20,7 +20,7 @@ describe('easysources:profiles ', function () {
             fs.mkdirSync(sourceFolder, { recursive: true } );
             fs.copySync(join(resourcesFolder,'myProfile.profile-meta.xml'), join(sourceFolder, 'MyProfile.profile-meta.xml'));
         })
-        .command(['easysources:profiles:split'])
+        .command(['easysources profiles split'])
         .it('runs easysources:profiles:split', async (ctx) => {
 
             expect(fs.existsSync(csvFolder)).to.be.true;
@@ -40,7 +40,7 @@ describe('easysources:profiles ', function () {
 
     test
         .stdout()
-        .command(['easysources:profiles:merge'])
+        .command(['easysources profiles merge'])
         .it('runs easysources:profiles:merge (1)', async (ctx) => {
                 
             expect(await areFilesEqual(join(resourcesFolder, 'myProfile_merge1.profile-meta.xml'), join(sourceFolder, 'MyProfile.profile-meta.xml'))).to.be.true;
@@ -52,7 +52,7 @@ describe('easysources:profiles ', function () {
         .do(() => {
             fs.copySync(join(resourcesFolder,'myProfile_upsert.profile-meta.xml'), join(sourceFolder, 'MyProfile.profile-meta.xml'));
         })
-        .command(['easysources:profiles:upsert'])
+        .command(['easysources profiles upsert'])
         .it('runs easysources:profiles:upsert', async (ctx) => {
                 
             expect(await areFilesEqual(join(resourcesFolder, 'csvupsert', 'myProfile-part.xml'), join(csvFolder, 'MyProfile-part.xml'))).to.be.true;
@@ -71,7 +71,7 @@ describe('easysources:profiles ', function () {
 
     test
         .stdout()
-        .command(['easysources:profiles:merge'])
+        .command(['easysources profiles merge'])
         .it('runs easysources:profiles:merge (2)', async (ctx) => {
                 
             expect(await areFilesEqual(join(resourcesFolder, 'myProfile_merge2.profile-meta.xml'), join(sourceFolder, 'MyProfile.profile-meta.xml'))).to.be.true;
@@ -82,14 +82,14 @@ describe('easysources:profiles ', function () {
         .do(() => {
             fs.copySync(join(resourcesFolder,'myProfile_updkeypre-layoutAssignments.csv'), join(csvFolder, 'MyProfile-layoutAssignments.csv'));
         })
-        .command(['easysources:profiles:updatekey'])
+        .command(['easysources profiles updatekey'])
         .it('runs easysources:profiles:updatekey',async (ctx) => {
             expect(await areFilesEqual(join(resourcesFolder, 'myProfile_updkeypost-layoutAssignments.csv'), join(csvFolder, 'MyProfile-layoutAssignments.csv'))).to.be.true;
         });
     
     test
         .stdout()
-        .command(['easysources:profiles:delete', '-t', 'classAccesses', '-k', 'Class C'])
+        .command(['easysources profiles delete', '-t', 'classAccesses', '-k', 'Class C'])
         .it('runs easysources:profiles:delete -t "classAccesses" -k "Class C"', async (ctx) => {
                 
             expect(await areFilesEqual(join(resourcesFolder, 'csvdelete', 'myProfile-classAccesses.csv'), join(csvFolder, 'MyProfile-classAccesses.csv'))).to.be.true;
@@ -97,7 +97,7 @@ describe('easysources:profiles ', function () {
 
     test
         .stdout()
-        .command(['easysources:profiles:delete', '-t', 'fieldPermissions', '-k', 'Object_B__c.Field_A__c'])
+        .command(['easysources profiles delete', '-t', 'fieldPermissions', '-k', 'Object_B__c.Field_A__c'])
         .it('runs easysources:profiles:delete -t "fieldPermissions" -k "Object_B__c.Field_A__c"', async (ctx) => {
                 
             expect(await areFilesEqual(join(resourcesFolder, 'csvdelete', 'myProfile-fieldPermissions.csv'), join(csvFolder, 'MyProfile-fieldPermissions.csv'))).to.be.true;
@@ -105,7 +105,7 @@ describe('easysources:profiles ', function () {
 
     test
         .stdout()
-        .command(['easysources:profiles:merge'])
+        .command(['easysources profiles merge'])
         .it('runs easysources:profiles:merge (3)', async (ctx) => {
                 
             expect(await areFilesEqual(join(resourcesFolder, 'myProfile_merge3.profile-meta.xml'), join(sourceFolder, 'MyProfile.profile-meta.xml'))).to.be.true;
@@ -113,14 +113,14 @@ describe('easysources:profiles ', function () {
 
     test
         .stdout()
-        .command(['easysources:profiles:arealigned', '-i', 'MyProfile', '--mode', 'logic'])
+        .command(['easysources profiles arealigned', '-i', 'MyProfile', '--mode', 'logic'])
         .it('runs easysources:profiles:arealigned with logic mode', async (ctx) => {
             expect(ctx.stdout).to.contain('1 aligned');
         });
 
     test
         .stdout()
-        .command(['easysources:profiles:arealigned', '-i', 'MyProfile', '--mode', 'string'])
+        .command(['easysources profiles arealigned', '-i', 'MyProfile', '--mode', 'string'])
         .it('runs easysources:profiles:arealigned with string mode', async (ctx) => {
             expect(ctx.stdout).to.contain('1 aligned');
         });

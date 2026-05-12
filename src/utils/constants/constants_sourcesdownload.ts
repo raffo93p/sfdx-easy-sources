@@ -9,9 +9,9 @@ export const TYPES_PICKVAL_ROOT = 'types';
 export const TYPES_PICKVAL_HEADER = ['picklist', 'values_fullName', 'values_default'];
 export const TYPES_PICKVAL_KEY = ['picklist', 'values_fullName'];
 
-export const MANIFEST_CREATE_CMD = 'force source manifest create';
-export const SOURCE_RETRIEVE_CMD = 'force source retrieve';
-export const ORG_DISPLAY_CMD = 'force org display';
+export const MANIFEST_CREATE_CMD = 'project generate manifest';
+export const SOURCE_RETRIEVE_CMD = 'project retrieve start';
+export const ORG_DISPLAY_CMD = 'org display';
 
 export const RESOURCES_MAXNUM = 8000;
 

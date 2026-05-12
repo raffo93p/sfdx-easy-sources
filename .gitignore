@@ -9,3 +9,5 @@ node_modules
 /assets
 /coverage
 /test_tmp
+/oclif.manifest.json
+*.tsbuildinfo
