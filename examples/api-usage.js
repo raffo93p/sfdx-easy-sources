@@ -6,13 +6,12 @@
  */
 
 // Import all API namespaces
-// When using as an installed package, use: require('sfdx-easy-sources')
+// When using as an installed package, use: import { profiles, ... } from 'sfdx-easy-sources'
 // When running from the project directory, use the relative path:
-const {
+import {
     profiles, permissionSets, labels, applications, 
     globalValueSets, globalValueSetTranslations, translations, recordTypes,
-    PathOptions, resolvePaths
-} = require('../lib');
+} from '../lib/index.js';
 
 
 
@@ -33,7 +32,7 @@ async function main() {
                 input: 'Admin',
                 ignoreuserperm: 'true'
             });
-            console.log('✓ Result:', splitResult.outputString);
+            console.log('✓ Result:', splitResult.result);
         } catch (error) {
             console.log('⚠ Expected error (no profiles directory):', error.message || 'Input folder does not exist');
             console.log('  → In a real project, this would split your profile XML files into CSV files');
@@ -47,7 +46,7 @@ async function main() {
                 'sf-xml': './custom-source-path', // Override this path
                 ignoreuserperm: 'false'          // Use settings for 'es-csv' path
             });
-            console.log('✓ Result:', upsertResult.outputString);
+            console.log('✓ Result:', upsertResult.result);
         } catch (error) {
             console.log('⚠ Expected error (no profiles directory):', error.message || 'Input folder does not exist');
             console.log('  → Upserts new XML data into existing CSV files');
@@ -73,7 +72,7 @@ async function main() {
             const minifyResult = await profiles.minify({
                 input: 'Admin'
             });
-            console.log('✓ Result:', minifyResult.outputString);
+            console.log('✓ Result:', minifyResult.result);
         } catch (error) {
             console.log('⚠ Expected error:', error.message || 'Input folder does not exist');
             console.log('  → Removes CSV entries with only false permission values');
@@ -87,7 +86,7 @@ async function main() {
                 target: 'org',
                 mode: 'log' // Options: 'log', 'clean'
             });
-            console.log('✓ Result:', cleanResult.outputString);
+            console.log('✓ Result:', cleanResult.result);
         } catch (error) {
             console.log('⚠ Expected error:', error.message || 'Org connection or input folder issue');
             console.log('  → Removes references to metadata that no longer exists in target org');
@@ -101,7 +100,7 @@ async function main() {
                 type: 'fieldPermissions',
                 tagid: 'Account.DeprecatedField__c'
             });
-            console.log('✓ Result:', deleteResult.outputString);
+            console.log('✓ Result:', deleteResult.result);
         } catch (error) {
             console.log('⚠ Expected error:', error.message || 'Input folder does not exist');
             console.log('  → Bulk deletes specific permissions across multiple profiles');
@@ -111,7 +110,7 @@ async function main() {
         console.log('\n7. Clearing empty CSV files and folders...');
         try {
             const clearResult = await profiles.clearEmpty();
-            console.log('✓ Result:', clearResult.outputString);
+            console.log('✓ Result:', clearResult.result);
             console.log(`  Files deleted: ${clearResult.deletedFiles}, Folders deleted: ${clearResult.deletedFolders}`);
         } catch (error) {
             console.log('⚠ Expected error:', error.message || 'Input folder does not exist');
@@ -185,7 +184,7 @@ async function automateProfileManagement() {
             const permsetSplitResult = await permissionSets.split({
                 input: 'MyCustomPermissionSet'
             });
-            console.log('✓ Permission set split result:', permsetSplitResult.outputString);
+            console.log('✓ Permission set split result:', permsetSplitResult.result);
         } catch (error) {
             console.log('⚠ Expected error (no permission sets directory):', error.message || 'Input folder does not exist');
             console.log('  → In a real project, this would split your permission set XML files into CSV files');
@@ -195,7 +194,7 @@ async function automateProfileManagement() {
         console.log('10. Permission set operations with namespace API...');
         try {
             const permsetUpsertResult = await permissionSets.upsert();
-            console.log('✓ Permission set upsert result:', permsetUpsertResult.outputString);
+            console.log('✓ Permission set upsert result:', permsetUpsertResult.result);
         } catch (error) {
             console.log('⚠ Expected error (no permission sets directory):', error.message || 'Input folder does not exist');
             console.log('  → In a real project, this would upsert new permissions into existing CSV files');
@@ -208,7 +207,7 @@ async function automateProfileManagement() {
             console.log('✓ Permission sets minified - removed entries with only false permissions');
             
             const clearResult = await permissionSets.clearEmpty();
-            console.log('✓ Permission set cleanup result:', clearResult.outputString);
+            console.log('✓ Permission set cleanup result:', clearResult.result);
             
             // Advanced: Permission set cleaning against org metadata
             // await permissionsets.clean({
@@ -263,7 +262,7 @@ async function managePermissionSets() {
         try {
             // Split custom labels (simpler than profiles/permission sets)
             const labelSplitResult = await labels.split();
-            console.log('✅ Labels split result:', labelSplitResult.outputString);
+            console.log('✅ Labels split result:', labelSplitResult.result);
         } catch (error) {
             console.log('⚠ Expected error (no labels directory):', error.message || 'Input folder does not exist');
             console.log('  → In a real project, this would split your custom label XML files into CSV files');
@@ -273,7 +272,7 @@ async function managePermissionSets() {
         console.log('13. Label operations with namespace API...');
         try {
             const labelUpsertResult = await labels.upsert();
-            console.log('✅ Label upsert result:', labelUpsertResult.outputString);
+            console.log('✅ Label upsert result:', labelUpsertResult.result);
         } catch (error) {
             console.log('⚠ Expected error (no labels directory):', error.message || 'Input folder does not exist');
             console.log('  → In a real project, this would upsert new labels into existing CSV files');
@@ -324,19 +323,19 @@ async function manageCustomLabels() {
             // Split applications
             console.log('\n1. Splitting applications...');
             const splitResult = await applications.split();
-            console.log('✓ Split result:', splitResult.outputString);
+            console.log('✓ Split result:', splitResult.result);
             
             // Upsert applications  
             console.log('\n2. Upserting applications from CSV...');
             const upsertResult = await applications.upsert();
-            console.log('✓ Upsert result:', upsertResult.outputString);
+            console.log('✓ Upsert result:', upsertResult.result);
             
             // Check applications alignment
             console.log('\n3. Checking applications alignment...');
             const alignedResult = await applications.areAligned({
                 mode: 'string'
             });
-            console.log('✓ Alignment result:', alignedResult.outputString);
+            console.log('✓ Alignment result:', alignedResult.result);
             
         } catch (error) {
             console.log('⚠ Application operations completed with expected behavior');
@@ -435,17 +434,17 @@ async function manageCustomLabels() {
             // Split translations
             console.log('\n1. Splitting translations...');
             const splitResult = await translations.split();
-            console.log('✓ Split result:', splitResult.outputString);
+            console.log('✓ Split result:', splitResult.result);
             
             // Upsert translations  
             console.log('\n2. Upserting translations from CSV...');
             const upsertResult = await translations.upsert();
-            console.log('✓ Upsert result:', upsertResult.outputString || 'No CSV changes found');
+            console.log('✓ Upsert result:', upsertResult.result || 'No CSV changes found');
             
             // Minify translations (unique feature)
             console.log('\n3. Minifying translations (removing empty entries)...');
             const minifyResult = await translations.minify();
-            console.log('✓ Minify result:', minifyResult.outputString);
+            console.log('✓ Minify result:', minifyResult.result);
             
             // Check translations alignment
             console.log('\n4. Checking translations alignment...');
@@ -478,12 +477,12 @@ async function manageCustomLabels() {
             // Split record types
             console.log('\n1. Splitting record types...');
             const splitResult = await recordTypes.split();
-            console.log('✓ Split result:', splitResult.outputString);
+            console.log('✓ Split result:', splitResult.result);
             
             // Upsert record types
             console.log('\n2. Upserting record types from CSV...');
             const upsertResult = await recordTypes.upsert();
-            console.log('✓ Upsert result:', upsertResult.outputString || 'No CSV changes found');
+            console.log('✓ Upsert result:', upsertResult.result || 'No CSV changes found');
             
             // Clean record types (unique feature for field validation)
             console.log('\n3. Cleaning record types (validating field references)...');
@@ -491,11 +490,11 @@ async function manageCustomLabels() {
                 mode: 'log',
                 target: 'both'
             });
-            console.log('✓ Clean result:', cleanResult.outputString);
+            console.log('✓ Clean result:', cleanResult.result);
             
             // Check record types alignment
             console.log('\n4. Checking record types alignment...');
-            const alignedResult = await recordtypes.areAligned({
+            const alignedResult = await recordTypes.areAligned({
                 mode: 'string'
             });
             console.log('✓ Alignment result:', alignedResult || 'No alignment issues');
@@ -509,12 +508,12 @@ async function manageCustomLabels() {
         // Complete record types management workflow
         async function completeRecordTypesWorkflow() {
             // 1. Split → 2. Edit CSVs → 3. Clean → 4. Upsert → 5. Validate → 6. Merge → 7. UpdateKey
-            await recordtypes.split();      // Convert XML to CSV
-            await recordtypes.clean();      // Validate field references
-            await recordtypes.upsert();     // Update from CSV changes
-            await recordtypes.areAligned(); // Validate consistency
-            await recordtypes.merge();      // Back to deployable XML
-            await recordtypes.updateKey();  // Update CSV tag IDs
+            await recordTypes.split();      // Convert XML to CSV
+            await recordTypes.clean();      // Validate field references
+            await recordTypes.upsert();     // Update from CSV changes
+            await recordTypes.areAligned(); // Validate consistency
+            await recordTypes.merge();      // Back to deployable XML
+            await recordTypes.updateKey();  // Update CSV tag IDs
         }
 
         console.log('\n=== All API demonstrations completed ===');
@@ -532,9 +531,5 @@ async function manageCustomLabels() {
     }
 }
 
-// Run if this script is executed directly
-if (require.main === module) {
-    main();
-}
-
-module.exports = { main };
+// Run if this script is executed directly (ESM equivalent of require.main === module)
+main();
