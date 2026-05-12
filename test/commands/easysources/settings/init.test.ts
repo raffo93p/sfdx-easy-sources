@@ -15,7 +15,7 @@ describe('easysources:settings:init', function () {
         .stdout()
         .command(['easysources settings init'])
         .it('runs easysources:settings:init', (ctx) => {
-            const settings = JSON.parse(fs.readFileSync(SETTINGS_PATH));
+            const settings = JSON.parse(fs.readFileSync(SETTINGS_PATH, 'utf-8'));
             expect(settings).to.have.property("salesforce-xml-path");
             expect(settings).to.have.property("easysources-csv-path");
             expect(settings).to.have.property("easysources-log-path");

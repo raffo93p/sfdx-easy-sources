@@ -4,7 +4,7 @@ import fs from 'fs-extra';
 
 
 export function loadSettings() {
-	const settings = fs.existsSync(SETTINGS_PATH) ? JSON.parse(fs.readFileSync(SETTINGS_PATH)) : {};
+	const settings = fs.existsSync(SETTINGS_PATH) ? JSON.parse(fs.readFileSync(SETTINGS_PATH, 'utf-8')) : {};
     return settings;
 }
 

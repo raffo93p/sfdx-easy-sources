@@ -29,6 +29,7 @@ export default class Init extends SfCommand<unknown> {
     };
 
     public async run(): Promise<unknown> {
+        await this.parse(Init);
 
         const settings = initSettings();
         fs.writeFileSync(SETTINGS_PATH, JSON.stringify(settings, null, 4));

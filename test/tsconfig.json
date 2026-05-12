@@ -3,14 +3,15 @@
   "compilerOptions": {
     "skipLibCheck": true,
     "noEmit": true,
-    "module": "commonjs",
+    "module": "Node16",
+    "moduleResolution": "Node16",
     "target": "es2022",
     "lib": ["es2022"],
     "sourceMap": true,
     "declaration": true,
-    "moduleResolution": "node",
     "alwaysStrict": true,
     "noUnusedLocals": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "types": ["mocha"]
   }
 }
