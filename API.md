@@ -15,7 +15,7 @@ yarn add sfdx-easy-sources
 ### JavaScript
 
 ```javascript
-const { profiles } = require('sfdx-easy-sources');
+import { profiles } from 'sfdx-easy-sources';
 
 async function main() {
     // Split profiles into CSV files
@@ -62,8 +62,6 @@ The profile API provides programmatic access to all profile-related operations.
 
 ```typescript
 import { profiles } from 'sfdx-easy-sources';
-// or
-const { profiles } = require('sfdx-easy-sources');
 ```
 
 #### Common Types
