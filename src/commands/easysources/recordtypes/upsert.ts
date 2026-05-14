@@ -176,7 +176,7 @@ export async function recordTypeUpsert(options: any = {}): Promise<any> {
                         jsonArrayNew = Array.from(jsonMapOld.values());
                     }
 
-                    if (options.sort === 'true') {
+                    if (options.sort !== 'false') {
                         jsonArrayNew = sortByKey(jsonArrayNew);
                     }
 

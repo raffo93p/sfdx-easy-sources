@@ -8,28 +8,14 @@ import * as os from 'os';
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages } from '@salesforce/core';
 
-import fs from 'fs-extra';
-import { join } from "path";
 import Performance from '../../../utils/performance.js';
-import { PROFILE_ITEMS, PROFILES_SUBPATH } from "../../../utils/constants/constants_profiles.js";
-import { calcCsvFilename, checkDirOrCreateSync, checkDirOrErrorSync, jsonArrayPackageToMap, readCsvToJsonArray, readXmlFromFile } from "../../../utils/filesUtils.js"
-import { sortByKey, toArray } from "../../../utils/utils.js"
+import { PROFILE_ITEMS, PROFILES_SUBPATH, PROFILE_KEY_TYPE } from "../../../utils/constants/constants_profiles.js";
 import { DEFAULT_ESCSV_PATH, DEFAULT_LOG_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants.js';
-import { loadSettings } from '../../../utils/localSettings.js';
-import { getDefaultOrgName, retrieveAllMetadataPackageLocal, retrieveAllMetadataPackageOrg } from '../../../utils/commands/utils.js';
-import { DEFAULT_PACKAGE_LOC_EXT, DEFAULT_PACKAGE_ORG_EXT, TYPES_PICKVAL_ROOT, TYPES_ROOT_TAG } from '../../../utils/constants/constants_sourcesdownload.js';
-import { PROFILE_KEY_TYPE } from '../../../utils/constants/constants_profiles.js';
-import CsvWriter from '../../../utils/csvWriter.js';
-import _ from 'lodash';
-
-
-const settings = loadSettings();
+import { clean } from '../../../utils/commands/cleaner.js';
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 
-// Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
-// or any library that is using the messages framework can also be loaded this way.
 const messages = Messages.loadMessages('sfdx-easy-sources', 'profiles_clean');
 
 export default class Clean extends SfCommand<unknown> {
@@ -37,9 +23,7 @@ export default class Clean extends SfCommand<unknown> {
 
     public static readonly examples = messages.getMessage('examples').split(os.EOL);
 
-
     public static readonly flags = {
-        // flag with a value (-n, --name=VALUE)
         "sf-xml": Flags.string({
             char: 'x',
             summary: messages.getMessage('sfXmlFlagDescription', [DEFAULT_SFXML_PATH]),
@@ -48,7 +32,7 @@ export default class Clean extends SfCommand<unknown> {
             char: 'c',
             summary: messages.getMessage('esCsvFlagDescription', [DEFAULT_ESCSV_PATH]),
         }),
-        orgname:  Flags.string({
+        orgname: Flags.string({
             char: 'u',
             summary: messages.getMessage('orgFlagDescription', [""]),
             required: false
@@ -58,7 +42,7 @@ export default class Clean extends SfCommand<unknown> {
             summary: messages.getMessage('inputFlagDescription'),
         }),
         "log-dir": Flags.string({
-            char:  'l',
+            char: 'l',
             summary: messages.getMessage('logdirFlagDescription', [DEFAULT_LOG_PATH]),
         }),
         mode: Flags.string({
@@ -111,187 +95,12 @@ export default class Clean extends SfCommand<unknown> {
     public async run(): Promise<unknown> {
         const { flags } = await this.parse(Clean);
         Performance.getInstance().start();
-
         const result = await profileClean(flags);
-
         Performance.getInstance().end();
         return result;
     }
-
-    
 }
 
-// Export a profile-specific clean function that encapsulates profile constants
 export async function profileClean(options: any): Promise<any> {
-    const csvWriter = new CsvWriter();
-    
-    const logdir = options['log-dir'] || settings['easysources-log-path'] || DEFAULT_LOG_PATH;
-    const csvDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), PROFILES_SUBPATH) as string;
-    const xmlDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH)) as string;
-    var orgname = options.orgname || await getDefaultOrgName();
-    const mode = options.mode || 'clean';
-    const target = options.target || 'both';
-
-    const skipStandardFields = !options['include-standard-fields'];
-    const skipStandardTabs = !options['include-standard-tabs'];
-    const skipTypes = options['skip-types'] || ['Settings'];
-    const includeTypes = options['include-types'] || [];
-    const skipManifestCreation = options['skip-manifest-creation'];
-
-    // Check for mutually exclusive flags
-    if (skipTypes && skipTypes.length > 0 && includeTypes && includeTypes.length > 0) {
-        throw new Error('--skip-types and --include-types flags are mutually exclusive. Please use only one of them.');
-    }
-
-    if (mode === 'log') checkDirOrCreateSync(logdir);
-
-    const inputProfile = options.input as string;
-    const manifestDir = join('.', 'manifest') as string;
-
-    checkDirOrErrorSync(csvDir);
-    checkDirOrErrorSync(xmlDir);
-
-    var profileList = [];
-    if (inputProfile) {
-        profileList = inputProfile.split(',');
-    } else {
-        profileList = fs.readdirSync(csvDir, { withFileTypes: true })
-            .filter(item => item.isDirectory())
-            .map(item => item.name)
-    }
-
-    // create packages all metadata 
-    if (!skipManifestCreation) {
-        var retrievePromises = [];
-        if (target === 'org' || target === 'both') {
-            retrievePromises.push(retrieveAllMetadataPackageOrg(orgname, manifestDir));
-        }
-        if (target === 'local' || target === 'both') {
-            retrievePromises.push(retrieveAllMetadataPackageLocal(xmlDir, manifestDir));
-        }
-
-        // create org manifest and src manifest
-        await Promise.all(retrievePromises);
-    }
-
-    // read manifests
-    var typeItemsMap_list = [];
-    if (target === 'org' || target === 'both') {
-        typeItemsMap_list.push(await readPackageToMap(manifestDir, DEFAULT_PACKAGE_ORG_EXT));
-    }
-    if (target === 'local' || target === 'both') {
-        typeItemsMap_list.push(await readPackageToMap(manifestDir, DEFAULT_PACKAGE_LOC_EXT));
-    }
-
-    var logList = [];
-    // profileName is the profile name without the extension
-    for (const profileName of profileList) {
-        console.log('Cleaning on: ' + profileName);
-
-        for (const tag_section in PROFILE_ITEMS) {
-            // tag_section is a profile section (applicationVisibilities, classAccess ecc)
-
-            const csvFilePath = join(csvDir, profileName, calcCsvFilename(profileName, tag_section));
-            if (fs.existsSync(csvFilePath)) {
-
-                // get the list of resources on the csv. eg. the list of apex classes
-                var resListCsv = await readCsvToJsonArray(csvFilePath)
-
-                for (const key_type of toArray(PROFILE_KEY_TYPE[tag_section])) {
-                    if (key_type == null) continue;
-
-                    // for each tagsection, get:
-                    // the typename on package. eg. ApexClass
-                    // the key that contains the name on the csv. eg. apexClass
-                    var typename = key_type["typename"];
-                    var key = key_type["key"];
-
-                    // res is a single resource on a given csv
-                    resListCsv = resListCsv.filter(function (res) {
-                        if (res[key] == null) return true;
-                        if (skipTypes != null && skipTypes.includes(typename)) return true;
-                        if (includeTypes != null && includeTypes.length > 0 && !includeTypes.includes(typename)) return true;
-                        if (skipStandardFields && typename === "CustomField" && !res[key].endsWith("__c")) return true;
-                        if (skipStandardTabs && typename === "CustomTab" && res[key].startsWith("standard-")) return true;
-
-                        // perform some manipulation on the item for profiles
-                        var item = manipulateItem(res[key], typename);
-
-                        var found = false;
-                        for (const typeItemsMap of typeItemsMap_list) {
-                            // typeItemsMap is a map of typename -> list of items
-                            // eg: ApexClass -> [MyClass, MyClass2]
-                            // eg: CustomField -> [MyObject__c.MyField__c]
-                            // eg: CustomTab -> [MyTab]
-
-                            // get the list of typename resources from the two packages (org or local or both) and check if they include the current item
-                            // item == null added to skip something on manipulateItem function
-                            if (typeItemsMap != null && typeItemsMap.get(typename) != null && (item == null || typeItemsMap.get(typename).includes(item))) {
-                                found = true;
-                            }
-                        }
-
-                        var dontCanc = false;
-
-                        if (!found) {
-                            const errStr = `Profile ${profileName}, ${tag_section}: ${key} "${item}" not found in ${typename}.`;
-                            if (mode === "log") {
-                                logList.push(`${errStr}`);
-                            }
-                        }
-
-                        return found || dontCanc;
-                    })
-                }
-
-
-                if (mode !== "log") {
-                    // write the cleaned csv
-                    const headers = PROFILE_ITEMS[tag_section].headers;
-
-                    if (options.sort === 'true') {
-                        resListCsv = sortByKey(resListCsv);
-                    }
-
-                    try {
-                        const csvContent = await csvWriter.toCsv(resListCsv, headers);
-                        fs.writeFileSync(csvFilePath, csvContent, { flag: 'w+' });
-                        // file written successfully
-                    } catch (err) {
-                        console.error(err);
-                    }
-                }
-            }
-        }
-    }
-
-    // write log file
-    if (mode === "log") {
-        fs.writeFileSync(join(logdir, 'profiles-clean.log'), logList.join('\n'), { flag: 'w+' });
-    }
-
-    return { outputString: 'OK' };
-}
-export function manipulateItem(itemOrig, typename){
-    var item = _.cloneDeep(itemOrig);
-    if(typename === "CustomField" && item.startsWith("Event.")){
-        item = item.replace("Event.", "Activity.");
-    } 
-    if(typename === "CustomField" && item.startsWith("Task.")){
-        item = item.replace("Task.", "Activity.");
-    }
-    if(typename === "RecordType" && item === 'Idea.InternalIdeasIdeaRecordType'){
-        item = null;
-    }
-    return item;
-}
-
-export async function readPackageToMap(manifestDir, packageName){
-    const inputFile =join(manifestDir, packageName);
-    const xmlFileContent = (await readXmlFromFile(inputFile)) ?? {};
-    const typesProperties = xmlFileContent[TYPES_ROOT_TAG] ?? {};
-    const typeItemsList = typesProperties[TYPES_PICKVAL_ROOT];
-
-    var typeItemsMap = jsonArrayPackageToMap(typeItemsList);
-    return typeItemsMap;
+    return clean(options, PROFILES_SUBPATH, PROFILE_ITEMS, PROFILE_KEY_TYPE, 'profiles-clean.log');
 }

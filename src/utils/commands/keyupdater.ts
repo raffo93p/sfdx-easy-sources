@@ -46,7 +46,7 @@ export async function updatekey(flags, file_subpath, file_items) {
 
                     generateTagId(jsonArray, file_items[tag_section].key, file_items[tag_section].headers);
 
-                    if (flags.sort === 'true') {
+                    if (flags.sort !== 'false') {
                         jsonArray = sortByKey(jsonArray);
                     }
 

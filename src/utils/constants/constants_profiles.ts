@@ -1,4 +1,3 @@
-import { setDefault } from "../utils.js";
 import { DEFAULT_SFXML_PATH } from "./constants.js";
 
 export const PROFILE_APP_ROOT = 'applicationVisibilities';
@@ -40,7 +39,7 @@ export const PROFILE_FLOW_KEY = 'flow';
 // fullName
 
 export const PROFILE_LAYOUT_ROOT = 'layoutAssignments';
-export const PROFILE_LAYOUT_HEADER = ['layout', setDefault('recordType')];
+export const PROFILE_LAYOUT_HEADER = ['layout', 'recordType'];
 export const PROFILE_LAYOUT_KEY = ['layout', 'recordType'];
 
 // loginFlows
@@ -58,7 +57,7 @@ export const PROFILE_PAGE_KEY = 'apexPage';
 // profileActionOverrides @deprecated
 
 export const PROFILE_RECTYPE_ROOT = 'recordTypeVisibilities';
-export const PROFILE_RECTYPE_HEADER = ['default', setDefault('personAccountDefault'), 'recordType', 'visible'];
+export const PROFILE_RECTYPE_HEADER = ['default', 'personAccountDefault', 'recordType', 'visible'];
 export const PROFILE_RECTYPE_KEY = 'recordType';
 
 export const PROFILE_TAB_ROOT = 'tabVisibilities';

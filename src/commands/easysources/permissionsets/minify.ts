@@ -8,24 +8,14 @@ import * as os from 'os';
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages } from '@salesforce/core';
 
-import fs from 'fs-extra';
-import { join } from "path";
 import Performance from '../../../utils/performance.js';
-import { calcCsvFilename, checkDirOrErrorSync, readCsvToJsonArray } from "../../../utils/filesUtils.js"
-import { sortByKey, toArray } from "../../../utils/utils.js"
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants.js';
-import { loadSettings } from '../../../utils/localSettings.js';
 import { PERMSETS_SUBPATH, PERMSET_ITEMS, PERMSET_TAG_BOOL } from '../../../utils/constants/constants_permissionsets.js';
-import { jsonAndPrintError } from '../../../utils/commands/utils.js';
-import CsvWriter from '../../../utils/csvWriter.js';
-
-const settings = loadSettings();
+import { minify, booleanFilter } from '../../../utils/commands/minifier.js';
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 
-// Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
-// or any library that is using the messages framework can also be loaded this way.
 const messages = Messages.loadMessages('sfdx-easy-sources', 'profiles_minify');
 
 export default class Clean extends SfCommand<unknown> {
@@ -33,9 +23,7 @@ export default class Clean extends SfCommand<unknown> {
 
     public static readonly examples = messages.getMessage('examples').split(os.EOL);
 
-
     public static readonly flags = {
-        // flag with a value (-n, --name=VALUE)
         "sf-xml": Flags.string({
             char: 'x',
             summary: messages.getMessage('sfXmlFlagDescription', [DEFAULT_SFXML_PATH]),
@@ -59,107 +47,13 @@ export default class Clean extends SfCommand<unknown> {
     public async run(): Promise<unknown> {
         const { flags } = await this.parse(Clean);
         Performance.getInstance().start();
-        
-        var result = await permissionsetMinify(flags);
-        
+        const result = await permissionsetMinify(flags);
         Performance.getInstance().end();
-
         return result;
     }
 }
 
-/**
- * Permission set-specific minify function that encapsulates all permission set constants
- * This function can be used programmatically without needing to pass permission set constants
- * 
- * @param options - Permission set minify options (paths will be resolved automatically if not provided)
- * @returns Promise with minify operation result
- */
 export async function permissionsetMinify(options: any): Promise<any> {
-    const csvWriter = new CsvWriter();
-    const csvDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), PERMSETS_SUBPATH) as string;
-    const xmlDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH)) as string;
-    
-    const inputProfile = options.input as string;
-
-    // Initialize result object
-    const result = { result: 'OK', items: {} };
-
-
-    try {
-        checkDirOrErrorSync(csvDir);
-        checkDirOrErrorSync(xmlDir);
-    } catch (error) {
-        return jsonAndPrintError(error.message);
-    }
-
-    var profileList = [];
-    if (inputProfile) {
-        profileList = inputProfile.split(',');
-    } else {
-        profileList = fs.readdirSync(csvDir, { withFileTypes: true })
-            .filter(item => item.isDirectory())
-            .map(item => item.name)
-    }
-
-    // profileName is the profile name without the extension
-    for (const profileName of profileList) {
-        console.log('Minifying on: ' + profileName);
-
-        try {
-            for (const tag_section in PERMSET_ITEMS) {
-                // tag_section is a profile section (applicationVisibilities, classAccess ecc)
-
-                const csvFilePath = join(csvDir, profileName, calcCsvFilename(profileName, tag_section));
-                if (fs.existsSync(csvFilePath)) {
-
-                    // get the list of resources on the csv. eg. the list of apex classes
-                    var resListCsv = await readCsvToJsonArray(csvFilePath)
-
-                    
-                    resListCsv = resListCsv.filter(function(res) {
-                        // return true to persist, false to delete
-                        if(PERMSET_TAG_BOOL[tag_section] == null) return true;
-
-                        for(const boolName of toArray(PERMSET_TAG_BOOL[tag_section]) ){
-                            if(res[boolName] === 'true' || res[boolName] === 'FALSE') return true;
-                        }
-
-                        return false;
-                    });
-                
-                
-                    // write the cleaned csv
-                    const headers = PERMSET_ITEMS[tag_section].headers;
-
-                    if (options.sort === 'true') {
-                        resListCsv = sortByKey(resListCsv);
-                    }
-
-                    try {
-                        const csvContent = await csvWriter.toCsv(resListCsv, headers);
-                        fs.writeFileSync(csvFilePath, csvContent, { flag: 'w+' });
-                        // file written successfully
-                    } catch (err) {
-                        console.error(err);
-                        throw new Error(`Failed to write CSV file ${csvFilePath}: ${err.message}`);
-                    }
-                
-                }
-
-                // Permission set processed successfully
-                result.items[profileName] = { result: 'OK' };
-            }
-
-        } catch (error) {
-            // Permission set processing failed
-            console.error(`Error minifying permission set ${profileName}:`, error);
-            result.items[profileName] = { 
-                result: 'KO', 
-                error: error.message || 'Unknown error occurred'
-            };
-        }
-    }
-
-    return result;
+    return minify(options, PERMSETS_SUBPATH, PERMSET_ITEMS, PERMSET_TAG_BOOL, booleanFilter);
 }
+

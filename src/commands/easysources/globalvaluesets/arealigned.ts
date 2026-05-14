@@ -36,11 +36,11 @@ export default class GlobalValueSetsAreAligned extends SfCommand<unknown> {
         summary: messages.getMessage('inputFlagDescription'),
     }),
     sort: Flags.string({
-        char: 'S',
-        summary: messages.getMessage('sortFlagDescription', ['true']),
-        options: ['true', 'false'],
-        default: 'true',
-    }),
+            char: 'S',
+            summary: messages.getMessage('sortFlagDescription', ['true']),
+            options: ['true', 'false'],
+            default: 'true',
+        }),
     mode: Flags.string({
         char: 'm',
         summary: messages.getMessage('modeFlagDescription', ['string']),

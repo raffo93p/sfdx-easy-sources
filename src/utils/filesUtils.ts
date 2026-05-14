@@ -1,7 +1,5 @@
 import { promises } from "fs";
-import { join } from "path";
 import { Parser } from "xml2js";
-import { SfProject } from "@salesforce/core";
 import XmlFormatter from "./xmlFormatter.js";
 import { CSV_EXTENSION } from "./constants/constants.js";
 import fs from 'fs-extra';
@@ -24,17 +22,6 @@ export async function writeXmlToFile(
 	xml: object
 ) {
 	return promises.writeFile(file, new XmlFormatter().formatXml(xml, file));
-}
-
-export function getDefaultFolder(project: SfProject): string {
-	const allPossibleDirectories = project.getPackageDirectories();
-	let defaultFolder;
-	if (allPossibleDirectories.length == 0) {
-		defaultFolder = allPossibleDirectories[0].path;
-	} else {
-		defaultFolder = allPossibleDirectories.find((path) => path.default).path;
-	}
-	return join(project.getPath(), defaultFolder);
 }
 
 export async function readCsvToJsonArray(csvFilePath: string) {

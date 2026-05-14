@@ -107,7 +107,7 @@ export async function objectTranslationUpdateKey(options: any = {}): Promise<any
 
                 generateTagId(jsonArray, OBJTRANSL_ITEMS[tag_section].key, OBJTRANSL_ITEMS[tag_section].headers);
 
-                if (options.sort === 'true') {
+                if (options.sort !== 'false') {
                     jsonArray = sortByKey(jsonArray);
                 }
 

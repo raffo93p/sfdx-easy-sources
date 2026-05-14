@@ -19,7 +19,7 @@ export function transformLayoutCSVtoXML(jsonArray) {
     var jsonArrayForXML = []
     var obj = {}
     var prevLayout: string;
-    for (var entry of jsonArray) {
+    for (const entry of jsonArray) {
 
         if (entry.layout !== prevLayout) {
             if (prevLayout != undefined) jsonArrayForXML.push(obj);
@@ -39,7 +39,7 @@ export function transformFieldXMLtoCSV(fieldTr){
     // if(picklistValues != null){
     //     if (!Array.isArray(picklistValues)) picklistValues = [picklistValues];
         
-    //     for(var entry of picklistValues){
+    //     for(const entry of picklistValues){
 
     //     }
     // }   
@@ -121,7 +121,7 @@ export function getFieldTranslationFiles(dir){
 
 export function removeEmpyOptionalTags(jsonArray, tag_section){
   if(OBJTRANSL_OPTIONAL_TAGS[tag_section]){
-    for (var i in jsonArray) {
+    for (const i in jsonArray) {
         for(const tag of OBJTRANSL_OPTIONAL_TAGS[tag_section]){
             if(jsonArray[i][tag] === ''){
                 delete jsonArray[i][tag];

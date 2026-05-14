@@ -33,11 +33,11 @@ export async function mergeItemFromCsv(itemName: string, csvDirPath: string, fil
         if (fs.existsSync(csvFilePath)) {
             var jsonArray = await readCsvToJsonArray(csvFilePath)
 
-            if (flags.sort !== 'false') { // Default to true
+            if (flags.sort !== 'false') {
                 jsonArray = sortByKey(jsonArray);
             }
 
-            for (var i in jsonArray) {
+            for (const i in jsonArray) {
                 delete jsonArray[i]['_tagid']
             }
 

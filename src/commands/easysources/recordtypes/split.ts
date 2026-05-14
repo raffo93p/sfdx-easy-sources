@@ -140,7 +140,7 @@ export async function recordTypeSplit(options: any = {}): Promise<any> {
 
                     // generate _tagId column
                     generateTagId(jsforcsv, RECORDTYPE_ITEMS[tag_section].key, RECORDTYPE_ITEMS[tag_section].headers);
-                    if (options.sort === 'true') {
+                    if (options.sort !== 'false') {
                         jsforcsv = sortByKey(jsforcsv);
                     }
 

@@ -1,11 +1,10 @@
-import { setDefault } from "../utils.js";
 import { DEFAULT_SFXML_PATH } from "./constants.js";
 
 export const GVSETS_EXTENSION = ".globalValueSet-meta.xml";
 export const GVSETS_ROOT_TAG = "GlobalValueSet";
 
 export const GVSET_ROOT = 'customValue';
-export const GVSET_HEADER = ['fullName', 'default', setDefault('isActive'), 'label'];
+export const GVSET_HEADER = ['fullName', 'default', 'isActive', 'label'];
 export const GVSET_KEY = 'fullName';
 
 export const GVSET_ITEMS = {

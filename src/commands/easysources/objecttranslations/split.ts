@@ -152,7 +152,7 @@ export async function objectTranslationSplit(options: any = {}): Promise<any> {
 
                 // generate _tagId column
                 generateTagId(myjson, OBJTRANSL_ITEMS[tag_section].key, OBJTRANSL_ITEMS[tag_section].headers);
-                if (options.sort === 'true') {
+                if (options.sort !== 'false') {
                     myjson = sortByKey(myjson);
                 }
 

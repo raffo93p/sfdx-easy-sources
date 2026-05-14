@@ -126,7 +126,7 @@ export async function customUpsert(flags: any, file_subpath: string, file_items:
 
             var jsonArray = Array.from(jsonMap.values());
 
-            if (flags.sort === 'true') {
+            if (flags.sort !== 'false') {
                 jsonArray = sortByKey(jsonArray);
             }
 

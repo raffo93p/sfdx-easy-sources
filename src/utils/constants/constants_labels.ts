@@ -1,11 +1,10 @@
-import { setDefault } from "../utils.js";
 import { DEFAULT_SFXML_PATH } from "./constants.js";
 
 export const LABELS_EXTENSION = ".labels-meta.xml";
 export const LABELS_ROOT_TAG = "CustomLabels";
 
 export const LABEL_ROOT = 'labels';
-export const LABEL_HEADER = ['fullName', setDefault('categories'), 'language', 'protected', 'shortDescription', 'value'];
+export const LABEL_HEADER = ['fullName', 'categories', 'language', 'protected', 'shortDescription', 'value'];
 export const LABEL_KEY = ['fullName', 'language'];
 
 export const LABEL_ITEMS = {

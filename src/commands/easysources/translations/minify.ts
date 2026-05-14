@@ -8,24 +8,14 @@ import * as os from 'os';
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages } from '@salesforce/core';
 
-import fs from 'fs-extra';
-import { join } from "path";
 import Performance from '../../../utils/performance.js';
 import { TRANSLATION_ITEMS, TRANSLAT_TAG_BOOL, TRANSLATIONS_SUBPATH } from "../../../utils/constants/constants_translations.js";
-import { calcCsvFilename, checkDirOrErrorSync, readCsvToJsonArray } from "../../../utils/filesUtils.js"
-import { isBlank, sortByKey, toArray } from "../../../utils/utils.js"
 import { DEFAULT_ESCSV_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants.js';
-import { loadSettings } from '../../../utils/localSettings.js';
-import { jsonAndPrintError } from '../../../utils/commands/utils.js';
-import CsvWriter from '../../../utils/csvWriter.js';
-
-const settings = loadSettings();
+import { minify, nonBlankFilter } from '../../../utils/commands/minifier.js';
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 
-// Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
-// or any library that is using the messages framework can also be loaded this way.
 const messages = Messages.loadMessages('sfdx-easy-sources', 'translations_minify');
 
 export default class Clean extends SfCommand<unknown> {
@@ -33,9 +23,7 @@ export default class Clean extends SfCommand<unknown> {
 
     public static readonly examples = messages.getMessage('examples').split(os.EOL);
 
-
     public static readonly flags = {
-        // flag with a value (-n, --name=VALUE)
         "sf-xml": Flags.string({
             char: 'x',
             summary: messages.getMessage('sfXmlFlagDescription', [DEFAULT_SFXML_PATH]),
@@ -59,103 +47,13 @@ export default class Clean extends SfCommand<unknown> {
     public async run(): Promise<unknown> {
         const { flags } = await this.parse(Clean);
         Performance.getInstance().start();
-        
         const result = await translationMinify(flags);
-
         Performance.getInstance().end();
-
         return result;
     }
-    
 }
 
-// Export function for programmatic API
 export async function translationMinify(options: any = {}): Promise<any> {
-    Performance.getInstance().start();
-    const csvWriter = new CsvWriter();
-    const csvDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), TRANSLATIONS_SUBPATH) as string;
-    const xmlDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH)) as string;
-
-    const inputTranslation = (options.input) as string;
-
-    // Initialize result object
-    const result = { result: 'OK', items: {} };
-
-    try {
-        checkDirOrErrorSync(csvDir);
-        checkDirOrErrorSync(xmlDir);
-    } catch (error) {
-        Performance.getInstance().end();
-        return jsonAndPrintError(error.message);
-    }
-
-    var transationList = [];
-    if (inputTranslation) {
-        transationList = inputTranslation.split(',');
-    } else {
-        transationList = fs.readdirSync(csvDir, { withFileTypes: true })
-            .filter(item => item.isDirectory())
-            .map(item => item.name)
-    }
-
-        // translationName is the profile name without the extension
-    for (const translationName of transationList) {
-        console.log('Minifying on: ' + translationName);
-
-        try {
-            for (const tag_section in TRANSLATION_ITEMS) {
-                    // tag_section is a profile section (applicationVisibilities, classAccess ecc)
-                const csvFilePath = join(csvDir, translationName, calcCsvFilename(translationName, tag_section));
-                if (fs.existsSync(csvFilePath)) {
-
-                        // get the list of resources on the csv. eg. the list of apex classes
-                    var resListCsv = await readCsvToJsonArray(csvFilePath)
-
-                    resListCsv = resListCsv.filter(function(res) {
-                            // return true to persist, false to delete
-                        if(TRANSLAT_TAG_BOOL[tag_section] == null) return true;
-
-                        for(const boolName of toArray(TRANSLAT_TAG_BOOL[tag_section]) ){
-                            if(!isBlank(res[boolName])) return true;
-                        }
-
-                        return false;
-                    });
-                    
-                        // write the cleaned csv
-                    const headers = TRANSLATION_ITEMS[tag_section].headers;
-
-                    if (options.sort === 'true') {
-                        resListCsv = sortByKey(resListCsv);
-                    }
-
-                    try {
-                        const csvContent = await csvWriter.toCsv(resListCsv, headers);
-                        fs.writeFileSync(csvFilePath, csvContent, { flag: 'w+' });
-                        // file written successfully
-                    } catch (err) {
-                        console.error(err);
-                        throw new Error(`Failed to write CSV file ${csvFilePath}: ${err.message}`);
-                    }
-                }
-
-                // Translation processed successfully
-                result.items[translationName] = { result: 'OK' };
-            }
-
-        } catch (error) {
-            // Translation processing failed
-            console.error(`Error minifying translation ${translationName}:`, error);
-            result.items[translationName] = { 
-                result: 'KO', 
-                error: error.message || 'Unknown error occurred'
-            };
-        }
-    }
-    
-    Performance.getInstance().end();
-
-    
-    return result;
+    return minify(options, TRANSLATIONS_SUBPATH, TRANSLATION_ITEMS, TRANSLAT_TAG_BOOL, nonBlankFilter);
 }
 

@@ -155,7 +155,7 @@ export async function upsert(flags, file_subpath, file_extension, file_root_tag,
                     }
                 }
 
-                if (flags.sort === 'true') {
+                if (flags.sort !== 'false') {
                     jsonArrayNew = sortByKey(jsonArrayNew);
                 }
 

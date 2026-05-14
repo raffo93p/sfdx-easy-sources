@@ -315,8 +315,8 @@ async function validateSingleRecordTypeForRecord(
             if (originalArray.length !== reconstructedArray.length) {
                 differences.push(`${sectionName}: Count mismatch (XML: ${originalArray.length}, CSV: ${reconstructedArray.length})`);
             } else {
-                const sortedOriginal = options.sort === 'true' ? [...originalArray].sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))) : originalArray;
-                const sortedReconstructed = options.sort === 'true' ? [...reconstructedArray].sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))) : reconstructedArray;
+                const sortedOriginal = options.sort !== 'false' ? [...originalArray].sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))) : originalArray;
+                const sortedReconstructed = options.sort !== 'false' ? [...reconstructedArray].sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))) : reconstructedArray;
 
                 for (let i = 0; i < sortedOriginal.length; i++) {
                     const originalItem = JSON.stringify(sortedOriginal[i]);

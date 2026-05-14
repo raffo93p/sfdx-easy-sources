@@ -125,7 +125,7 @@ export async function objectTranslationMinify(options: any = {}): Promise<any> {
                     // write the cleaned csv
                     const headers = OBJTRANSL_ITEMS[tag_section].headers;
 
-                    if (options.sort === 'true' || options.sort === true || options.sort === undefined) {
+                    if (options.sort !== 'false') {
                         resListCsv = sortByKey(resListCsv);
                     }
 

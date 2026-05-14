@@ -17,7 +17,7 @@ export function transformCSVtoXML(jsonArray) {
     var jsonArrayForXML = []
     var obj = {}
     var prevPicklist: string;
-    for (var entry of jsonArray) {
+    for (const entry of jsonArray) {
 
         if (entry.picklist !== prevPicklist) {
             if (prevPicklist != undefined) jsonArrayForXML.push(obj);

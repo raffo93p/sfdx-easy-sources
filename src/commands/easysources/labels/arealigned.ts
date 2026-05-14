@@ -32,11 +32,11 @@ export default class LabelsAreAligned extends SfCommand<unknown> {
         summary: messages.getMessage('esCsvFlagDescription', [DEFAULT_ESCSV_PATH]),
     }),
     sort: Flags.string({
-        char: 'S',
-        summary: messages.getMessage('sortFlagDescription', ['true']),
-        options: ['true', 'false'],
-        default: 'true',
-    }),
+            char: 'S',
+            summary: messages.getMessage('sortFlagDescription', ['true']),
+            options: ['true', 'false'],
+            default: 'true',
+        }),
     mode: Flags.string({
         char: 'm',
         summary: messages.getMessage('modeFlagDescription', ['string']),

@@ -216,7 +216,7 @@ export async function recordTypeClean(options: any = {}): Promise<any> {
                 if (mode !== "log") {
                     const headers = RECORDTYPE_ITEMS[RECORDTYPES_PICKVAL_ROOT].headers;
 
-                    if (options.sort === 'true' || options.sort === true || options.sort === undefined) {
+                    if (options.sort !== 'false') {
                         resListCsv = sortByKey(resListCsv);
                     }
 

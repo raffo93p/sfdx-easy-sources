@@ -1,5 +1,10 @@
 # Release Notes
 
+## Version 1.0.1
+- **Refactoring: Removed dead code** - Removed unused functions (`setDefault`, `getDefaultFolder`) and commented-out code blocks across utility and constants files.
+- **Refactoring: Shared `clean` and `minify` utilities** - Extracted duplicated inline logic from `profiles` and `permissionsets` clean/minify commands into shared utility modules (`cleaner.ts`, `minifier.ts`), reducing code duplication.
+- **Refactoring: Variable declarations** - Replaced `var` with `let`/`const` throughout the codebase.
+
 ## Version 1.0.0
 - **Migration to ES Modules (ESM)** - The project has been fully converted to native ESM to stay aligned with the modern Salesforce CLI ecosystem. Dependencies updated accordingly.
 - **BREAKING: Full upgrade to `sf` CLI framework** - The plugin has been fully migrated to the modern `sf` CLI. All commands now use the space-separated format (e.g. `sf easysources profiles split`) — the legacy `sfdx` colon-separated syntax is no longer supported.

@@ -8,20 +8,10 @@ import * as os from 'os';
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages } from '@salesforce/core';
 
-import fs from 'fs-extra';
-import { join } from "path";
 import Performance from '../../../utils/performance.js';
-import { calcCsvFilename, checkDirOrCreateSync, checkDirOrErrorSync, jsonArrayPackageToMap, readCsvToJsonArray, readXmlFromFile } from "../../../utils/filesUtils.js"
-import { sortByKey, toArray } from "../../../utils/utils.js"
 import { DEFAULT_ESCSV_PATH, DEFAULT_LOG_PATH, DEFAULT_SFXML_PATH } from '../../../utils/constants/constants.js';
-import { loadSettings } from '../../../utils/localSettings.js';
-import { getDefaultOrgName, retrieveAllMetadataPackageLocal, retrieveAllMetadataPackageOrg } from '../../../utils/commands/utils.js';
-import { DEFAULT_PACKAGE_LOC_EXT, DEFAULT_PACKAGE_ORG_EXT, TYPES_PICKVAL_ROOT, TYPES_ROOT_TAG } from '../../../utils/constants/constants_sourcesdownload.js';
 import { PERMSETS_SUBPATH, PERMSET_ITEMS, PERMSET_KEY_TYPE } from '../../../utils/constants/constants_permissionsets.js';
-import CsvWriter from '../../../utils/csvWriter.js';
-import _ from 'lodash';
-
-const settings = loadSettings();
+import { clean } from '../../../utils/commands/cleaner.js';
 
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
@@ -109,192 +99,12 @@ export default class Clean extends SfCommand<unknown> {
     public async run(): Promise<unknown> {
         const { flags } = await this.parse(Clean);
         Performance.getInstance().start();
-        
-        var result = await permissionsetClean(flags);
-        
+        const result = await permissionsetClean(flags);
         Performance.getInstance().end();
-
         return result;
     }
 }
 
-/**
- * Permission set-specific clean function that encapsulates all permission set constants
- * This function can be used programmatically without needing to pass permission set constants
- * 
- * @param options - Permission set clean options (paths will be resolved automatically if not provided)
- * @returns Promise with clean operation result
- */
 export async function permissionsetClean(options: any): Promise<any> {
-    const csvWriter = new CsvWriter();
-
-    const logdir = options['log-dir'] || settings['easysources-log-path'] || DEFAULT_LOG_PATH;
-    const csvDir = join((options["es-csv"] || settings['easysources-csv-path'] || DEFAULT_ESCSV_PATH), PERMSETS_SUBPATH) as string;
-    const xmlDir = join((options["sf-xml"] || settings['salesforce-xml-path'] || DEFAULT_SFXML_PATH)) as string;
-    var orgname = options.orgname || await getDefaultOrgName();
-    const mode = options.mode;
-    const target = options.target;
-
-    const skipStandardFields = !options['include-standard-fields'];
-    const skipStandardTabs = !options['include-standard-tabs'];
-    const skipTypes = options['skip-types'];
-    const includeTypes = options['include-types'] || [];
-    const skipManifestCreation = options['skip-manifest-creation'];
-
-    // Check for mutually exclusive flags
-    if (skipTypes && skipTypes.length > 0 && includeTypes && includeTypes.length > 0) {
-        throw new Error('--skip-types and --include-types flags are mutually exclusive. Please use only one of them.');
-    }
-
-    if (mode ==='log' ) checkDirOrCreateSync(logdir);
-
-    const inputProfile = options.input as string;
-    const manifestDir = join( '.', 'manifest') as string;
-
-    checkDirOrErrorSync(csvDir);
-    checkDirOrErrorSync(xmlDir);
-
-    var profileList = [];
-    if (inputProfile) {
-        profileList = inputProfile.split(',');
-    } else {
-        profileList = fs.readdirSync(csvDir, { withFileTypes: true })
-            .filter(item => item.isDirectory())
-            .map(item => item.name)
-    }
-
-    // create packages all metadata 
-    if(!skipManifestCreation){
-        var retrievePromises = [];
-        if(target === 'org' || target === 'both'){
-            retrievePromises.push(retrieveAllMetadataPackageOrg(orgname, manifestDir));
-        }
-        if(target === 'local' || target === 'both'){
-            retrievePromises.push(retrieveAllMetadataPackageLocal(xmlDir, manifestDir));
-        }
-
-        // create org manifest and src manifest
-        await Promise.all(retrievePromises);
-    }
-
-    // read manifests
-    var typeItemsMap_list = [];
-    if(target === 'org' || target === 'both'){
-        typeItemsMap_list.push(await readPackageToMap(manifestDir, DEFAULT_PACKAGE_ORG_EXT));
-    }
-    if(target === 'local' || target === 'both'){
-        typeItemsMap_list.push(await readPackageToMap(manifestDir, DEFAULT_PACKAGE_LOC_EXT));
-    }
-
-    var logList = [];
-    // profileName is the profile name without the extension
-    for (const profileName of profileList) {
-        console.log('Cleaning on: ' + profileName);
-
-        for (const tag_section in PERMSET_ITEMS) {
-            // tag_section is a permission set section (applicationVisibilities, classAccess ecc)
-
-            const csvFilePath = join(csvDir, profileName, calcCsvFilename(profileName, tag_section));
-            if (fs.existsSync(csvFilePath)) {
-
-                // get the list of resources on the csv. eg. the list of apex classes
-                var resListCsv = await readCsvToJsonArray(csvFilePath)
-
-                for(const key_type of toArray(PERMSET_KEY_TYPE[tag_section]) ){
-                    if (key_type == null) continue;
-
-                    // for each tagsection, get:
-                    // the typename on package. eg. ApexClass
-                    // the key that contains the name on the csv. eg. apexClass
-                    var typename = key_type["typename"];
-                    var key = key_type["key"]; 
-
-                    // res is a single resource on a given csv
-                    resListCsv = resListCsv.filter(function(res) {
-                        if(res[key] == null) return true;
-                        if(skipTypes != null && skipTypes.includes(typename)) return true;
-                        if(includeTypes != null && includeTypes.length > 0 && !includeTypes.includes(typename)) return true;
-                        if(skipStandardFields && typename === "CustomField" && !res[key].endsWith("__c")) return true;
-                        if(skipStandardTabs && typename === "CustomTab" && res[key].startsWith("standard-")) return true;
-
-                        // perform some manipulation on the item for profiles
-                        var item = manipulateItem(res[key], typename);
-
-                        var found = false;
-                        for(const typeItemsMap of typeItemsMap_list){
-                            // typeItemsMap is a map of typename -> list of items
-                            // eg: ApexClass -> [MyClass, MyClass2]
-                            // eg: CustomField -> [MyObject__c.MyField__c]
-                            // eg: CustomTab -> [MyTab]
-
-                            // get the list of typename resources from the two packages (org or local or both) and check if they include the current item
-                            // item == null added to skip something on manipulateItem function
-                            if(typeItemsMap != null && typeItemsMap.get(typename) != null && (item == null || typeItemsMap.get(typename).includes(item))){
-                                found = true;
-                            }
-                        }
-
-                        var dontCanc = false;
-
-                        if(!found){
-                            const errStr = `Permission Set ${profileName}, ${tag_section}: ${key} "${item}" not found in ${typename}.`;
-                            if(mode === "log") {
-                                logList.push(`${errStr}`);
-                            }
-                        }
-                        
-                        return found || dontCanc;
-                    })
-                }
-            
-                if(mode !== "log"){
-                    // write the cleaned csv
-                    const headers = PERMSET_ITEMS[tag_section].headers;
-
-                    if (options.sort === 'true') {
-                        resListCsv = sortByKey(resListCsv);
-                    }
-
-                    try {
-                        const csvContent = await csvWriter.toCsv(resListCsv, headers);
-                        fs.writeFileSync(csvFilePath, csvContent, { flag: 'w+' });
-                        // file written successfully
-                    } catch (err) {
-                        console.error(err);
-                    }
-                }
-            }
-        }
-    }
-
-    // write log file
-    if(mode === "log") {
-        fs.writeFileSync(join(logdir, 'permissionsets-clean.log'), logList.join('\n'), { flag: 'w+' });
-    }
-
-    return { outputString: 'OK' };
-}
-
-export function manipulateItem(itemOrig, typename){
-    var item = _.cloneDeep(itemOrig);
-    if(typename === "CustomField" && item.startsWith("Event.")){
-        item = item.replace("Event.", "Activity.");
-    } 
-    if(typename === "CustomField" && item.startsWith("Task.")){
-        item = item.replace("Task.", "Activity.");
-    }
-    if(typename === "RecordType" && item === 'Idea.InternalIdeasIdeaRecordType'){
-        item = null;
-    }
-    return item;
-}
-
-export async function readPackageToMap(manifestDir, packageName){
-    const inputFile =join(manifestDir, packageName);
-    const xmlFileContent = (await readXmlFromFile(inputFile)) ?? {};
-    const typesProperties = xmlFileContent[TYPES_ROOT_TAG] ?? {};
-    const typeItemsList = typesProperties[TYPES_PICKVAL_ROOT];
-
-    var typeItemsMap = jsonArrayPackageToMap(typeItemsList);
-    return typeItemsMap;
+    return clean(options, PERMSETS_SUBPATH, PERMSET_ITEMS, PERMSET_KEY_TYPE, 'permissionsets-clean.log');
 }

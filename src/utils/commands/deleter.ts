@@ -58,7 +58,7 @@ export async function deleteFromCsv(flags: any, file_subpath: string, file_items
             if (fs.existsSync(csvFilePath)) {
                 var jsonMap = await readCsvToJsonMap(csvFilePath);
 
-                for (var k of tagid.split(',')) {
+                for (const k of tagid.split(',')) {
                     const trimmedK = k.trim();
                     
                     // Check if wildcard pattern is used
@@ -104,7 +104,7 @@ export async function deleteFromCsv(flags: any, file_subpath: string, file_items
 
                 const headers = file_items[type].headers;
 
-                if (flags.sort === 'true') {
+                if (flags.sort !== 'false') {
                     jsonArray = sortByKey(jsonArray);
                 }
 

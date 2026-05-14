@@ -150,7 +150,7 @@ export async function recordTypeDelete(options: any = {}): Promise<any> {
 
                     const headers = RECORDTYPE_ITEMS[RECORDTYPES_PICKVAL_ROOT].headers;
 
-                    if (options.sort === 'true') {
+                    if (options.sort !== 'false') {
                         jsonArray = sortByKey(jsonArray);
                     }
 

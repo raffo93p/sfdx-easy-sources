@@ -118,7 +118,7 @@ export async function recordTypeUpdateKey(options: any = {}): Promise<any> {
                         var jsonArray = await readCsvToJsonArray(csvFilePath)
                         generateTagId(jsonArray, RECORDTYPE_ITEMS[tag_section].key, RECORDTYPE_ITEMS[tag_section].headers);
 
-                        if (options.sort === 'true' || options.sort === true || options.sort === undefined) {
+                        if (options.sort !== 'false') {
                             jsonArray = sortByKey(jsonArray);
                         }
 

@@ -31,7 +31,7 @@ function arrayToFlatInner(inputArray, prefix=""){
 			}
 		}
 
-		for(var flatNest of flattenedNested){
+		for(const flatNest of flattenedNested){
 			flattenedItems.push({...flattenedItem, ...flatNest});
 		}
 

@@ -11,3 +11,4 @@ node_modules
 /test_tmp
 /oclif.manifest.json
 *.tsbuildinfo
+**/.DS_Store

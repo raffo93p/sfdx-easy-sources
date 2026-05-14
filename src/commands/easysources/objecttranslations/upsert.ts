@@ -185,7 +185,7 @@ export async function objectTranslationUpsert(options: any = {}): Promise<any> {
                     myjson = Array.from(jsonMapOld.values());
                 }
 
-                if (options.sort === 'true') {
+                if (options.sort !== 'false') {
                     myjson = sortByKey(myjson);
                 }
 

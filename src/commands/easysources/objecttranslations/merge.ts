@@ -183,12 +183,12 @@ export async function mergeObjectTranslationFromCsv(objectName: string, csvDirPa
         if (fs.existsSync(csvFilePath)) {
             var jsonArray = await readCsvToJsonArrayWithNulls(csvFilePath);
 
-            if (flags.sort === 'true' || flags.sort === true || flags.sort === undefined) {
+            if (flags.sort !== 'false') {
                 jsonArray = sortByKey(jsonArray);
             }
 
             // Remove _tagid for merging
-            for (var i in jsonArray) {
+            for (const i in jsonArray) {
                 delete jsonArray[i]['_tagid'];
             }
 
