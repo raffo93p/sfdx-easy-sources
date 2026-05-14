@@ -1,8 +1,6 @@
-sfdx-easy-sources
-=================
-SFDX plugin to simplify the management of Salesforce sources, splitting some long xml files into smaller csv ones.
+<p align="center"><img src="./sf_easysources_wordmark_full.png" alt="sfdx-easy-sources" width="400"/></p>
 
-# [BETA]
+SF plugin to simplify the management of Salesforce sources, splitting some long xml files into smaller csv ones.
 
 > **🚀 From version 1.0.0, this plugin is fully compatible with the `sf` CLI.** All commands now use the space-separated format (e.g., `sf easysources profiles split`). The legacy `sfdx` colon-separated format is no longer supported.
 
@@ -63,7 +61,7 @@ Examples
 
 ```javascript
 // JavaScript - Basic usage with automatic path resolution
-const { profiles, permissionsets, labels, objectTranslations } = require('sfdx-easy-sources');
+import { profiles, permissionsets, labels, objectTranslations } from 'sfdx-easy-sources';
 
 async function automateMetadata() {
   // Paths auto-resolved from easysources-settings.json
