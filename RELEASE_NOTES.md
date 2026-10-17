@@ -1,5 +1,8 @@
 # Release Notes
 
+## Version 1.0.2
+- **Documentation: Line endings and git** - Added a `.gitattributes.example` file that forces LF line endings on the xml and csv files managed by the plugin (default Salesforce paths and csv folder). The plugin always writes LF, so files committed with CRLF would otherwise show up as completely modified after `split`/`merge`. A note has been added to the README ("Git Considerations").
+
 ## Version 1.0.1
 - **Refactoring: Removed dead code** - Removed unused functions (`setDefault`, `getDefaultFolder`) and commented-out code blocks across utility and constants files.
 - **Refactoring: Shared `clean` and `minify` utilities** - Extracted duplicated inline logic from `profiles` and `permissionsets` clean/minify commands into shared utility modules (`cleaner.ts`, `minifier.ts`), reducing code duplication.

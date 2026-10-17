@@ -1,0 +1,27 @@
+# Example .gitattributes for a Salesforce project using sfdx-easy-sources.
+# Copy it to the root of your Salesforce project as ".gitattributes" and commit it.
+#
+# The plugin always writes xml and csv files with LF line endings. Forcing LF in git
+# avoids whole-file diffs when files were committed with CRLF (e.g. from Windows).
+#
+# NOTE: the paths below assume the default folders (sf-xml and es-csv both default to
+# ./force-app/main/default). If your sfdx package directory or the csv folder
+# (--es-csv / "easysources-csv-path" in easysources-settings.json) is different,
+# adapt the paths accordingly.
+#
+# After adding the file, normalize the files already committed once, in a dedicated commit:
+#   git add --renormalize .
+
+# Metadata managed with csv by the plugin (xml, -part.xml and csv files in the same folder)
+force-app/main/default/profiles/**                   text eol=lf
+force-app/main/default/permissionsets/**             text eol=lf
+force-app/main/default/labels/**                     text eol=lf
+force-app/main/default/globalValueSets/**            text eol=lf
+force-app/main/default/globalValueSetTranslations/** text eol=lf
+force-app/main/default/applications/**               text eol=lf
+force-app/main/default/translations/**               text eol=lf
+force-app/main/default/objectTranslations/**         text eol=lf
+force-app/main/default/objects/**/recordTypes/**     text eol=lf
+
+# Custom csv folder (only if "easysources-csv-path" is not the default one), e.g.:
+# easysources/**                                     text eol=lf

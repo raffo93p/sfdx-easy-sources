@@ -324,6 +324,11 @@ To build a better experience to developers and release manager, one can configur
 For this reason, the csv files have the _tagid column, that is a key on which the automatic resolution of conflicts can be done.
 I built a custom csv git merger that in my mind should work well, but at the moment there is no ETA to publish it. In my project I configured [this open source git merger](https://github.com/sctweedie/csvdiff3).
 
+### Line endings (LF vs CRLF)
+The plugin always writes xml and csv files with LF line endings. If your repository contains files committed with CRLF (typically from Windows or `core.autocrlf`), after a `split`/`merge` git will show those files as completely modified.
+To avoid it, copy [.gitattributes.example](.gitattributes.example) to the root of your Salesforce project as `.gitattributes` and commit it. It forces LF on the xml and csv files managed by the plugin. If your sfdx package directory or the csv folder differs from the default (`./force-app/main/default`), adapt the paths inside the file.
+The files already committed must be normalized once, in a dedicated commit, with `git add --renormalize .`.
+
 ## Other considerations
 In my project I still have the xml files even if they are supported by csv.
 It could be a great idea and it could avoid many conflicts and waste of time if the release manager removes the xml files from the repository, and the pipeline merges automatically the csv into the xml at runtime while deploying.
