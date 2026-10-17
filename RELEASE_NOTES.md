@@ -1,5 +1,9 @@
 # Release Notes
 
+## Version 1.0.3
+- **Bug Fix: `objecttranslations` no longer deletes or alters field translations it cannot represent in csv** - A `*.fieldTranslation-meta.xml` file containing tags not handled by the plugin (e.g. `caseValues`, `gender`, `startsWith`, `description`, `lookupFilter`) was converted to an empty csv row, discarded by `minify` and deleted by `merge`, losing the translation. Such files are now skipped by `split` and `upsert` (a warning is printed), ignored by `minify`, left untouched by `merge` and never overwritten by a csv row with the same name.
+- **Bug Fix: `objecttranslations merge` now removes field translation files when `minify` empties the csv** - Previously the stale `fieldTranslation` xml files were kept if the `fieldTranslations` csv had no rows left.
+
 ## Version 1.0.2
 - **Documentation: Line endings and git** - Added a `.gitattributes.example` file that forces LF line endings on the xml and csv files managed by the plugin (default Salesforce paths and csv folder). The plugin always writes LF, so files committed with CRLF would otherwise show up as completely modified after `split`/`merge`. A note has been added to the README ("Git Considerations").
 

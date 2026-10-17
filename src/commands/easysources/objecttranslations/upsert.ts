@@ -154,7 +154,7 @@ export async function objectTranslationUpsert(options: any = {}): Promise<any> {
                 if(tag_section === OBJTRANSL_CFIELDTRANSL_ROOT){
                     myjson = [];
 
-                    var fieldTrList = getFieldTranslationFiles(join(baseInputDir, objTrName));
+                    var fieldTrList = getFieldTranslationFiles(join(baseInputDir, objTrName), true);
 
                     for(const fieldTrFilename of fieldTrList){
                         const fieldTrPath = join(baseInputDir, objTrName, fieldTrFilename);

@@ -30,6 +30,8 @@ export const OBJTRANSL_CFIELDTRANSL_ROOT = 'fieldTranslations';
 export const OBJTRANSL_CFIELDTRANSL_HEADER = ['help', 'label', 'relationshipLabel', 'name', 'picklistValues_masterLabel', 'picklistValues_translation'];
 export const OBJTRANSL_CFIELDTRANSL_KEY = ['name', 'picklistValues_masterLabel'];
 export const OBJTRANSL_CFIELDTRANSL_ROOT_TAG = 'CustomFieldTranslation';
+// fieldTranslation files with any other non-empty tag (e.g. caseValues, gender) are left untouched by the plugin
+export const OBJTRANSL_CFIELDTRANSL_SUPPORTED_TAGS = ['help', 'label', 'relationshipLabel', 'name', 'picklistValues'];
 export const OBJTRANSL_FIELDTRANSL_EXTENSION = '.fieldTranslation-meta.xml';
 
 

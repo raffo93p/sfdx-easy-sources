@@ -14,7 +14,7 @@ import { loadSettings } from '../../../utils/localSettings.js';
 import { join } from "path";
 import { calcCsvFilename, checkDirOrErrorSync, readCsvToJsonArrayWithNulls, readXmlFromFile, writeXmlToFile } from '../../../utils/filesUtils.js';
 import { sortByKey } from '../../../utils/utils.js';
-import { getFieldTranslationFiles, removeEmpyOptionalTags, transformFieldCSVtoXMLs } from '../../../utils/utils_objtransl.js';
+import { getFieldTranslationFiles, listFieldTranslationFiles, removeEmpyOptionalTags, transformFieldCSVtoXMLs, warnUnsupportedFieldTranslations } from '../../../utils/utils_objtransl.js';
 import { flatToArray } from '../../../utils/flatArrayUtils.js';
 import { jsonAndPrintError } from '../../../utils/commands/utils.js';
 
@@ -130,13 +130,24 @@ export async function objectTranslationMerge(options: any = {}): Promise<any> {
             await writeXmlToFile(outputFile, mergedXml);
 
             // Handle fieldTranslations using the exported function
-            const fieldXmlArray = await getFieldTranslationsFromCsv(obj, join(baseInputDir, obj, 'csv'));
-            
-            if (fieldXmlArray.length > 0) {
-                deleteFieldTranslationsXmls(baseOutputDir, obj);
+            const csvDir = join(baseInputDir, obj, 'csv');
+
+            // an existing csv, even without rows (e.g. after minify), is the source of truth for the managed xml files
+            if (fs.existsSync(join(csvDir, calcCsvFilename(obj, OBJTRANSL_CFIELDTRANSL_ROOT)))) {
+                const fieldXmlArray = await getFieldTranslationsFromCsv(obj, csvDir);
+                const { managed, unsupported } = listFieldTranslationFiles(join(baseOutputDir, obj));
+                warnUnsupportedFieldTranslations(unsupported);
+                const unsupportedFiles = new Set(unsupported.map(item => item.file));
+
+                deleteFieldTranslationsXmls(baseOutputDir, obj, managed);
 
                 for (const entry of fieldXmlArray) {
-                    await writeXmlToFile(join(baseOutputDir, obj, entry.name + OBJTRANSL_FIELDTRANSL_EXTENSION), 
+                    const fieldFilename = entry.name + OBJTRANSL_FIELDTRANSL_EXTENSION;
+                    if (unsupportedFiles.has(fieldFilename)) {
+                        console.warn(`  Not overwriting ${fieldFilename}: the existing file contains unsupported tags.`);
+                        continue;
+                    }
+                    await writeXmlToFile(join(baseOutputDir, obj, fieldFilename),
                         { [OBJTRANSL_CFIELDTRANSL_ROOT_TAG]: entry }
                     );
                 }
@@ -232,8 +243,7 @@ export async function getFieldTranslationsFromCsv(objectName: string, csvDirPath
     return transformFieldCSVtoXMLs(jsonArray);
 }
 
-export function deleteFieldTranslationsXmls(baseInputDir, objTrName){
-    var fieldTrFiles = getFieldTranslationFiles(join(baseInputDir, objTrName));
+export function deleteFieldTranslationsXmls(baseInputDir, objTrName, fieldTrFiles: string[] = getFieldTranslationFiles(join(baseInputDir, objTrName))){
 
     for(const fieldTrFile of fieldTrFiles){
         const filePath = join(baseInputDir, objTrName, fieldTrFile);
