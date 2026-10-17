@@ -83,6 +83,12 @@ export async function minify(
 
                     resListCsv = resListCsv.filter((res) => filter_fn(res, tag_section, file_tag_bool));
 
+                    // merge treats a missing csv as an empty one, and a new split would not recreate it
+                    if (resListCsv.length === 0) {
+                        fs.unlinkSync(csvFilePath);
+                        continue;
+                    }
+
                     const headers = file_items[tag_section].headers;
 
                     if (flags.sort !== 'false') {

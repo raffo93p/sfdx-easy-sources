@@ -1,5 +1,8 @@
 # Release Notes
 
+## Version 1.0.4
+- **Enhancement: `minify` deletes the csv files it empties** - For `profiles`, `permissionsets` and `translations`, a csv left without rows by `minify` is now deleted instead of being rewritten with only the header. `merge` already treats a missing csv as an empty one, so the resulting xml is the same, and a single `split`/`minify`/`merge` run now gives the same result as running it twice (a new `split` never recreates those csv files). `objecttranslations minify` is unchanged.
+
 ## Version 1.0.3
 - **Bug Fix: `objecttranslations` no longer deletes or alters field translations it cannot represent in csv** - A `*.fieldTranslation-meta.xml` file containing tags not handled by the plugin (e.g. `caseValues`, `gender`, `startsWith`, `description`, `lookupFilter`) was converted to an empty csv row, discarded by `minify` and deleted by `merge`, losing the translation. Such files are now skipped by `split` and `upsert` (a warning is printed), ignored by `minify`, left untouched by `merge` and never overwritten by a csv row with the same name.
 - **Bug Fix: `objecttranslations merge` now removes field translation files when `minify` empties the csv** - Previously the stale `fieldTranslation` xml files were kept if the `fieldTranslations` csv had no rows left.
